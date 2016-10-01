@@ -1,0 +1,71 @@
+﻿<metro:Flyout x:Class="Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views.ConnectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay"
+             xmlns:local="clr-namespace:Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views"
+                   xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" 
+               Theme="Accent"
+              Position="Right"
+              Header="Connection"
+              Width="300"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <ContentControl>
+        <ContentControl.Style>
+            <Style TargetType="{x:Type ContentControl}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsConnecting}" Value="True">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Margin="5,100">
+                                        <metro:ProgressRing Margin="2" />
+                                        <TextBlock TextAlignment="Center" Text="Connecting..." />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center" Margin="0,100">
+                                        <TextBlock Foreground="White" Text="{Binding Path=DataContext.EndPoint, StringFormat='Connected to {0}'}" />
+                                     </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ContentControl.Style>
+        
+        <Grid Margin="10,10,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0, 2">
+                <TextBlock Text="Host Address"/>
+                <xctk:WatermarkTextBox x:Name="_hostAddress" Text="{Binding HostAddress}" Watermark="Enter Host Address" />
+            </StackPanel>
+            <StackPanel Grid.Row="1" Margin="0, 2">
+                <TextBlock Text="Host Port"/>
+                <xctk:WatermarkTextBox x:Name="_hostPort" Text="{Binding HostPort}" Watermark="Enter Host Port" />
+            </StackPanel>
+            <Button Grid.Row="2" Padding="5,2" Margin="0,5" HorizontalAlignment="Center" Content="Connect" Command="{Binding ConnectCommand}">
+                <Button.CommandParameter>
+                    <MultiBinding Converter="{StaticResource ipEndPointValueConverter}">
+                        <Binding ElementName="_hostAddress" Path="Text" />
+                        <Binding ElementName="_hostPort" Path="Text" />
+                    </MultiBinding>
+                </Button.CommandParameter>
+            </Button>
+        </Grid>
+    </ContentControl>
+</metro:Flyout>

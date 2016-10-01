@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+
+        <!-- Icons -->
+        <ResourceDictionary Source="/iXPayTestClient.Infrastructure;component/BitmapGraphics/Icons.xaml"/>
+        
+        <!-- Styles -->
+        <ResourceDictionary Source="/iXPayTestClient.Infrastructure;component/Styles/Label.xaml"/>
+        
+        <!-- Popup-Windows -->
+        <ResourceDictionary Source="/iXPayTestClient.Infrastructure;component/Styles/Popup.xaml"/>
+
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

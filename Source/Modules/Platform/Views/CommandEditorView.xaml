@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views.CommandEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <xctk:PropertyGrid NameColumnWidth="110" AutoGenerateProperties="True" SelectedObject="{Binding Command}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="PropertyValueChanged">
+                    <i:InvokeCommandAction Command="{Binding PropertyChangedCommand}" CommandParameter="{Binding SelectedObject, RelativeSource={RelativeSource AncestorType={x:Type xctk:PropertyGrid}, Mode=FindAncestor}}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </xctk:PropertyGrid>
+    </Grid>
+</UserControl>

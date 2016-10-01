@@ -1,0 +1,4429 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by Craig Lewis (Dresser Wayne) -->
+<xs:schema xmlns="http://tempuri.org/TerminalCommands.xsd" xmlns:mstns="http://tempuri.org/TerminalCommands.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://tempuri.org/TerminalCommands.xsd" elementFormDefault="qualified" id="TerminalCommands">
+  <xs:complexType name="BaseCommand">
+    <xs:attribute name="SequenceNumber" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BaseHexCommand">
+    <xs:simpleContent>
+      <xs:extension base="xs:hexBinary"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="BaseSimpleHexCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseHexCommand">
+        <xs:attribute name="SequenceNumber" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="BaseResponse">
+    <xs:attribute name="SequenceNumber" type="xs:int" use="required"/>
+    <xs:attribute name="Success" type="xs:boolean" use="required"/>
+    <xs:attribute name="Message" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="BaseSimpleHexResponse">
+    <xs:simpleContent>
+      <xs:extension base="BaseHexCommand">
+        <xs:attribute name="SequenceNumber" type="xs:int" use="required"/>
+        <xs:attribute name="Success" type="xs:boolean" use="required"/>
+        <xs:attribute name="Message" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TurnLightOnCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FlashLightCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="OnTime" type="xs:int" use="required"/>
+        <xs:attribute name="OffTime" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TurnLightOffCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetOpenedCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCardPositionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetReaderTypeCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TurnLightOnResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FlashLightResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TurnLightOffResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="State" type="Status" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetOpenedResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Open" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCardPositionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="CardPosition" type="CardPosition" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetReaderTypeResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="ReaderType" type="CardReader" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="Status">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Ok"/>
+      <xs:enumeration value="Failed"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="StatusChanged">
+    <xs:attribute name="Status" type="Status" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="OpenChanged">
+    <xs:attribute name="Open" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="CardPosition">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="NoCard"/>
+      <xs:enumeration value="InReader"/>
+      <xs:enumeration value="Ejected"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="CardPositionChanged">
+    <xs:attribute name="CardPosition" type="CardPosition" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="CardReader">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Motor"/>
+      <xs:enumeration value="Insert"/>
+      <xs:enumeration value="Swipe"/>
+      <xs:enumeration value="Contactless"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--BEGIN TERMINAL INTERFACE-->
+  <!--   COMMANDS-->
+  <xs:complexType name="DisplaySecurePromptCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+					<xs:element name="PINEntryFunctionKeys" type="PINEntryFunctionKey" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="KeypadFunctionKeys" type="KeypadFunctionKey" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="EMVPin" type="EMVPin" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="PromptId" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="required"/>
+        <xs:attribute name="SecurityLevel" type="SecurityLevels" use="required"/>
+        <xs:attribute name="EntryType" type="EntryType" use="optional"/>
+        <xs:attribute name="MinLength" type="xs:int" use="optional"/>
+        <xs:attribute name="MaxLength" type="xs:int" use="optional"/>
+        <xs:attribute name="AutoTerminate" type="xs:boolean" use="optional"/>
+        <xs:attribute name="Hidden" type="xs:boolean" use="optional"/>
+        <xs:attribute name="PINSupportData" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PINEntryFunctionKey">
+    <xs:attribute name="KeypadFunctionKey" type="KeypadFunctionKeyEnum" use="required"/>
+    <xs:attribute name="PINEntryFunction" type="PINEntryFunction" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="PINEntryFunction">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Lock"/>
+      <xs:enumeration value="DebitCancel"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SecurityLevels">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Encrypted"/>
+      <xs:enumeration value="Unencrypted"/>
+    </xs:restriction>
+  </xs:simpleType>
+	<xs:simpleType name="EMVPinTypes">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Enciphered"/>
+			<xs:enumeration value="PlainText"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EMVPin">
+		<xs:attribute name="Type" type="EMVPinTypes" use="required"/>
+		<xs:attribute name="Modulus" type="xs:hexBinary" use="optional"/>
+		<xs:attribute name="Exponent" type="xs:hexBinary" use="optional"/>
+		<xs:attribute name="Challenge" type="xs:hexBinary" use="optional"/>
+	</xs:complexType>
+  <xs:complexType name="FunctionKey">
+    <xs:attribute name="Function" type="xs:int" use="required"/>
+    <xs:attribute name="Location" type="xs:int" use="optional"/>
+    <xs:attribute name="Text" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:simpleType name="EntryType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Numeric"/>
+      <xs:enumeration value="AlphaNumeric"/>
+      <xs:enumeration value="Alphabetic"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ResetCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableFunctionKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="FunctionKey" type="FunctionKey"/>
+        </xs:sequence>
+        <xs:attribute name="Timeout" type="xs:int" use="optional"/>
+        <xs:attribute name="ClearOnSoftKeyPress" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisableFunctionKeysCommand">
+    <xs:complexContent>
+	  <xs:extension base="BaseCommand">
+        <xs:attribute name="ClearSoftKeyText" type="xs:boolean" use="optional" default="true"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BeginTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EndTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CancelTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableCancelKeyCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisableCancelKeyCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SystemClock">
+    <xs:sequence>
+      <xs:element name="TimeZone">
+        <xs:complexType>
+          <xs:attribute name="utcOffsetMinutes" type="xs:int" use="required"/>
+          <xs:attribute name="standardName" type="xs:string" use="required"/>
+          <xs:attribute name="daylightName" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="dateTime" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SetDateTimeCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="SystemClock" type="SystemClock"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetToIdleCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetToBusyCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTerminalIdCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedTerminalIdsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPackageVersionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetOperationalStateCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTerminalStateCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBatteryStateCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTerminalCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PassThroughCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexCommand"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TerminalCommand">
+    <xs:choice>
+      <xs:element name="GetTerminalIdCommand" type="GetTerminalIdCommand"/>
+      <xs:element name="GetSupportedTerminalIdsCommand" type="GetSupportedTerminalIdsCommand"/>
+      <xs:element name="GetPackageVersionCommand" type="GetPackageVersionCommand"/>
+      <xs:element name="GetOperationalStateCommand" type="GetOperationalStateCommand"/>
+      <xs:element name="GetTerminalStateCommand" type="GetTerminalStateCommand"/>
+      <xs:element name="GetBatteryStateCommand" type="GetBatteryStateCommand"/>
+      <xs:element name="ResetCommand" type="ResetCommand"/>
+      <xs:element name="SetDateTimeCommand" type="SetDateTimeCommand"/>
+      <xs:element name="SetToIdleCommand" type="SetToIdleCommand"/>
+      <xs:element name="SetToBusyCommand" type="SetToBusyCommand"/>
+      <xs:element name="DisplaySecurePromptCommand" type="DisplaySecurePromptCommand"/>
+      <xs:element name="EnableFunctionKeysCommand" type="EnableFunctionKeysCommand"/>
+      <xs:element name="DisableFunctionKeysCommand" type="DisableFunctionKeysCommand"/>
+      <xs:element name="EnableCancelKeyCommand" type="EnableCancelKeyCommand"/>
+      <xs:element name="DisableCancelKeyCommand" type="DisableCancelKeyCommand"/>
+      <xs:element name="BeginTransactionCommand" type="BeginTransactionCommand"/>
+      <xs:element name="EndTransactionCommand" type="EndTransactionCommand"/>
+      <xs:element name="CancelTransactionCommand" type="CancelTransactionCommand"/>
+      <xs:element name="GetTerminalCapabilitiesCommand" type="GetTerminalCapabilitiesCommand"/>
+      <xs:element name="PassThroughCommand" type="PassThroughCommand"/>
+      <xs:element name="DisplayCommand" type="DisplayCommand"/>
+      <xs:element name="MagStripeReaderCommand" type="MagStripeReaderCommand"/>
+      <xs:element name="ChipCardReaderCommand" type="ChipCardReaderCommand"/>
+      <xs:element name="BarcodeReaderCommand" type="BarcodeReaderCommand"/>
+      <xs:element name="KeypadCommand" type="KeypadCommand"/>
+      <xs:element name="EMVModuleCommand" type="EMVModuleCommand"/>
+      <xs:element name="PrinterCommand" type="PrinterCommand"/>
+      <xs:element name="SecurityModuleCommand" type="SecurityModuleCommand"/>
+      <xs:element name="TamperDetectorsCommand" type="TamperDetectorsCommand"/>
+      <xs:element name="BillAcceptorCommand" type="BillAcceptorCommand"/>
+      <xs:element name="NonSecureKeypadCommand" type="NonSecureKeypadCommand"/>
+      <xs:element name="BeeperCommand" type="BeeperCommand"/>
+      <xs:element name="DallasKeyCommand" type="DallasKeyCommand"/>
+      <xs:element name="ContactlessReaderCommand" type="ContactlessReaderCommand"/>
+      <xs:element name="SAMReaderCommand" type="SAMReaderCommand"/>
+      <xs:element name="SoftphoneCommand" type="SoftphoneCommand"/>
+    </xs:choice>
+    <xs:attribute name="TerminalId" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="TerminalEvent">
+    <xs:choice>
+      <xs:element name="Heartbeat" type="Heartbeat"/>
+      <xs:element name="CancelKeyPressed" type="CancelKeyPressed"/>
+      <xs:element name="FunctionKeyPressed" type="FunctionKeyPressed"/>
+      <xs:element name="OperationalStatusChanged" type="OperationalStatusChanged"/>
+      <xs:element name="TerminalStatusChanged" type="TerminalStatusChanged"/>
+      <xs:element name="BatteryStatusChanged" type="BatteryStatusChanged"/>
+      <xs:element name="FunctionKeyEntryTimedOut" type="FunctionKeyEntryTimedOut"/>
+      <xs:element name="PassThroughEvent" type="PassThroughEvent"/>
+      <xs:element name="DisplayEvent" type="DisplayEvent"/>
+      <xs:element name="BarcodeReaderEvent" type="BarcodeReaderEvent"/>
+      <xs:element name="MagStripeReaderEvent" type="MagStripeReaderEvent"/>
+      <xs:element name="ChipCardReaderEvent" type="ChipCardReaderEvent"/>
+      <xs:element name="EMVModuleEvent" type="EMVModuleEvent"/>
+      <xs:element name="PrinterEvent" type="PrinterEvent"/>
+      <xs:element name="KeypadEvent" type="KeypadEvent"/>
+      <xs:element name="TamperDetectorsEvent" type="TamperDetectorsEvent"/>
+      <xs:element name="BillAcceptorEvent" type="BillAcceptorEvent"/>
+      <xs:element name="NonSecureKeypadEvent" type="NonSecureKeypadEvent"/>
+      <xs:element name="DallasKeyEvent" type="DallasKeyEvent"/>
+      <xs:element name="ContactlessReaderEvent" type="ContactlessReaderEvent"/>
+      <xs:element name="SAMReaderEvent" type="SAMReaderEvent"/>
+      <xs:element name="SoftphoneEvent" type="SoftphoneEvent"/>
+    </xs:choice>
+    <xs:attribute name="TerminalId" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="Heartbeat"/>
+  <xs:complexType name="CancelKeyPressed"/>
+  <xs:simpleType name="TerminalStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Idle"/>
+      <xs:enumeration value="Busy"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="FunctionKeyEntryTimedOut"/>
+  <xs:complexType name="PassThroughEvent">
+    <xs:simpleContent>
+      <xs:extension base="xs:hexBinary"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TerminalStatusChanged">
+    <xs:attribute name="TerminalState" type="TerminalStatus" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="OperationalStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Operational"/>
+      <xs:enumeration value="WaitingForInstall"/>
+      <xs:enumeration value="Maintenance"/>
+      <xs:enumeration value="Breached"/>
+      <xs:enumeration value="PackageNotValidated"/>
+      <xs:enumeration value="RuntimeDiagnostics"/>
+      <xs:enumeration value="SecurityModuleNotConnected"/>
+      <xs:enumeration value="SecurityModuleNotAuthenticated"/>
+      <xs:enumeration value="EmvKeysNotValid"/>
+      <xs:enumeration value="SecurePromptsNotValid"/>
+      <xs:enumeration value="OperationalProductionTest"/>
+      <xs:enumeration value="ResetPending"/>
+      <xs:enumeration value="LimitedFunctionalityMode"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="OperationalStatusChanged">
+    <xs:attribute name="OperationalState" type="OperationalStatus" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="BatteryStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Good"/>
+      <xs:enumeration value="Low"/>
+      <xs:enumeration value="Critical"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="BatteryStatusChanged">
+    <xs:attribute name="BatteryState" type="BatteryStatus" use="required"/>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="TerminalResponse">
+    <xs:choice>
+      <xs:element name="GetTerminalIdResponse" type="GetTerminalIdResponse"/>
+      <xs:element name="GetSupportedTerminalIdsResponse" type="GetSupportedTerminalIdsResponse"/>
+      <xs:element name="GetPackageVersionResponse" type="GetPackageVersionResponse"/>
+      <xs:element name="GetOperationalStateResponse" type="GetOperationalStateResponse"/>
+      <xs:element name="GetTerminalStateResponse" type="GetTerminalStateResponse"/>
+      <xs:element name="GetBatteryStateResponse" type="GetBatteryStateResponse"/>
+      <xs:element name="ResetResponse" type="ResetResponse"/>
+      <xs:element name="SetDateTimeResponse" type="SetDateTimeResponse"/>
+      <xs:element name="SetToIdleResponse" type="SetToIdleResponse"/>
+      <xs:element name="SetToBusyResponse" type="SetToBusyResponse"/>
+      <xs:element name="DisplaySecurePromptResponse" type="DisplaySecurePromptResponse"/>
+      <xs:element name="EnableFunctionKeysResponse" type="EnableFunctionKeysResponse"/>
+      <xs:element name="DisableFunctionKeysResponse" type="DisableFunctionKeysResponse"/>
+      <xs:element name="EnableCancelKeyResponse" type="EnableCancelKeyResponse"/>
+      <xs:element name="DisableCancelKeyResponse" type="DisableCancelKeyResponse"/>
+      <xs:element name="BeginTransactionResponse" type="BeginTransactionResponse"/>
+      <xs:element name="EndTransactionResponse" type="EndTransactionResponse"/>
+      <xs:element name="CancelTransactionResponse" type="CancelTransactionResponse"/>
+      <xs:element name="GetTerminalCapabilitiesResponse" type="GetTerminalCapabilitiesResponse"/>
+      <xs:element name="PassThroughResponse" type="PassThroughResponse"/>
+      <xs:element name="DisplayResponse" type="DisplayResponse"/>
+      <xs:element name="PrinterResponse" type="PrinterResponse"/>
+      <xs:element name="KeypadResponse" type="KeypadResponse"/>
+      <xs:element name="BarcodeReaderResponse" type="BarcodeReaderResponse"/>
+      <xs:element name="MagStripeReaderResponse" type="MagStripeReaderResponse"/>
+      <xs:element name="ChipCardReaderResponse" type="ChipCardReaderResponse"/>
+      <xs:element name="EMVModuleResponse" type="EMVModuleResponse"/>
+      <xs:element name="SecurityModuleResponse" type="SecurityModuleResponse"/>
+      <xs:element name="TamperDetectorsResponse" type="TamperDetectorsResponse"/>
+      <xs:element name="BillAcceptorResponse" type="BillAcceptorResponse"/>
+      <xs:element name="NonSecureKeypadResponse" type="NonSecureKeypadResponse"/>
+      <xs:element name="BeeperResponse" type="BeeperResponse"/>
+      <xs:element name="DallasKeyResponse" type="DallasKeyResponse"/>
+      <xs:element name="ContactlessReaderResponse" type="ContactlessReaderResponse"/>
+      <xs:element name="SAMReaderResponse" type="SAMReaderResponse"/>
+      <xs:element name="SoftphoneResponse" type="SoftphoneResponse"/>
+    </xs:choice>
+    <xs:attribute name="TerminalId" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="GetTerminalIdResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="TerminalId" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTerminalCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SupportsFunctionKeyEntryTimeout" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SupportedTerminal">
+    <xs:attribute name="TerminalId" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedTerminalIdsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="SupportedTerminal" type="SupportedTerminal"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPackageVersionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="PackageVersion" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetOperationalStateResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="OperationalState" type="OperationalStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTerminalStateResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="TerminalState" type="TerminalStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBatteryStateResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="BatteryState" type="BatteryStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BeginTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EndTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CancelTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableCancelKeyResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisableCancelKeyResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetToIdleResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetToBusyResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplaySecurePromptResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResetResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetDateTimeResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableFunctionKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisableFunctionKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PassThroughResponse">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexResponse"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END TERMINAL INTERFACE-->
+  <!--BEGIN DISPLAY INTERFACE-->
+  <xs:complexType name="DisplayCommand">
+    <xs:choice>
+      <xs:element name="GetFontsCommand" type="GetDisplayFontsCommand"/>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetSupportedLanguagesCommand" type="GetSupportedLanguagesCommand"/>
+      <xs:element name="GetCurrentLanguageCommand" type="GetCurrentLanguageCommand"/>
+      <xs:element name="SetCurrentLanguageCommand" type="SetCurrentLanguageCommand"/>
+      <xs:element name="DisplayPromptCommand" type="DisplayPromptCommand"/>
+      <xs:element name="DisplayPromptImmediateCommand" type="DisplayPromptImmediateCommand"/>
+      <xs:element name="DisplayStringCommand" type="DisplayStringCommand"/>
+      <xs:element name="GetMessageWindowPropertiesCommand" type="GetMessageWindowPropertiesCommand"/>
+      <xs:element name="SetMessageWindowPropertiesCommand" type="SetMessageWindowPropertiesCommand"/>
+      <xs:element name="GetSoftKeyPropertiesCommand" type="GetSoftKeyPropertiesCommand"/>
+      <xs:element name="SetSoftKeyPropertiesCommand" type="SetSoftKeyPropertiesCommand"/>
+      <xs:element name="GetDataEntryWindowPropertiesCommand" type="GetDataEntryWindowPropertiesCommand"/>
+      <xs:element name="SetDataEntryWindowPropertiesCommand" type="SetDataEntryWindowPropertiesCommand"/>
+      <xs:element name="GetDisplayTypeCommand" type="GetDisplayTypeCommand"/>
+      <xs:element name="GetImageListCommand" type="GetImageListCommand"/>
+      <xs:element name="GetImageDetailsCommand" type="GetImageDetailsCommand"/>
+      <xs:element name="SetImageDetailsCommand" type="SetImageDetailsCommand"/>
+      <xs:element name="GetAnimationListCommand" type="GetAnimationListCommand"/>
+      <xs:element name="GetAnimationDetailsCommand" type="GetAnimationDetailsCommand"/>
+      <xs:element name="SetAnimationDetailsCommand" type="SetAnimationDetailsCommand"/>
+      <xs:element name="GetPromptListCommand" type="GetPromptListCommand"/>
+      <xs:element name="GetPromptDetailsCommand" type="GetPromptDetailsCommand"/>
+      <xs:element name="SetPromptDetailsCommand" type="SetPromptDetailsCommand"/>
+      <xs:element name="DeletePromptCommand" type="DeletePromptCommand"/>
+      <xs:element name="DeleteImageCommand" type="DeleteImageCommand"/>
+      <xs:element name="DeleteAnimationCommand" type="DeleteAnimationCommand"/>
+      <xs:element name="DeleteAllPromptsCommand" type="DeleteAllPromptsCommand"/>
+      <xs:element name="DeleteAllImagesCommand" type="DeleteAllImagesCommand"/>
+      <xs:element name="DeleteAllAnimationsCommand" type="DeleteAllAnimationsCommand"/>
+      <xs:element name="DeleteAllCommand" type="DeleteAllCommand"/>
+      <xs:element name="RestoreDefaultCommand" type="RestoreDefaultCommand"/>
+      <xs:element name="SetVideoWindowCommand" type="SetVideoWindowCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="Size">
+    <xs:attribute name="Width" type="xs:int" use="required"/>
+    <xs:attribute name="Height" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Location">
+    <xs:attribute name="Top" type="xs:int" use="required"/>
+    <xs:attribute name="Left" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="HorizontalAlignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VerticalAlignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Top"/>
+      <xs:enumeration value="Middle"/>
+      <xs:enumeration value="Bottom"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SoftKeyAlignment">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Outside"/>
+      <xs:enumeration value="Inside"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DisplayType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="qVGA"/>
+      <xs:enumeration value="VGA"/>
+      <xs:enumeration value="SuperVGA"/>
+      <xs:enumeration value="SVGA"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="MessageWindowProperties">
+    <xs:sequence>
+      <xs:element name="Location" type="Location"/>
+      <xs:element name="Size" type="Size"/>
+      <xs:element name="Font" type="Font"/>
+    </xs:sequence>
+    <xs:attribute name="ForeColor" type="xs:hexBinary" use="required"/>
+    <xs:attribute name="BackColor" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="VerticalAlignment" type="VerticalAlignment" use="required"/>
+    <xs:attribute name="HorizontalAlignment" type="HorizontalAlignment" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="DataEntryWindowProperties">
+    <xs:sequence>
+      <xs:element name="Location" type="Location"/>
+      <xs:element name="Size" type="Size"/>
+      <xs:element name="Font" type="Font"/>
+    </xs:sequence>
+    <xs:attribute name="ForeColor" type="xs:hexBinary" use="required"/>
+    <xs:attribute name="BackColor" type="xs:hexBinary" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="SoftKeyProperties">
+    <xs:sequence>
+      <xs:element name="Font" type="Font"/>
+    </xs:sequence>
+    <xs:attribute name="ForeColor" type="xs:hexBinary" use="required"/>
+    <xs:attribute name="BackColor" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="PixelsFromEdge" type="xs:int" use="required"/>
+    <xs:attribute name="SoftKeyWidth" type="xs:int" use="required"/>
+    <xs:attribute name="SoftKeyHeight" type="xs:int" use="required"/>
+    <xs:attribute name="SoftKeyAlignment" type="SoftKeyAlignment" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="AnimationFrame">
+    <xs:attribute name="ImageId" type="xs:int" use="required"/>
+    <xs:attribute name="Duration" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="AnimationDetails">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="AnimationFrame" type="AnimationFrame"/>
+    </xs:sequence>
+    <xs:attribute name="AnimationId" type="xs:int" use="required"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="AnimationInstance">
+    <xs:sequence>
+      <xs:element name="Location" type="Location"/>
+    </xs:sequence>
+    <xs:attribute name="AnimationId" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ImageInstance">
+    <xs:sequence>
+      <xs:element name="Location" type="Location"/>
+    </xs:sequence>
+    <xs:attribute name="ImageId" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ImageSummary">
+    <xs:attribute name="ImageId" type="xs:int"/>
+    <xs:attribute name="Filename" type="xs:string"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="AnimationSummary">
+    <xs:attribute name="AnimationId" type="xs:int"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="PromptSummary">
+    <xs:attribute name="PromptId" type="xs:int"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
+    <xs:attribute name="PromptText" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="Animations">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="AnimationInstance" type="AnimationInstance"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Images">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="ImageInstance" type="ImageInstance"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AdditionalText">
+    <xs:sequence>
+      <xs:element name="Font" type="Font" minOccurs="0"/>
+      <xs:element name="Location" type="Location"/>
+      <xs:element name="Size" type="Size"/>
+    </xs:sequence>
+    <xs:attribute name="Id" type="xs:int" use="required"/>
+    <xs:attribute name="PromptText" type="xs:string" use="required"/>
+    <xs:attribute name="VerticalAlignment" type="VerticalAlignment" use="optional"/>
+    <xs:attribute name="HorizontalAlignment" type="HorizontalAlignment" use="optional"/>
+    <xs:attribute name="ForeColor" type="xs:hexBinary" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="AdditionalTexts">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="AdditionalText" type="AdditionalText"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PromptDetails">
+    <xs:sequence>
+      <xs:element name="Font" type="Font" minOccurs="0"/>
+      <xs:element name="Animations" type="Animations" minOccurs="0"/>
+      <xs:element name="Images" type="Images" minOccurs="0"/>
+      <xs:element name="Location" type="Location" minOccurs="0"/>
+      <xs:element name="Size" type="Size" minOccurs="0"/>
+      <xs:element name="AdditionalTexts" type="AdditionalTexts" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="PromptId" type="xs:int" use="required"/>
+    <xs:attribute name="PromptText" type="xs:string" use="optional"/>
+    <xs:attribute name="Description" type="xs:string" use="optional"/>
+    <xs:attribute name="VerticalAlignment" type="VerticalAlignment" use="optional"/>
+    <xs:attribute name="HorizontalAlignment" type="HorizontalAlignment" use="optional"/>
+    <xs:attribute name="ForeColor" type="xs:hexBinary" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="GetMessageWindowPropertiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetMessageWindowPropertiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="MessageWindowProperties" type="MessageWindowProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDataEntryWindowPropertiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="DataEntryWindowProperties" type="DataEntryWindowProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetDataEntryWindowPropertiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="DataEntryWindowProperties" type="DataEntryWindowProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSoftKeyPropertiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="SoftKeyProperties" type="SoftKeyProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetSoftKeyPropertiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="SoftKeyProperties" type="SoftKeyProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDisplayTypeCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetImageListCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetImageDetailsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="ImageId" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetImageDetailsCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexCommand">
+        <xs:attribute name="ImageId" type="xs:int" use="required"/>
+        <xs:attribute name="Filename" type="xs:string" use="required"/>
+        <xs:attribute name="Description" type="xs:string" use="optional"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+        <xs:attribute name="TransparentColor" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="GetAnimationListCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetAnimationDetailsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="AnimationId" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetAnimationDetailsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="AnimationDetails" type="AnimationDetails"/>
+        </xs:sequence>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPromptListCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPromptDetailsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="PromptId" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetPromptDetailsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="PromptDetails" type="PromptDetails"/>
+        </xs:sequence>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeletePromptCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteImageCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAnimationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllPromptsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllImagesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllAnimationsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RestoreDefaultCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetVideoWindowCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="FullScreen" type="xs:boolean"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedLanguagesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCurrentLanguageCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetCurrentLanguageCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Language" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDisplayFontsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayPromptCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="SubstituteParameter" type="SubstituteParameter" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+        <xs:attribute name="Language" type="xs:string" use="optional"/>
+        <xs:attribute name="IgnoreSoftKeySet" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayStringCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Message" type="xs:string" use="required"/>
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+        <xs:attribute name="ShowDataEntry" type="xs:boolean" use="optional"/>
+        <xs:attribute name="ClearScreen" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayImmediateImageDetails">
+    <xs:simpleContent>
+      <xs:extension base="xs:hexBinary"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayImmediateImage">
+    <xs:simpleContent>
+      <xs:extension base="DisplayImmediateImageDetails">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayImmediateImages">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="DisplayImmediateImage" type="DisplayImmediateImage"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DisplayImmediateImageInstance">
+    <xs:sequence>
+      <xs:element name="Location" type="Location"/>
+      <xs:element name="Size" type="Size"/>
+    </xs:sequence>
+    <xs:attribute name="ImageId" type="xs:int" use="required"/>
+    <xs:attribute name="PromptId" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="DisplayImmediateImageInstances">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="DisplayImmediateImageInstance" type="DisplayImmediateImageInstance"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DisplayImmediateFrame">
+    <xs:sequence>
+      <xs:element name="DisplayImmediateImageInstances" type="DisplayImmediateImageInstances" minOccurs="0"/>
+      <xs:element name="TextStrings" type="AdditionalTexts" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="Duration" type="xs:int" use="optional"/>
+    <xs:attribute name="PromptId" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="SimpleDisplay">
+    <xs:sequence>
+      <xs:element name="DisplayImmediateFrame" type="DisplayImmediateFrame"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AnimationDisplay">
+    <xs:sequence>
+      <xs:element name="DisplayImmediateFrame" type="DisplayImmediateFrame" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DisplayPromptImmediateCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="DisplayImmediateImages" type="DisplayImmediateImages" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:choice>
+            <xs:element name="SimpleDisplay" type="SimpleDisplay"/>
+            <xs:element name="AnimationDisplay" type="AnimationDisplay"/>
+          </xs:choice>
+          <xs:element name="BackgroundImage" type="DisplayImmediateImageInstance" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="DisplayRetainedKeypadData" type="xs:boolean" use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SubstituteParameter">
+    <xs:attribute name="Text" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="Font">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Size" type="xs:int" use="required"/>
+    <xs:attribute name="Style" type="xs:int" use="required"/>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="DisplayResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetFontsResponse" type="GetDisplayFontsResponse"/>
+      <xs:element name="GetSupportedLanguagesResponse" type="GetSupportedLanguagesResponse"/>
+      <xs:element name="GetCurrentLanguageResponse" type="GetCurrentLanguageResponse"/>
+      <xs:element name="SetCurrentLanguageResponse" type="SetCurrentLanguageResponse"/>
+      <xs:element name="DisplayPromptResponse" type="DisplayPromptResponse"/>
+      <xs:element name="DisplayPromptImmediateResponse" type="DisplayPromptImmediateResponse"/>
+      <xs:element name="DisplayStringResponse" type="DisplayStringResponse"/>
+      <xs:element name="GetMessageWindowPropertiesResponse" type="GetMessageWindowPropertiesResponse"/>
+      <xs:element name="SetMessageWindowPropertiesResponse" type="SetMessageWindowPropertiesResponse"/>
+      <xs:element name="GetSoftKeyPropertiesResponse" type="GetSoftKeyPropertiesResponse"/>
+      <xs:element name="SetSoftKeyPropertiesResponse" type="SetSoftKeyPropertiesResponse"/>
+      <xs:element name="GetDataEntryWindowPropertiesResponse" type="GetDataEntryWindowPropertiesResponse"/>
+      <xs:element name="SetDataEntryWindowPropertiesResponse" type="SetDataEntryWindowPropertiesResponse"/>
+      <xs:element name="GetDisplayTypeResponse" type="GetDisplayTypeResponse"/>
+      <xs:element name="GetImageListResponse" type="GetImageListResponse"/>
+      <xs:element name="GetImageDetailsResponse" type="GetImageDetailsResponse"/>
+      <xs:element name="SetImageDetailsResponse" type="SetImageDetailsResponse"/>
+      <xs:element name="GetAnimationListResponse" type="GetAnimationListResponse"/>
+      <xs:element name="GetAnimationDetailsResponse" type="GetAnimationDetailsResponse"/>
+      <xs:element name="SetAnimationDetailsResponse" type="SetAnimationDetailsResponse"/>
+      <xs:element name="GetPromptListResponse" type="GetPromptListResponse"/>
+      <xs:element name="GetPromptDetailsResponse" type="GetPromptDetailsResponse"/>
+      <xs:element name="SetPromptDetailsResponse" type="SetPromptDetailsResponse"/>
+      <xs:element name="DeletePromptResponse" type="DeletePromptResponse"/>
+      <xs:element name="DeleteImageResponse" type="DeleteImageResponse"/>
+      <xs:element name="DeleteAnimationResponse" type="DeleteAnimationResponse"/>
+      <xs:element name="DeleteAllPromptsResponse" type="DeleteAllPromptsResponse"/>
+      <xs:element name="DeleteAllImagesResponse" type="DeleteAllImagesResponse"/>
+      <xs:element name="DeleteAllAnimationsResponse" type="DeleteAllAnimationsResponse"/>
+      <xs:element name="DeleteAllResponse" type="DeleteAllResponse"/>
+      <xs:element name="RestoreDefaultResponse" type="RestoreDefaultResponse"/>
+      <xs:element name="SetVideoWindowResponse" type="SetVideoWindowResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetDisplayFontsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="Font" type="Font"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SupportedLanguage">
+    <xs:attribute name="Language" type="xs:string" use="required"/>
+    <xs:attribute name="IsDefault" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedLanguagesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="SupportedLanguage" type="SupportedLanguage" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCurrentLanguageResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Language" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetCurrentLanguageResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayPromptResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayStringResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisplayPromptImmediateResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetMessageWindowPropertiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="MessageWindowProperties" type="MessageWindowProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetMessageWindowPropertiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSoftKeyPropertiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="SoftKeyProperties" type="SoftKeyProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetSoftKeyPropertiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDataEntryWindowPropertiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="DataEntryWindowProperties" type="DataEntryWindowProperties"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetDataEntryWindowPropertiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDisplayTypeResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="DisplayType" type="DisplayType" use="required"/>
+        <xs:attribute name="IsColor" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetImageListResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="ImageSummary" type="ImageSummary" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetImageDetailsResponse">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexResponse"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="SetImageDetailsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetAnimationListResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="AnimationSummary" type="AnimationSummary" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetAnimationDetailsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="AnimationDetails" type="AnimationDetails"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetAnimationDetailsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPromptListResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="PromptSummary" type="PromptSummary" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPromptDetailsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="PromptDetails" type="PromptDetails"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetPromptDetailsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeletePromptResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteImageResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAnimationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllPromptsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllImagesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllAnimationsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteAllResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RestoreDefaultResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetVideoWindowResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--   EVENTS-->
+  <xs:complexType name="DisplayEvent">
+    <xs:choice>
+      <xs:element name="CurrentLanguageChanged" type="CurrentLanguageChanged"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="CurrentLanguageChanged">
+    <xs:attribute name="Language" type="xs:string" use="required"/>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--END DISPLAY INTERFACE-->
+  <!--BEGIN PRINTER INTERFACE-->
+  <!--   COMMANDS-->
+  <xs:complexType name="PrinterCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetPaperStatusCommand" type="GetPaperStatusCommand"/>
+      <xs:element name="GetCapabilitiesCommand" type="GetCapabilitiesCommand"/>
+      <xs:element name="GetWidthCommand" type="GetWidthCommand"/>
+      <xs:element name="GetFontsCommand" type="GetFontsCommand"/>
+      <xs:element name="GetTypeFacesCommand" type="GetTypeFacesCommand"/>
+      <xs:element name="GetSupportedImagesCommand" type="GetSupportedImagesCommand"/>
+      <xs:element name="GetSupportedBarCodeSymbologiesCommand" type="GetSupportedBarCodeSymbologiesCommand"/>
+      <xs:element name="PrintCommand" type="PrintCommand"/>
+      <xs:element name="SetMemoryImageCommand" type="SetMemoryImageCommand"/>
+      <xs:element name="TurnLightOnCommand" type="TurnLightOnCommand"/>
+      <xs:element name="FlashLightCommand" type="FlashLightCommand"/>
+      <xs:element name="TurnLightOffCommand" type="TurnLightOffCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:simpleType name="TypeFaceEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Bold"/>
+      <xs:enumeration value="Italic"/>
+      <xs:enumeration value="Underline"/>
+      <xs:enumeration value="InverseVideo"/>
+      <xs:enumeration value="DoubleHigh"/>
+      <xs:enumeration value="DoubleWide"/>
+      <xs:enumeration value="DoubleHighDoubleWide"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ImageTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Bitmap"/>
+      <xs:enumeration value="JPEG"/>
+      <xs:enumeration value="GIF"/>
+      <xs:enumeration value="PNG"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HorizontalJustificationsEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Left"/>
+      <xs:enumeration value="Center"/>
+      <xs:enumeration value="Right"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BarCodeSymbologiesEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CodaBar"/>
+      <xs:enumeration value="Code128"/>
+      <xs:enumeration value="Code39"/>
+      <xs:enumeration value="Code93"/>
+      <xs:enumeration value="EAN_8"/>
+      <xs:enumeration value="EAN_8S"/>
+      <xs:enumeration value="EAN_13"/>
+      <xs:enumeration value="EAN_13S"/>
+      <xs:enumeration value="EAN_128"/>
+      <xs:enumeration value="ITF"/>
+      <xs:enumeration value="JAN_8"/>
+      <xs:enumeration value="JAN_13"/>
+      <xs:enumeration value="OCRa"/>
+      <xs:enumeration value="OCRb"/>
+      <xs:enumeration value="TF"/>
+      <xs:enumeration value="UPC_A"/>
+      <xs:enumeration value="UPC_AS"/>
+      <xs:enumeration value="UPC_D1"/>
+      <xs:enumeration value="UPC_D2"/>
+      <xs:enumeration value="UPC_D3"/>
+      <xs:enumeration value="UPC_D4"/>
+      <xs:enumeration value="UPC_D5"/>
+      <xs:enumeration value="UPC_E"/>
+      <xs:enumeration value="UPC_ES"/>
+      <xs:enumeration value="Code128A"/>
+      <xs:enumeration value="Code128B"/>
+      <xs:enumeration value="Code128C"/>
+      <xs:enumeration value="InterLeaved2_5"/>
+      <xs:enumeration value="Discrete2_5"/>
+      <xs:enumeration value="MSI"/>
+      <xs:enumeration value="PDF417"/>
+      <xs:enumeration value="DataMatrix"/>
+      <xs:enumeration value="Maxicode"/>
+      <xs:enumeration value="QR"/>
+      <xs:enumeration value="Aztec"/>
+      <xs:enumeration value="CompositeCCC"/>
+      <xs:enumeration value="CompositeCCAandB"/>
+      <xs:enumeration value="CompositeTLC39"/>
+      <xs:enumeration value="MicroPDF417"/>
+      <xs:enumeration value="MicroQR"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PrintCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="SetTypeFace">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="TypeFace" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:attribute name="Id" type="TypeFaceEnum" use="required"/>
+                    <xs:attribute name="Value" type="xs:boolean" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="ResetToDefaults" type="xs:boolean" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SetFont">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Font">
+                  <xs:complexType>
+                    <xs:attribute name="FontName" type="xs:string" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PrintText">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Text">
+                  <xs:complexType mixed="true"/>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="Justification" type="HorizontalJustificationsEnum" use="required"/>
+              <xs:attribute name="LineFeed" type="xs:boolean" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PrintBarCode">
+            <xs:complexType>
+              <xs:attribute name="Characters" type="xs:string" use="required"/>
+              <xs:attribute name="Symbology" type="BarCodeSymbologiesEnum" use="required"/>
+              <xs:attribute name="Justification" type="HorizontalJustificationsEnum" use="optional"/>
+              <xs:attribute name="TextPosition" use="optional">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="NoText"/>
+                    <xs:enumeration value="TextAbove"/>
+                    <xs:enumeration value="TextBelow"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="Encoding" use="optional">
+                <xs:annotation>
+                  <xs:documentation xml:lang="en">For backwards compatibility</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="Text"/>
+                    <xs:enumeration value="Hex"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="Width" type="xs:int" use="optional"/>
+              <xs:attribute name="Height" type="xs:int" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PrintDownloadedImage">
+            <xs:complexType>
+              <xs:attribute name="Id" type="xs:int" use="required"/>
+              <xs:attribute name="Justification" type="HorizontalJustificationsEnum" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="PrintImage">
+            <xs:complexType>
+              <xs:attribute name="FileName" type="xs:string" use="required"/>
+              <xs:attribute name="Justification" type="HorizontalJustificationsEnum" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="CutPaper">
+            <xs:complexType>
+              <xs:attribute name="FullCut" type="xs:boolean" use="optional"/>
+              <xs:attribute name="Eject" type="xs:boolean" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetMemoryImageCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+        <xs:attribute name="FileName" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPaperStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetWidthCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetFontsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTypeFacesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedImagesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedBarCodeSymbologiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="PrinterEvent">
+    <xs:choice>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="PrinterPaperStatusChanged" type="PrinterPaperStatusChanged"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:simpleType name="PrinterPaperStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Ok"/>
+      <xs:enumeration value="Error"/>
+      <xs:enumeration value="PaperLow"/>
+      <xs:enumeration value="PaperOut"/>
+      <xs:enumeration value="PaperJammed"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PrinterPaperStatusChanged">
+    <xs:attribute name="PrinterPaperStatus" type="PrinterPaperStatus" use="required"/>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="PrinterFont">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="Width" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="TypeFace">
+    <xs:attribute name="Id" type="TypeFaceEnum" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ImageType">
+    <xs:attribute name="Type" type="ImageTypeEnum" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SymbologyType">
+    <xs:attribute name="Type" type="BarCodeSymbologiesEnum" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="GetFontsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="Font" type="PrinterFont"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetTypeFacesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="TypeFace" type="TypeFace"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedImagesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="ImageType" type="ImageType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedBarCodeSymbologiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="Symbology" type="SymbologyType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PrinterResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetPaperStatusResponse" type="GetPaperStatusResponse"/>
+      <xs:element name="GetCapabilitiesResponse" type="GetCapabilitiesResponse"/>
+      <xs:element name="GetWidthResponse" type="GetWidthResponse"/>
+      <xs:element name="GetFontsResponse" type="GetFontsResponse"/>
+      <xs:element name="GetTypeFacesResponse" type="GetTypeFacesResponse"/>
+      <xs:element name="GetSupportedImagesResponse" type="GetSupportedImagesResponse"/>
+      <xs:element name="GetSupportedBarCodeSymbologiesResponse" type="GetSupportedBarCodeSymbologiesResponse"/>
+      <xs:element name="PrintResponse" type="PrintResponse"/>
+      <xs:element name="SetMemoryImageResponse" type="SetMemoryImageResponse"/>
+      <xs:element name="TurnLightOnResponse" type="TurnLightOnResponse"/>
+      <xs:element name="FlashLightResponse" type="FlashLightResponse"/>
+      <xs:element name="TurnLightOffResponse" type="TurnLightOffResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetPaperStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="PrinterPaperStatus" type="PrinterPaperStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="BarCode" type="xs:boolean" use="optional"/>
+        <xs:attribute name="Image" type="xs:boolean" use="optional"/>
+        <xs:attribute name="MaxMemoryImages" type="xs:int" use="optional"/>
+        <xs:attribute name="EmptySensor" type="xs:boolean" use="optional"/>
+        <xs:attribute name="NearEndSensor" type="xs:boolean" use="optional"/>
+        <xs:attribute name="PaperCut" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetWidthResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Width" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PrintResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetMemoryImageResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END PRINTER INTERFACE-->
+  <!--NON SECURE KEYPAD INTERFACE -->
+  <!-- COMMANDS -->
+  <xs:complexType name="NonSecureKeypadKey">
+    <xs:attribute name="Location" type="xs:int" use="required"/>
+    <xs:attribute name="Lock" type="xs:boolean" use="required"/>
+    <xs:attribute name="Clear" type="xs:boolean" use="required"/>
+    <xs:attribute name="Illegal" type="xs:boolean" use="required"/>
+    <xs:attribute name="Beep" type="xs:boolean" use="required"/>
+    <xs:attribute name="EchoChar" type="xs:byte" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="NonSecureKeypadKeys">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="NonSecureKeypadKey" type="NonSecureKeypadKey"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="NonSecureKeypadPINFunction">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Lock"/>
+      <xs:enumeration value="Clear"/>
+      <xs:enumeration value="DebitCancel"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="NonSecureKeypadPINFunctionKey">
+    <xs:attribute name="Location" type="xs:int" use="required"/>
+    <xs:attribute name="Function" type="NonSecureKeypadPINFunction" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="NonSecureKeypadPINFunctionKeys">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="NonSecureKeypadPINFunctionKey" type="NonSecureKeypadPINFunctionKey"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NonSecureKeypadCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="DisableKeypadCommand" type="DisableKeypadCommand"/>
+      <xs:element name="EnableKeypadCommand" type="EnableKeypadCommand"/>
+      <xs:element name="EnableKeypadForPINCommand" type="EnableKeypadForPINCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="EnableKeypadCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="NonSecureKeypadKeys" type="NonSecureKeypadKeys"/>
+          <xs:element name="Location" type="Location"/>
+          <xs:element name="Font" type="Font"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableKeypadForPINCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="NonSecureKeypadPINFunctionKeys" type="NonSecureKeypadPINFunctionKeys"/>
+          <xs:element name="Location" type="Location"/>
+          <xs:element name="Font" type="Font"/>
+        </xs:sequence>
+        <xs:attribute name="PAN" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="Beep" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- END COMMANDS -->
+  <!-- EVENTS -->
+  <xs:complexType name="NonSecureKeypadEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="NonSecureKeypadKeyPressed" type="NonSecureKeypadKeyPressed"/>
+      <xs:element name="NonSecureKeypadEntryComplete" type="NonSecureKeypadEntryComplete"/>
+      <xs:element name="NonSecureKeypadPINEntryComplete" type="NonSecureKeypadPINEntryComplete"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="NonSecureKeypadKeyPressed">
+    <xs:attribute name="CurrentKeyData" type="xs:hexBinary" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="NonSecureKeypadEntryComplete">
+    <xs:attribute name="KeyData" type="xs:hexBinary" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="NonSecureKeypadPINEntryComplete">
+    <xs:attribute name="Cancelled" type="xs:boolean" use="required"/>
+    <xs:attribute name="PINBlock" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="KSN" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="Error" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <!-- END EVENTS -->
+  <!-- RESPONSES -->
+  <xs:complexType name="NonSecureKeypadResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="DisableKeypadResponse" type="DisableKeypadResponse"/>
+      <xs:element name="EnableKeypadResponse" type="EnableKeypadResponse"/>
+      <xs:element name="EnableKeypadForPINResponse" type="EnableKeypadForPINResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="EnableKeypadResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableKeypadForPINResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- END RESPONSES -->
+  <!--END NON SECURE KEYPAD INTERFACE-->
+  <!--KEYPAD INTERFACE-->
+  <xs:complexType name="KeypadCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="DisableKeypadCommand" type="DisableKeypadCommand"/>
+      <xs:element name="EnableKeypadFunctionKeysCommand" type="EnableKeypadFunctionKeysCommand"/>
+      <xs:element name="ValidatePINBlockCommand" type="ValidatePINBlockCommand"/>
+      <xs:element name="GetKeypadCapabilitiesCommand" type="GetKeypadCapabilitiesCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="KeypadFunctionKey">
+    <xs:attribute name="Function" type="KeypadFunctionKeyEnum" use="required"/>
+    <xs:attribute name="ReturnValue" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="KeypadFunctionKeyEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Enter"/>
+      <xs:enumeration value="Cancel"/>
+      <xs:enumeration value="Yes"/>
+      <xs:enumeration value="No"/>
+      <xs:enumeration value="Num1"/>
+      <xs:enumeration value="Num2"/>
+      <xs:enumeration value="Num3"/>
+      <xs:enumeration value="Num4"/>
+      <xs:enumeration value="Num5"/>
+      <xs:enumeration value="Num6"/>
+      <xs:enumeration value="Clear"/>
+      <xs:enumeration value="FuncL1"/>
+      <xs:enumeration value="FuncL2"/>
+      <xs:enumeration value="FuncL3"/>
+      <xs:enumeration value="FuncL4"/>
+      <xs:enumeration value="FuncR1"/>
+      <xs:enumeration value="FuncR2"/>
+      <xs:enumeration value="FuncR3"/>
+      <xs:enumeration value="FuncR4"/>
+      <xs:enumeration value="FuncB1"/>
+      <xs:enumeration value="FuncB2"/>
+      <xs:enumeration value="Checking"/>
+      <xs:enumeration value="Savings"/>
+      <xs:enumeration value="Help"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="EnableKeypadFunctionKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="KeypadFunctionKey" type="KeypadFunctionKey"/>
+        </xs:sequence>
+        <xs:attribute name="Timeout" type="xs:int" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ValidatePINBlockCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="PINBlock" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisableKeypadCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetKeypadCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="KeypadEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="KeyPressed" type="KeyPressed"/>
+      <xs:element name="FunctionKeyPressed" type="FunctionKeyPressed"/>
+      <xs:element name="EntryComplete" type="EntryComplete"/>
+      <xs:element name="PINEntryComplete" type="PINEntryComplete"/>
+      <xs:element name="KeypadEntryTimedOut" type="KeypadEntryTimedOut"/>
+			<xs:element name="EMVPinEntryComplete" type="EMVPinEntryComplete"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="KeypadEntryTimedOut"/>
+  <xs:complexType name="FunctionKeyPressed">
+    <xs:attribute name="FunctionKey" type="xs:int" use="required"/>
+    <xs:attribute name="KeypadFunctionKey" type="KeypadFunctionKeyEnum" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="KeyPressed">
+    <xs:attribute name="CurrentKeyData" type="xs:string" use="required"/>
+    <xs:attribute name="ClearPressedOnEmptyBuffer" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="EntryComplete">
+    <xs:attribute name="KeyData" type="xs:string" use="required"/>
+    <xs:attribute name="Cancelled" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="PINEntryComplete">
+    <xs:attribute name="Cancelled" type="xs:boolean" use="required"/>
+    <xs:attribute name="PINBlock" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="KSN" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="PINValid" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+	<xs:complexType name="EMVPinEntryComplete">
+		<xs:attribute name="Cancelled" type="xs:boolean" use="required"/>
+		<xs:attribute name="rAPDU" type="xs:hexBinary" use="required"/>
+		<xs:attribute name="InsufficientDigits" type="xs:boolean" use="optional"/>
+	</xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="KeypadResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="DisableKeypadResponse" type="DisableKeypadResponse"/>
+      <xs:element name="EnableKeypadFunctionKeysResponse" type="EnableKeypadFunctionKeysResponse"/>
+      <xs:element name="ValidatePINBlockResponse" type="ValidatePINBlockResponse"/>
+      <xs:element name="GetKeypadCapabilitiesResponse" type="GetKeypadCapabilitiesResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetKeypadCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SupportsEntryTimeout" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ValidatePINBlockResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="PINValid" type="xs:boolean"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DisableKeypadResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EnableKeypadFunctionKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END KEYPAD INTERFACE-->
+  <!--BEGIN EMV MODULE INTERFACE-->
+  <xs:complexType name="EMVModuleCommand">
+    <xs:choice>
+      <xs:element name="GetEMVModuleStatusCommand" type="GetEMVModuleStatusCommand"/>
+      <xs:element name="GetApplicationExclusionListCommand" type="GetApplicationExclusionListCommand"/>
+      <xs:element name="SetApplicationExclusionListCommand" type="SetApplicationExclusionListCommand"/>
+      <xs:element name="InitiateTransactionCommand" type="InitiateTransactionCommand"/>
+      <xs:element name="SetAmountsCommand" type="SetAmountsCommand"/>
+      <xs:element name="ContinueTransactionCommand" type="ContinueTransactionCommand"/>
+      <xs:element name="CompleteOnlineTransactionCommand" type="CompleteOnlineTransactionCommand"/>
+      <xs:element name="AbortTransactionCommand" type="AbortTransactionCommand"/>
+      <xs:element name="ReadCardDataCommand" type="ReadCardDataCommand"/>
+      <xs:element name="DownloadApplicationCommand" type="DownloadApplicationCommand"/>
+      <xs:element name="DeleteApplicationCommand" type="DeleteApplicationCommand"/>
+      <xs:element name="DownloadApplicationPublicKeysCommand" type="DownloadApplicationPublicKeysCommand"/>
+      <xs:element name="DeleteApplicationPublicKeysCommand" type="DeleteApplicationPublicKeysCommand"/>
+      <xs:element name="ReenterOnlinePINCommand" type="ReenterOnlinePINCommand"/>
+      <xs:element name="ClearAllApplicationsAndKeysCommand" type="ClearAllApplicationsAndKeysCommand"/>
+      <xs:element name="SetTimeoutCommand" type="SetTimeoutCommand"/>
+      <xs:element name="GetEMVHashValuesCommand" type="GetEMVHashValuesCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ApplicationExclusion">
+    <xs:attribute name="App" type="xs:string" use="required"/>
+    <xs:attribute name="ExcludeAll" type="xs:boolean" use="optional"/>
+    <xs:attribute name="Exclude" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="GetEMVModuleStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetApplicationExclusionListCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetApplicationExclusionListCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="ApplicationExclusion" type="ApplicationExclusion"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetAmountsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="InitiateTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ContinueTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CompleteOnlineTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadCardDataCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AbortTransactionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetEMVHashValuesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OverrideParameters">
+    <xs:attribute name="BIN" type="xs:string" use="required"/>
+    <xs:attribute name="Name" type="xs:string" use="optional"/>
+    <xs:attribute name="TerminalActionCodeDefault" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="TerminalActionCodeDenial" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="TerminalActionCodeOnline" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="DDOL" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="TDOL" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="FloorLimit" type="xs:int" use="optional"/>
+    <xs:attribute name="ThresholdValue" type="xs:int" use="optional"/>
+    <xs:attribute name="TargetPercentage" type="xs:int" use="optional"/>
+    <xs:attribute name="MaxTargetPercentage" type="xs:int" use="optional"/>
+    <xs:attribute name="ApprovalAmount" type="xs:int" use="optional"/>
+    <xs:attribute name="MaxTransactionValue" type="xs:int" use="optional"/>
+    <xs:attribute name="MaxNoCVMTransactionValue" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="DownloadApplicationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="EmvDataElement" type="EmvDataElement"/>
+          </xs:sequence>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="OverrideParameters" type="OverrideParameters"/>
+          </xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="Name" type="xs:string" use="optional"/>
+        <xs:attribute name="Rid" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="Pix" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="Version" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="TerminalActionCodeDefault" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TerminalActionCodeDenial" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TerminalActionCodeOnline" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="DDOL" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TDOL" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="SelectionIndicator" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="FloorLimit" type="xs:int" use="optional"/>
+        <xs:attribute name="ThresholdValue" type="xs:int" use="optional"/>
+        <xs:attribute name="TargetPercentage" type="xs:int" use="optional"/>
+        <xs:attribute name="MaxTargetPercentage" type="xs:int" use="optional"/>
+        <xs:attribute name="ApprovalAmount" type="xs:int" use="optional"/>
+        <xs:attribute name="MaxTransactionValue" type="xs:int" use="optional"/>
+        <xs:attribute name="MaxNoCVMTransactionValue" type="xs:int" use="optional"/>
+        <xs:attribute name="PromptForAccountType" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteApplicationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Pix" type="xs:string" use="required"/>
+        <xs:attribute name="Rid" type="xs:string" use="required"/>
+        <xs:attribute name="Version" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DownloadApplicationPublicKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="KeyDefinition" type="KeyDefinition"/>
+        </xs:sequence>
+        <xs:attribute name="Rid" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteApplicationPublicKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Rid" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EmvDataElement">
+    <xs:simpleContent>
+      <xs:extension base="xs:hexBinary"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ReenterOnlinePINCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ClearAllApplicationsAndKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetTimeoutCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="TimeoutValue" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="KeyDefinition">
+    <xs:attribute name="SignAlgorithm" type="xs:string" use="optional"/>
+    <xs:attribute name="Exponent" type="xs:string" use="required"/>
+    <xs:attribute name="Modulus" type="xs:string" use="required"/>
+    <xs:attribute name="Number" type="xs:string" use="required"/>
+    <xs:attribute name="HashAlgorithm" type="xs:string" use="optional"/>
+    <xs:attribute name="HashValue" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="EMVModuleEvent">
+    <xs:choice>
+      <xs:element name="ApplicationSelected" type="ApplicationSelectedData"/>
+      <xs:element name="CardDataRead" type="CardDataReadData"/>
+      <xs:element name="CardDetails" type="CardDetailsData"/>
+      <xs:element name="OnlineApprovalRequest" type="OnlineApprovalRequestData"/>
+      <xs:element name="TransactionResult" type="TransactionResultData"/>
+      <xs:element name="EMVModuleStatusChanged" type="EMVModuleStatusChanged"/>
+      <xs:element name="ReenterOnlinePinFailed" type="ReenterOnlinePinFailedData"/>
+      <xs:element name="RemovedApplication" type="RemovedApplicationData"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ApplicationSelectedData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="EmvDataElement" type="EmvDataElement"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CardDetailsData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="EmvDataElement" type="EmvDataElement"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CardDataReadData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="EmvDataElement" type="EmvDataElement"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OnlineApprovalRequestData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="EmvDataElement" type="EmvDataElement"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TransactionResultData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="EmvDataElement" type="EmvDataElement"/>
+    </xs:sequence>
+    <xs:attribute name="TransactionCompletionStatus" type="TransactionCompletionStatus" use="required"/>
+    <xs:attribute name="FailureReasonCode" type="FailureReasonCode" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="ReenterOnlinePinFailedData">
+    <xs:attribute name="PINFailureReasonCode" type="PINFailureReasonCode" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="RemovedApplicationData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="EmvDataElement" type="EmvDataElement"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="EMVModuleStatusChanged">
+    <xs:attribute name="EMVModuleState" type="EMVModuleStatus" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="EMVModuleStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Idle"/>
+      <xs:enumeration value="ApplicationSelection"/>
+      <xs:enumeration value="ApplicationSelected"/>
+      <xs:enumeration value="CardValidation"/>
+      <xs:enumeration value="EnterPin"/>
+      <xs:enumeration value="PendingOnlineApproval"/>
+      <xs:enumeration value="ProcessingOnlineResponse"/>
+      <xs:enumeration value="Complete"/>
+      <xs:enumeration value="Aborted"/>
+      <xs:enumeration value="Tampered"/>
+      <xs:enumeration value="Unknown"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TransactionCompletionStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Approved"/>
+      <xs:enumeration value="Denied"/>
+      <xs:enumeration value="Aborted"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FailureReasonCode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="CardBlocked"/>
+      <xs:enumeration value="CardError"/>
+      <xs:enumeration value="ApplicationBlocked"/>
+      <xs:enumeration value="ApplicationUnavailable"/>
+      <xs:enumeration value="ApplicationDisabled"/>
+      <xs:enumeration value="ProcessingError"/>
+      <xs:enumeration value="Declined"/>
+      <xs:enumeration value="NotAccepted"/>
+      <xs:enumeration value="CustomerCancelled"/>
+      <xs:enumeration value="CustomerEntryTimeout"/>
+      <xs:enumeration value="PINTriesExceeded"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PINFailureReasonCode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="CustomerCancelled"/>
+      <xs:enumeration value="CustomerEntryTimeout"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="EMVModuleResponse">
+    <xs:choice>
+      <xs:element name="GetEMVModuleStatusResponse" type="GetEMVModuleStatusResponse"/>
+      <xs:element name="GetApplicationExclusionListResponse" type="GetApplicationExclusionListResponse"/>
+      <xs:element name="SetApplicationExclusionListResponse" type="SetApplicationExclusionListResponse"/>
+      <xs:element name="InitiateTransactionResponse" type="InitiateTransactionResponse"/>
+      <xs:element name="SetAmountsResponse" type="SetAmountsResponse"/>
+      <xs:element name="ContinueTransactionResponse" type="ContinueTransactionResponse"/>
+      <xs:element name="CompleteOnlineTransactionResponse" type="CompleteOnlineTransactionResponse"/>
+      <xs:element name="ReadCardDataResponse" type="ReadCardDataResponse"/>
+      <xs:element name="AbortTransactionResponse" type="AbortTransactionResponse"/>
+      <xs:element name="DownloadApplicationResponse" type="DownloadApplicationResponse"/>
+      <xs:element name="DeleteApplicationResponse" type="DeleteApplicationResponse"/>
+      <xs:element name="DownloadApplicationPublicKeysResponse" type="DownloadApplicationPublicKeysResponse"/>
+      <xs:element name="DeleteApplicationPublicKeysResponse" type="DeleteApplicationPublicKeysResponse"/>
+      <xs:element name="ReenterOnlinePINResponse" type="ReenterOnlinePINResponse"/>
+      <xs:element name="ClearAllApplicationsAndKeysResponse" type="ClearAllApplicationsAndKeysResponse"/>
+      <xs:element name="SetTimeoutResponse" type="SetTimeoutResponse"/>
+      <xs:element name="GetEMVHashValuesResponse" type="GetEMVHashValuesResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetEMVHashValuesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="KernelHash" type="xs:string" use="required"/>
+        <xs:attribute name="PINPadHash" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetEMVModuleStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="EMVModuleState" type="EMVModuleStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetApplicationExclusionListResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="ApplicationExclusion" type="ApplicationExclusion"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetApplicationExclusionListResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="InitiateTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetAmountsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ContinueTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CompleteOnlineTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadCardDataResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AbortTransactionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DownloadApplicationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteApplicationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DownloadApplicationPublicKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteApplicationPublicKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReenterOnlinePINResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ClearAllApplicationsAndKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetTimeoutResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END EMV MODULE INTERFACE-->
+  <!--BEGIN BAR CODE READER INTERFACE-->
+  <xs:complexType name="OpenBarcodeReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="CloseAfterScan" type="xs:boolean" use="optional">
+          <xs:annotation>
+            <xs:documentation xml:lang="en">For backwards compatibility</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseBarCodeReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BarcodeReaderCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="OpenBarcodeReaderCommand" type="OpenBarcodeReaderCommand"/>
+      <xs:element name="CloseBarCodeReaderCommand" type="CloseBarCodeReaderCommand"/>
+      <xs:element name="TurnLightOnCommand" type="TurnLightOnCommand"/>
+      <xs:element name="FlashLightCommand" type="FlashLightCommand"/>
+      <xs:element name="TurnLightOffCommand" type="TurnLightOffCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="BarcodeData">
+    <xs:attribute name="BarCode" type="xs:string" use="required"/>
+    <xs:attribute name="Symbology" type="BarCodeSymbologiesEnum" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="BarcodeInvalidData"/>
+  <xs:complexType name="BarcodeReaderEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="BarcodeData" type="BarcodeData"/>
+      <xs:element name="BarcodeInvalidData" type="BarcodeInvalidData"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="OpenBarcodeReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseBarCodeReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BarcodeReaderResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="OpenBarcodeReaderResponse" type="OpenBarcodeReaderResponse"/>
+      <xs:element name="CloseBarCodeReaderResponse" type="CloseBarCodeReaderResponse"/>
+      <xs:element name="TurnLightOnResponse" type="TurnLightOnResponse"/>
+      <xs:element name="FlashLightResponse" type="FlashLightResponse"/>
+      <xs:element name="TurnLightOffResponse" type="TurnLightOffResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END BAR CODE READER INTERFACE-->
+  <!--BEGIN MAG STRIPE READER INTERFACE-->
+  <xs:complexType name="MagStripeReaderCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetCardPositionCommand" type="GetCardPositionCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="GetReaderTypeCommand" type="GetReaderTypeCommand"/>
+      <xs:element name="OpenMagStripeReaderCommand" type="OpenMagStripeReaderCommand"/>
+      <xs:element name="CloseMagStripeReaderCommand" type="CloseMagStripeReaderCommand"/>
+      <xs:element name="TurnLightOnCommand" type="TurnLightOnCommand"/>
+      <xs:element name="FlashLightCommand" type="FlashLightCommand"/>
+      <xs:element name="TurnLightOffCommand" type="TurnLightOffCommand"/>
+      <xs:element name="GetMagStripeReaderCapabilitiesCommand" type="GetMagStripeReaderCapabilitiesCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetMagStripeReaderCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenMagStripeReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Timeout" type="xs:int" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseMagStripeReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="MagStripeData">
+    <xs:sequence maxOccurs="unbounded">
+      <xs:element name="Tracks" type="Track"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Track">
+    <xs:attribute name="TrackNumber" type="xs:int" use="required"/>
+    <xs:attribute name="TrackData" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="MagStripeInvalidData"/>
+  <xs:complexType name="MagStripeReaderTimedOut"/>
+  <xs:complexType name="MagStripeReaderEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="CardPositionChanged" type="CardPositionChanged"/>
+      <xs:element name="MagStripeData" type="MagStripeData"/>
+      <xs:element name="MagStripeInvalidData" type="MagStripeInvalidData"/>
+      <xs:element name="MagStripeReaderTimedOut" type="MagStripeReaderTimedOut"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="OpenMagStripeReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseMagStripeReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetMagStripeReaderCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SupportsEntryTimeout" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MagStripeReaderResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="GetCardPositionResponse" type="GetCardPositionResponse"/>
+      <xs:element name="GetReaderTypeResponse" type="GetReaderTypeResponse"/>
+      <xs:element name="OpenMagStripeReaderResponse" type="OpenMagStripeReaderResponse"/>
+      <xs:element name="CloseMagStripeReaderResponse" type="CloseMagStripeReaderResponse"/>
+      <xs:element name="TurnLightOnResponse" type="TurnLightOnResponse"/>
+      <xs:element name="FlashLightResponse" type="FlashLightResponse"/>
+      <xs:element name="TurnLightOffResponse" type="TurnLightOffResponse"/>
+      <xs:element name="GetMagStripeReaderCapabilitiesResponse" type="GetMagStripeReaderCapabilitiesResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END MAG STRIPE READER INTERFACE-->
+  <!--BEGIN CHIP CARD READER INTERFACE-->
+  <xs:complexType name="ChipCardReaderCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetCardPositionCommand" type="GetCardPositionCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="GetReaderTypeCommand" type="GetReaderTypeCommand"/>
+      <xs:element name="OpenChipCardReaderCommand" type="OpenChipCardReaderCommand"/>
+      <xs:element name="CloseChipCardReaderCommand" type="CloseChipCardReaderCommand"/>
+      <xs:element name="TurnLightOnCommand" type="TurnLightOnCommand"/>
+      <xs:element name="FlashLightCommand" type="FlashLightCommand"/>
+      <xs:element name="TurnLightOffCommand" type="TurnLightOffCommand"/>
+      <xs:element name="DeactivateChipCardCommand" type="DeactivateChipCardCommand"/>
+      <xs:element name="SoftResetChipCardCommand" type="SoftResetChipCardCommand"/>
+      <xs:element name="ChipCardProcessAPDUCommand" type="ChipCardProcessAPDUCommand"/>
+      <xs:element name="GetChipCardReaderCapabilitiesCommand" type="GetChipCardReaderCapabilitiesCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetChipCardReaderCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenChipCardReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="AllowMagStripeFallback" type="xs:boolean" use="optional"/>
+        <xs:attribute name="Timeout" type="xs:int" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseChipCardReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeactivateChipCardCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="ReleaseCard" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SoftResetChipCardCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ChipCardProcessAPDUCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="CAPDU" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="ChipCardData">
+    <xs:sequence>
+      <xs:element name="MagStripeData" type="MagStripeData" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="AtrData" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ChipCardInvalidData"/>
+  <xs:complexType name="ChipCardReaderTimedOut"/>
+  <xs:complexType name="ChipCardReaderEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="CardPositionChanged" type="CardPositionChanged"/>
+      <xs:element name="ChipCardData" type="ChipCardData"/>
+      <xs:element name="ChipCardInvalidData" type="ChipCardInvalidData"/>
+      <xs:element name="ChipCardReaderTimedOut" type="ChipCardReaderTimedOut"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="OpenChipCardReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseChipCardReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeactivateChipCardResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SoftResetChipCardResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="ATR" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ChipCardProcessAPDUResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="RAPDU" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetChipCardReaderCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SupportsEntryTimeout" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ChipCardReaderResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="GetCardPositionResponse" type="GetCardPositionResponse"/>
+      <xs:element name="GetReaderTypeResponse" type="GetReaderTypeResponse"/>
+      <xs:element name="OpenChipCardReaderResponse" type="OpenChipCardReaderResponse"/>
+      <xs:element name="CloseChipCardReaderResponse" type="CloseChipCardReaderResponse"/>
+      <xs:element name="TurnLightOnResponse" type="TurnLightOnResponse"/>
+      <xs:element name="FlashLightResponse" type="FlashLightResponse"/>
+      <xs:element name="TurnLightOffResponse" type="TurnLightOffResponse"/>
+      <xs:element name="DeactivateChipCardResponse" type="DeactivateChipCardResponse"/>
+      <xs:element name="SoftResetChipCardResponse" type="SoftResetChipCardResponse"/>
+      <xs:element name="ChipCardProcessAPDUResponse" type="ChipCardProcessAPDUResponse"/>
+      <xs:element name="GetChipCardReaderCapabilitiesResponse" type="GetChipCardReaderCapabilitiesResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END CHIP CARD READER INTERFACE-->
+  <!--SECURITY MODULE INTERFACE-->
+  <!--  COMMANDS-->
+  <xs:simpleType name="HierarchyType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MasterSession_DES"/>
+      <xs:enumeration value="MasterSession_2Key3DES"/>
+      <xs:enumeration value="DUKPT_DES"/>
+      <xs:enumeration value="DUKPT_2Key3DES"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="WorkingKeyType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PIN"/>
+      <xs:enumeration value="MessageMAC"/>
+      <xs:enumeration value="MessageEncrypt"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PINVerificationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="CentralPINBlock"/>
+      <xs:enumeration value="LocalPINBlock"/>
+      <xs:enumeration value="LocalPINValidation"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="SupportedKeyHierarchy">
+    <xs:attribute name="Id" type="xs:int" use="required"/>
+    <xs:attribute name="Name" type="xs:string" use="optional"/>
+    <xs:attribute name="HierarchyType" type="HierarchyType" use="required"/>
+    <xs:attribute name="Active" type="xs:boolean" use="required"/>
+    <xs:attribute name="PINVerification" type="PINVerificationType" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="WorkingKey">
+    <xs:attribute name="Type" type="WorkingKeyType" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SecurityModuleCommand">
+    <xs:choice>
+      <xs:element name="GetSerialNumberCommand" type="GetSerialNumberCommand"/>
+      <xs:element name="GetBankSerialNumberCommand" type="GetBankSerialNumberCommand"/>
+      <xs:element name="GetSupportedKeyHierarchiesCommand" type="GetSupportedKeyHierarchiesCommand"/>
+      <xs:element name="GetHierarchyInUseCommand" type="GetHierarchyInUseCommand"/>
+      <xs:element name="SetHierarchyInUseCommand" type="SetHierarchyInUseCommand"/>
+      <xs:element name="GetSupportedWorkingKeysCommand" type="GetSupportedWorkingKeysCommand"/>
+      <xs:element name="GetSecurityModuleCapabilitiesCommand" type="GetSecurityModuleCapabilitiesCommand"/>
+      <xs:element name="SwitchKeyHierarchyCommand" type="SwitchKeyHierarchyCommand"/>
+      <xs:element name="CalculateMACCommand" type="CalculateMACCommand"/>
+      <xs:element name="VerifyMACCommand" type="VerifyMACCommand"/>
+      <xs:element name="EncryptMessageCommand" type="EncryptMessageCommand"/>
+      <xs:element name="SetWorkingKeyCommand" type="SetWorkingKeyCommand"/>
+      <xs:element name="GetWorkingKeyStatisticsCommand" type="GetWorkingKeyStatisticsCommand"/>
+      <xs:element name="IncrementKSNCommand" type="IncrementKSNCommand"/>
+      <xs:element name="KeyMaintenanceCommand" type="KeyMaintenanceCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="KeyMaintenanceCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseSimpleHexCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IncrementKSNCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSerialNumberCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBankSerialNumberCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetHierarchyInUseCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedKeyHierarchiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetHierarchyInUseCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedWorkingKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSecurityModuleCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SwitchKeyHierarchyCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CalculateMACCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexCommand"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="VerifyMACCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexCommand">
+        <xs:attribute name="MACValue" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="KSN" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="EncryptMessageCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexCommand"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="SetWorkingKeyCommand">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexCommand">
+        <xs:attribute name="KeyType" type="WorkingKeyType" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="GetWorkingKeyStatisticsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="KeyType" type="WorkingKeyType" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="SecurityModuleResponse">
+    <xs:choice>
+      <xs:element name="GetSerialNumberResponse" type="GetSerialNumberResponse"/>
+      <xs:element name="GetBankSerialNumberResponse" type="GetBankSerialNumberResponse"/>
+      <xs:element name="GetSupportedKeyHierarchiesResponse" type="GetSupportedKeyHierarchiesResponse"/>
+      <xs:element name="GetHierarchyInUseResponse" type="GetHierarchyInUseResponse"/>
+      <xs:element name="SetHierarchyInUseResponse" type="SetHierarchyInUseResponse"/>
+      <xs:element name="GetSupportedWorkingKeysResponse" type="GetSupportedWorkingKeysResponse"/>
+      <xs:element name="GetSecurityModuleCapabilitiesResponse" type="GetSecurityModuleCapabilitiesResponse"/>
+      <xs:element name="SwitchKeyHierarchyResponse" type="SwitchKeyHierarchyResponse"/>
+      <xs:element name="CalculateMACResponse" type="CalculateMACResponse"/>
+      <xs:element name="VerifyMACResponse" type="VerifyMACResponse"/>
+      <xs:element name="EncryptMessageResponse" type="EncryptMessageResponse"/>
+      <xs:element name="SetWorkingKeyResponse" type="SetWorkingKeyResponse"/>
+      <xs:element name="GetWorkingKeyStatisticsResponse" type="GetWorkingKeyStatisticsResponse"/>
+      <xs:element name="IncrementKSNResponse" type="IncrementKSNResponse"/>
+      <xs:element name="KeyMaintenanceResponse" type="KeyMaintenanceResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="KeyMaintenanceResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseSimpleHexResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="IncrementKSNResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSerialNumberResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SerialNumber" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBankSerialNumberResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="BankSerialNumber" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetHierarchyInUseResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Id" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedKeyHierarchiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="SupportedKeyHierarchy" type="SupportedKeyHierarchy"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetHierarchyInUseResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSupportedWorkingKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="WorkingKey" type="WorkingKey"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSecurityModuleCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="MultipleKeyHierarchies" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SwitchKeyHierarchyResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CalculateMACResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="MACValue" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="KSN" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="VerifyMACResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Valid" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EncryptMessageResponse">
+    <xs:simpleContent>
+      <xs:extension base="BaseSimpleHexResponse">
+        <xs:attribute name="KSN" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="SetWorkingKeyResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetWorkingKeyStatisticsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SuccessfulUpdates" type="xs:int" use="required"/>
+        <xs:attribute name="UpdateAttempts" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END SECURITY MODULE INTERFACE-->
+  <!--BILL ACCEPTOR INTERFACE-->
+  <xs:simpleType name="BankNoteStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Empty"/>
+      <xs:enumeration value="InPosition"/>
+      <xs:enumeration value="Collected"/>
+      <xs:enumeration value="Ejected"/>
+      <xs:enumeration value="Returning"/>
+      <xs:enumeration value="Stacking"/>
+      <xs:enumeration value="Accepting"/>
+      <xs:enumeration value="Jammed"/>
+      <xs:enumeration value="Rejected"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SafeboxStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NotUsed"/>
+      <xs:enumeration value="Disarmed"/>
+      <xs:enumeration value="Armed"/>
+      <xs:enumeration value="Triggered"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StackerStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NotUsed"/>
+      <xs:enumeration value="Open"/>
+      <xs:enumeration value="Closed"/>
+      <xs:enumeration value="Full"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="BillAcceptorStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Idle"/>
+      <xs:enumeration value="Paused"/>
+      <xs:enumeration value="MechanicalCheat"/>
+      <xs:enumeration value="Reset"/>
+      <xs:enumeration value="PowerUp"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="BillAcceptorStatusBytes">
+    <xs:sequence>
+      <xs:element name="Status3" type="xs:unsignedByte" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Status4" type="xs:unsignedByte" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Status5" type="xs:unsignedByte" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BillAcceptorCommand">
+    <xs:choice>
+      <xs:element name="GetAcceptorIdCommand" type="GetAcceptorIdCommand"/>
+      <xs:element name="OpenBillAcceptorCommand" type="OpenBillAcceptorCommand"/>
+      <xs:element name="CloseBillAcceptorCommand" type="CloseBillAcceptorCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="CollectCommand" type="CollectCommand"/>
+      <xs:element name="EjectCommand" type="EjectCommand"/>
+      <xs:element name="NoteStateConfirmCommand" type="NoteStateConfirmCommand"/>
+      <xs:element name="GetBankNoteStatusCommand" type="GetBankNoteStatusCommand"/>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetSafeboxStatusCommand" type="GetSafeboxStatusCommand"/>
+      <xs:element name="GetStackerStatusCommand" type="GetStackerStatusCommand"/>
+      <xs:element name="GetCurrentNoteCommand" type="GetCurrentNoteCommand"/>
+      <xs:element name="GetBillAcceptorCapabilitiesCommand" type="GetBillAcceptorCapabilitiesCommand"/>
+      <xs:element name="ConfigureBillCommand" type="ConfigureBillCommand"/>
+      <xs:element name="GetEscrowCommand" type="GetEscrowCommand"/>
+      <xs:element name="SetEscrowCommand" type="SetEscrowCommand"/>
+      <xs:element name="GetDualOrientationCommand" type="GetDualOrientationCommand"/>
+      <xs:element name="SetDualOrientationCommand" type="SetDualOrientationCommand"/>
+      <xs:element name="GetSecurityCommand" type="GetSecurityCommand"/>
+      <xs:element name="SetSecurityCommand" type="SetSecurityCommand"/>
+      <xs:element name="SendBillAcceptorCommandCommand" type="SendBillAcceptorCommandCommand"/>
+      <xs:element name="GetBillAcceptorStatusBytesCommand" type="GetBillAcceptorStatusBytesCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetAcceptorIdCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenBillAcceptorCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseBillAcceptorCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EjectCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NoteStateConfirmCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBankNoteStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSafeboxStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetStackerStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCurrentNoteCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBillAcceptorCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConfigureBillCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="BankNoteValue" type="BankNoteValue"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetEscrowCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetEscrowCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="EnableEscrow" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDualOrientationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetDualOrientationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="EnableDualOrientation" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSecurityCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetSecurityCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="EnableSecurity" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SendBillAcceptorCommandCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="ControlCommandCode1" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="ControlCommandCode2" type="xs:unsignedByte" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBillAcceptorStatusBytesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="BankNoteStatusChanged">
+    <xs:attribute name="BankNoteState" type="BankNoteStatus" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SafeboxStatusChanged">
+    <xs:attribute name="SafeboxState" type="SafeboxStatus" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="StackerStatusChanged">
+    <xs:attribute name="StackerState" type="StackerStatus" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="AcceptorStatusChanged">
+    <xs:attribute name="AcceptorStatus" type="BillAcceptorStatus" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="BillAcceptorStatusBytesChanged">
+    <xs:sequence>
+      <xs:element name="BillAcceptorStatusBytes" type="BillAcceptorStatusBytes" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BillAcceptorEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="BankNoteStatusChanged" type="BankNoteStatusChanged"/>
+      <xs:element name="SafeboxStatusChanged" type="SafeboxStatusChanged"/>
+      <xs:element name="StackerStatusChanged" type="StackerStatusChanged"/>
+      <xs:element name="AcceptorStatusChanged" type="AcceptorStatusChanged"/>
+      <xs:element name="BillAcceptorStatusBytesChanged" type="BillAcceptorStatusBytesChanged"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="BillAcceptorResponse">
+    <xs:choice>
+      <xs:element name="GetAcceptorIdResponse" type="GetAcceptorIdResponse"/>
+      <xs:element name="OpenBillAcceptorResponse" type="OpenBillAcceptorResponse"/>
+      <xs:element name="CloseBillAcceptorResponse" type="CloseBillAcceptorResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="CollectResponse" type="CollectResponse"/>
+      <xs:element name="EjectResponse" type="EjectResponse"/>
+      <xs:element name="NoteStateConfirmResponse" type="NoteStateConfirmResponse"/>
+      <xs:element name="GetBankNoteStatusResponse" type="GetBankNoteStatusResponse"/>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetSafeboxStatusResponse" type="GetSafeboxStatusResponse"/>
+      <xs:element name="GetStackerStatusResponse" type="GetStackerStatusResponse"/>
+      <xs:element name="GetCurrentNoteResponse" type="GetCurrentNoteResponse"/>
+      <xs:element name="GetBillAcceptorCapabilitiesResponse" type="GetBillAcceptorCapabilitiesResponse"/>
+      <xs:element name="ConfigureBillResponse" type="ConfigureBillResponse"/>
+      <xs:element name="GetEscrowResponse" type="GetEscrowResponse"/>
+      <xs:element name="SetEscrowResponse" type="SetEscrowResponse"/>
+      <xs:element name="GetDualOrientationResponse" type="GetDualOrientationResponse"/>
+      <xs:element name="SetDualOrientationResponse" type="SetDualOrientationResponse"/>
+      <xs:element name="GetSecurityResponse" type="GetSecurityResponse"/>
+      <xs:element name="SetSecurityResponse" type="SetSecurityResponse"/>
+      <xs:element name="SendBillAcceptorCommandResponse" type="SendBillAcceptorCommandResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetAcceptorIdResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="AcceptorId" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenBillAcceptorResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseBillAcceptorResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CollectResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="EjectResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NoteStateConfirmResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBankNoteStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="BankNoteState" type="BankNoteStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSafeboxStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SafeboxState" type="SafeboxStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetStackerStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="StackerState" type="StackerStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BankNoteValue">
+    <xs:attribute name="Id" type="xs:int" use="required"/>
+    <xs:attribute name="Currency" type="xs:string" use="required"/>
+    <xs:attribute name="Value" type="xs:decimal" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="GetCurrentNoteResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence minOccurs="0">
+          <xs:element name="BankNoteValue" type="BankNoteValue"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBillAcceptorCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="CapSafebox" type="xs:boolean" use="required"/>
+        <xs:attribute name="CapStacker" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConfigureBillResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetEscrowResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="EscrowEnabled" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetEscrowResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetDualOrientationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="DualOrientationEnabled" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetDualOrientationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetSecurityResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="SecurityEnabled" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetSecurityResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SendBillAcceptorCommandResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END BILL ACCEPTOR INTERFACE-->
+  <!--TAMPER DETECTORS INTERFACE-->
+  <xs:simpleType name="TamperLocation">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TerminalFrontDoor"/>
+      <xs:enumeration value="TerminalBackDoor"/>
+      <xs:enumeration value="PrinterDoor"/>
+      <xs:enumeration value="BillacceptorDoor"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TamperState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Ok"/>
+      <xs:enumeration value="Failed"/>
+      <xs:enumeration value="Ongoing"/>
+      <xs:enumeration value="ConfirmRequested"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="TamperDetectorsCommand">
+    <xs:choice>
+      <xs:element name="GetAvailableDetectorsCommand" type="GetAvailableDetectorsCommand"/>
+      <xs:element name="ConfirmDetectorOpenCommand" type="ConfirmDetectorOpenCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetAvailableDetectorsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConfirmDetectorOpenCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="TamperLocation" type="TamperLocation"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="TamperStatusChanged">
+    <xs:sequence>
+      <xs:element name="TamperDetecter" type="TamperDetector"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TamperDetectorsEvent">
+    <xs:choice>
+      <xs:element name="StatusChanged" type="TamperStatusChanged"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="TamperDetectorsResponse">
+    <xs:choice>
+      <xs:element name="GetAvailableDetectorsResponse" type="GetAvailableDetectorsResponse"/>
+      <xs:element name="ConfirmDetectorOpenResponse" type="ConfirmDetectorOpenResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="TamperDetector">
+    <xs:attribute name="Id" type="xs:int" use="required"/>
+    <xs:attribute name="Location" type="TamperLocation" use="required"/>
+    <xs:attribute name="State" type="TamperState" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="GetAvailableDetectorsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="TamperDetector" type="TamperDetector"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ConfirmDetectorOpenResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--END TAMPER DETECTORS INTERFACE-->
+  <!--BEEPER INTERFACE-->
+  <!--   COMMANDS-->
+  <xs:complexType name="BeeperCommand">
+    <xs:choice>
+      <xs:element name="BeepCommand" type="BeepCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="BeepCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="OnTime" type="xs:int"/>
+        <xs:attribute name="OffTime" type="xs:int"/>
+        <xs:attribute name="NumBeeps" type="xs:int"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="BeeperResponse">
+    <xs:choice>
+      <xs:element name="BeepResponse" type="BeepResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="BeepResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!--ENDBEEPER INTERFACE-->
+  <!-- DALLAS KEY INTERFACE -->
+  <!--   COMMANDS-->
+  <xs:complexType name="DallasKeyCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetPositionCommand" type="GetPositionCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="OpenDallasKeyReaderCommand" type="OpenDallasKeyReaderCommand"/>
+      <xs:element name="CloseDallasKeyReaderCommand" type="CloseDallasKeyReaderCommand"/>
+      <xs:element name="TurnLightOnCommand" type="TurnLightOnCommand"/>
+      <xs:element name="FlashLightCommand" type="FlashLightCommand"/>
+      <xs:element name="TurnLightOffCommand" type="TurnLightOffCommand"/>
+      <xs:element name="ReadDallasKeyDataCommand" type="ReadDallasKeyDataCommand"/>
+      <xs:element name="WriteDallasKeyDataCommand" type="WriteDallasKeyDataCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ReadDallasKeyDataCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Offset" type="xs:int" use="required"/>
+        <xs:attribute name="Length" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPositionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenDallasKeyReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="MaxReadSize" type="xs:int" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseDallasKeyReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WriteDallasKeyDataCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="DallasKeyWriteData" type="DallasKeyWriteData" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="ROMData" type="xs:hexBinary"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:simpleType name="DallasKeyPosition">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="KeyPresent"/>
+      <xs:enumeration value="KeyNotPresent"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DallasKeyData">
+    <xs:attribute name="ROMData" type="xs:hexBinary" use="required"/>
+    <xs:attribute name="Offset" type="xs:int" use="required"/>
+    <xs:attribute name="TotalAvailableLength" type="xs:int" use="required"/>
+    <xs:attribute name="Data" type="xs:hexBinary" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="DallasKeyWriteData">
+    <xs:attribute name="Offset" type="xs:int" use="required"/>
+    <xs:attribute name="Data" type="xs:hexBinary" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="DallasKeyInvalidData"/>
+  <xs:complexType name="PositionChanged">
+    <xs:attribute name="Position" type="DallasKeyPosition" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="DallasKeyEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="PositionChanged" type="PositionChanged"/>
+      <xs:element name="DallasKeyData" type="DallasKeyData"/>
+      <xs:element name="DallasKeyInvalidData" type="DallasKeyInvalidData"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="DallasKeyResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="GetPositionResponse" type="GetPositionResponse"/>
+      <xs:element name="OpenDallasKeyReaderResponse" type="OpenDallasKeyReaderResponse"/>
+      <xs:element name="CloseDallasKeyReaderResponse" type="CloseDallasKeyReaderResponse"/>
+      <xs:element name="TurnLightOnResponse" type="TurnLightOnResponse"/>
+      <xs:element name="FlashLightResponse" type="FlashLightResponse"/>
+      <xs:element name="TurnLightOffResponse" type="TurnLightOffResponse"/>
+      <xs:element name="ReadDallasKeyDataResponse" type="ReadDallasKeyDataResponse"/>
+      <xs:element name="WriteDallasKeyDataResponse" type="WriteDallasKeyDataResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="OpenDallasKeyReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseDallasKeyReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPositionResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Position" type="DallasKeyPosition" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadDallasKeyDataResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="DallasKeyData" type="DallasKeyData"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WriteDallasKeyDataResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!-- END DALLAS KEY INTERFACE -->
+  <!-- CONTACTLESS READER INTERFACE -->
+  <!--   COMMANDS-->
+  <xs:complexType name="ContactlessReaderCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetOpenedCommand" type="GetOpenedCommand"/>
+      <xs:element name="GetContactlessReaderCapabilitiesCommand" type="GetContactlessReaderCapabilitiesCommand"/>
+      <xs:element name="GetContactlessOperationalStateCommand" type ="GetContactlessOperationalStateCommand"/>
+      <xs:element name="GetGlobalEMVDataCommand" type="GetGlobalEMVDataCommand"/>
+      <xs:element name="SetGlobalEMVDataCommand" type="SetGlobalEMVDataCommand"/>
+      <xs:element name="GetBrandTerminalCapabilitiesCommand" type="GetBrandTerminalCapabilitiesCommand"/>
+      <xs:element name="SetBrandTerminalCapabilitiesCommand" type="SetBrandTerminalCapabilitiesCommand"/>
+      <xs:element name="GetBrandModeCommand" type="GetBrandModeCommand"/>
+      <xs:element name="SetBrandModeCommand" type="SetBrandModeCommand"/>
+      <xs:element name="GetContactlessApplicationCommand" type="GetContactlessApplicationCommand"/>
+      <xs:element name="DownloadContactlessApplicationCommand" type="DownloadContactlessApplicationCommand"/>
+      <xs:element name="DownloadContactlessPublicKeysCommand" type="DownloadContactlessPublicKeysCommand"/>
+      <xs:element name="DeleteApplicationPublicKeysCommand" type="DeleteApplicationPublicKeysCommand"/>
+      <xs:element name="SetBrandApplicationParametersCommand" type="SetBrandApplicationParametersCommand"/>
+      <xs:element name="GetBrandApplicationParametersCommand" type="GetBrandApplicationParametersCommand"/>
+      <xs:element name="DeleteContactlessApplicationCommand" type="DeleteContactlessApplicationCommand"/>
+      <xs:element name="SetTransactionIndicatorCommand" type="SetTransactionIndicatorCommand"/>
+      <xs:element name="OpenContactlessReaderCommand" type="OpenContactlessReaderCommand"/>
+      <xs:element name="CloseContactlessReaderCommand" type="CloseContactlessReaderCommand"/>
+      <xs:element name="ResetContactlessConfigurationCommand" type="ResetContactlessConfigurationCommand"/>      
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetContactlessReaderCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="ContactlessOperationalState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Operational"/>
+      <xs:enumeration value="AuthenticationFailed"/>
+      <xs:enumeration value="PublicKeysNotValid"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="GetContactlessOperationalStateCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetGlobalEMVDataCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetGlobalEMVDataCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="BrandName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="MasterCard"/>
+      <xs:enumeration value="Visa"/>
+      <xs:enumeration value="AmericanExpress"/>
+      <xs:enumeration value="Discover"/>
+      <xs:enumeration value="Interac"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="SetBrandTerminalCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBrandTerminalCapabilitiesCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetBrandModeCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+        <xs:attribute name="Mode" type="xs:unsignedByte" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBrandModeCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetContactlessApplicationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="AID" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="ApplicationIndex" type="xs:unsignedByte" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DownloadContactlessApplicationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="EmvDataElement" type="EmvDataElement"/>
+          </xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+        <xs:attribute name="AID" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="ApplicationIndex" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="ApplicationSchemeIndicator" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="TransactionTypeIndicator" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="TerminalActionCodeDefault" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TerminalActionCodeDenial" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TerminalActionCodeOnline" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TransactionLimit" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TransactionFloorLimit" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="CVMRequiredLimit" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="ZeroAmountOption" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="StatusCheck" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="TargetPercentage" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="ThresholdValue" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="MaxTargetPercentage" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="DeviceContactlessTransactionLimit" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ContactlessKey">
+    <xs:attribute name="Exponent" type="xs:string" use="required"/>
+    <xs:attribute name="Modulus" type="xs:string" use="required"/>
+    <xs:attribute name="Index" type="xs:string" use="required"/>
+    <xs:attribute name="Checksum" type="xs:string" use="required"/>
+    <xs:attribute name="ExpirationDate" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="DownloadContactlessPublicKeysCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="ContactlessKey" type="ContactlessKey"/>
+        </xs:sequence>
+        <xs:attribute name="Rid" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetBrandApplicationParametersCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+        <xs:attribute name="OfflineChipData" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="OnlineChipData" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="StatusCheckAmount" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="UnpredictableNumberRange" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="RemovalTimeout" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="MaxLifetimeTornTransaction" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="MaxNumberOfTornTransaction" type="xs:unsignedByte" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBrandApplicationParametersCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteContactlessApplicationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="ApplicationIndex" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="AID" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="TerminalTransactionResult">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Approved"/>
+      <xs:enumeration value="Declined"/>
+      <xs:enumeration value="OnlineFailed"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="SetTransactionIndicatorCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="TerminalTransactionResult" type="TerminalTransactionResult" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenContactlessReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="EnablePayment" type="EnablePayment" minOccurs="0"/>
+          <xs:element name="EnableWallet" type="EnableWallet" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AdditionalData">
+    <xs:simpleContent>
+      <xs:extension base="xs:hexBinary"/>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="EnablePayment">
+    <xs:sequence>
+      <xs:element name="AdditionalData" type="AdditionalData" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="PaymentScheme" type="PaymentSchemes" use="required"/>
+    <xs:attribute name="PaymentType" type="PaymentType" use="optional" default="Default"/>
+  </xs:complexType>
+  <xs:complexType name="EnableWallet">
+    <xs:sequence>
+      <xs:element name="AdditionalData" type="AdditionalData" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="WalletScheme" type="WalletSchemes" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="CloseContactlessReaderCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResetContactlessConfigurationCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>  
+  <xs:simpleType name="PaymentSchemes">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="StandardPayment"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="WalletSchemes">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Google"/>
+      <xs:enumeration value="NotSupported"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DataReadState">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ReadSuccessful"/>
+      <xs:enumeration value="ReadError"/>
+      <xs:enumeration value="NoData"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PaymentType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default"/>      
+      <xs:enumeration value="MagOnly"/>
+      <xs:enumeration value="EmvOnly"/>
+      <xs:enumeration value="EmvWithMagFallback"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="ContactlessReaderEvent">
+    <xs:choice>
+      <xs:element name="OpenChanged" type="OpenChanged"/>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+      <xs:element name="ContactlessOperationalStateChanged" type="ContactlessOperationalStateChanged"/>
+      <xs:element name="ContactlessData" type="ContactlessData"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ContactlessOperationalStateChanged">
+    <xs:attribute name="OperationalState" type="ContactlessOperationalState" use="required"/>
+  </xs:complexType>
+  <xs:simpleType name="CardScheme">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="VisaWave2"/>
+      <xs:enumeration value="VisaqVSDC"/>
+      <xs:enumeration value="VisaMSD"/>
+      <xs:enumeration value="MasterCardMagStripe"/>
+      <xs:enumeration value="MasterCardMChip"/>
+      <xs:enumeration value="AmexMagStripe"/>
+      <xs:enumeration value="AmexChip"/>
+      <xs:enumeration value="DiscoverMagStripe"/>
+      <xs:enumeration value="InteracChip"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TransactionResult">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="OfflineApprove"/>
+      <xs:enumeration value="OfflineDecline"/>
+      <xs:enumeration value="MagStripe"/>
+      <xs:enumeration value="ChipOnlineRequest"/>
+      <xs:enumeration value="Terminated"/>
+      <xs:enumeration value="TryAgain"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TransactionCVM">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="NoCVMRequired"/>
+      <xs:enumeration value="Signature"/>
+      <xs:enumeration value="OnlinePIN"/>
+      <xs:enumeration value="Signature+OnlinePIN"/>
+      <xs:enumeration value="ConfirmationCodeVerified"/>
+      <xs:enumeration value="NoCVMPreference"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TerminalEntryCapability">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="VSDCSupported"/>
+      <xs:enumeration value="VSDCNotSupported"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PaymentData">
+    <xs:sequence>
+      <xs:element name="AdditionalData" type="AdditionalData" maxOccurs="unbounded"/>
+      <xs:element name="Tracks" type="Track" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="PaymentScheme" type="PaymentSchemes" use="required"/>
+    <xs:attribute name="DataReadState" type="DataReadState" use="required"/>
+    <xs:attribute name="BrandName" type="BrandName" use="optional"/>
+    <xs:attribute name="CardScheme" type="CardScheme" use="optional"/>
+    <xs:attribute name="TransactionResult" type="TransactionResult" use="optional"/>
+    <xs:attribute name="TransactionErrorCode" type="xs:unsignedByte" use="optional"/>
+    <xs:attribute name="Track1DiscretionaryData" type="xs:string" use="optional"/>
+    <xs:attribute name="Track2DiscretionaryData" type="xs:string" use="optional"/>
+    <xs:attribute name="TransactionCVM" type="TransactionCVM" use="optional"/>
+    <xs:attribute name="TerminalEntryCapability" type="TerminalEntryCapability" use="optional"/>
+    <xs:attribute name="BalanceReadBeforeGenAC" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="BalanceReadAfterGenAC" type="xs:hexBinary" use="optional"/>
+    <xs:attribute name="TornRecord" type="xs:hexBinary" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="WalletData">
+    <xs:sequence>
+      <xs:element name="AdditionalData" type="AdditionalData" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="WalletScheme" type="WalletSchemes" use="required"/>
+    <xs:attribute name="DataReadState" type="DataReadState" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ContactlessData">
+    <xs:sequence>
+      <xs:element name="PaymentData" type="PaymentData" minOccurs="0"/>
+      <xs:element name="WalletData" type="WalletData" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="ContactlessReaderResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetOpenedResponse" type="GetOpenedResponse"/>
+      <xs:element name="GetContactlessReaderCapabilitiesResponse" type="GetContactlessReaderCapabilitiesResponse"/>
+      <xs:element name="GetContactlessOperationalStateResponse" type="GetContactlessOperationalStateResponse"/>
+      <xs:element name="GetGlobalEMVDataResponse" type="GetGlobalEMVDataResponse"/>
+      <xs:element name="SetGlobalEMVDataResponse" type="SetGlobalEMVDataResponse"/>
+      <xs:element name="GetBrandTerminalCapabilitiesResponse" type="GetBrandTerminalCapabilitiesResponse"/>
+      <xs:element name="SetBrandTerminalCapabilitiesResponse" type="SetBrandTerminalCapabilitiesResponse"/>
+      <xs:element name="GetBrandModeResponse" type="GetBrandModeResponse"/>
+      <xs:element name="SetBrandModeResponse" type="SetBrandModeResponse"/>
+      <xs:element name="GetContactlessApplicationResponse" type="GetContactlessApplicationResponse"/>
+      <xs:element name="DownloadContactlessApplicationResponse" type="DownloadContactlessApplicationResponse"/>
+      <xs:element name="DownloadContactlessPublicKeysResponse" type="DownloadContactlessPublicKeysResponse"/>
+      <xs:element name="DeleteApplicationPublicKeysResponse" type="DeleteApplicationPublicKeysResponse"/>
+      <xs:element name="SetBrandApplicationParametersResponse" type="SetBrandApplicationParametersResponse"/>
+      <xs:element name="GetBrandApplicationParametersResponse" type="GetBrandApplicationParametersResponse"/>
+      <xs:element name="DeleteContactlessApplicationResponse" type="DeleteContactlessApplicationResponse"/>
+      <xs:element name="SetTransactionIndicatorResponse" type="SetTransactionIndicatorResponse"/>
+      <xs:element name="OpenContactlessReaderResponse" type="OpenContactlessReaderResponse"/>
+      <xs:element name="CloseContactlessReaderResponse" type="CloseContactlessReaderResponse"/>
+      <xs:element name="ResetContactlessConfigurationResponse" type="ResetContactlessConfigurationResponse"/>      
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="SupportedPaymentScheme">
+    <xs:sequence>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element name="PaymentType" type="PaymentType"/>
+      </xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="PaymentScheme" type="PaymentSchemes"/>
+  </xs:complexType>
+  <xs:complexType name="GetContactlessReaderCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element name="SupportedPaymentScheme" type="SupportedPaymentScheme"/>
+          </xs:sequence>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element name="SupportedWalletScheme" type="WalletSchemes"/>
+          </xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetContactlessOperationalStateResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="OperationalState" type="ContactlessOperationalState" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetGlobalEMVDataResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetGlobalEMVDataResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetBrandTerminalCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBrandTerminalCapabilitiesResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetBrandModeResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBrandModeResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Mode" type="xs:unsignedByte" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetContactlessApplicationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="EmvDataElement" type="EmvDataElement"/>
+          </xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+        <xs:attribute name="AID" type="xs:hexBinary" use="required"/>
+        <xs:attribute name="ApplicationIndex" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="ApplicationSchemeIndicator" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="TransactionTypeIndicator" type="xs:unsignedByte" use="required"/>
+        <xs:attribute name="TerminalActionCodeDefault" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TerminalActionCodeDenial" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TerminalActionCodeOnline" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TransactionLimit" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="TransactionFloorLimit" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="CVMRequiredLimit" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="ZeroAmountOption" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="StatusCheck" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="TargetPercentage" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="ThresholdValue" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="MaxTargetPercentage" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="DeviceContactlessTransactionLimit" type="xs:hexBinary" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DownloadContactlessApplicationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DownloadContactlessPublicKeysResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetBrandApplicationParametersResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetBrandApplicationParametersResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+        <xs:attribute name="Name" type="BrandName" use="required"/>
+        <xs:attribute name="OfflineChipData" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="OnlineChipData" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="StatusCheckAmount" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="UnpredictableNumberRange" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="RemovalTimeout" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="MaxLifetimeTornTransaction" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="MaxNumberOfTornTransaction" type="xs:unsignedByte" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeleteContactlessApplicationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetTransactionIndicatorResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="ReaderTransactionResult" type="TransactionResult" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="OpenContactlessReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CloseContactlessReaderResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ResetContactlessConfigurationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!-- END CONTACTLESS READER INTERFACE -->
+  <!-- SAM READER INTERFACE -->
+  <!--   COMMANDS-->
+  <xs:complexType name="SAMReaderCommand">
+    <xs:choice>
+      <xs:element name="GetStatusCommand" type="GetStatusCommand"/>
+      <xs:element name="GetAvailableSlotsCommand" type="GetAvailableSlotsCommand"/>
+      <xs:element name="RefreshAvailableSlotsCommand" type="RefreshAvailableSlotsCommand"/>
+      <xs:element name="SelectSAMSlotCommand" type="SelectSAMSlotCommand"/>
+      <xs:element name="ActivateSAMCommand" type="ActivateSAMCommand"/>
+      <xs:element name="DeactivateSAMCommand" type="DeactivateSAMCommand"/>
+      <xs:element name="SoftResetSAMCommand" type="SoftResetSAMCommand"/>
+      <xs:element name="SAMProcessAPDUCommand" type="SAMProcessAPDUCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetAvailableSlotsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RefreshAvailableSlotsCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SelectSAMSlotCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="SlotID" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ActivateSAMCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeactivateSAMCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SoftResetSAMCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SAMProcessAPDUCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="CAPDU" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="SAMReaderEvent">
+    <xs:choice>
+      <xs:element name="StatusChanged" type="StatusChanged"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="SAMReaderResponse">
+    <xs:choice>
+      <xs:element name="GetStatusResponse" type="GetStatusResponse"/>
+      <xs:element name="GetAvailableSlotsResponse" type="GetAvailableSlotsResponse"/>
+      <xs:element name="RefreshAvailableSlotsResponse" type="RefreshAvailableSlotsResponse"/>
+      <xs:element name="SelectSAMSlotResponse" type="SelectSAMSlotResponse"/>
+      <xs:element name="ActivateSAMResponse" type="ActivateSAMResponse"/>
+      <xs:element name="DeactivateSAMResponse" type="DeactivateSAMResponse"/>
+      <xs:element name="SoftResetSAMResponse" type="SoftResetSAMResponse"/>
+      <xs:element name="SAMProcessAPDUResponse" type="SAMProcessAPDUResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="SAMSlot">
+    <xs:attribute name="SlotID" type="xs:int" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="GetAvailableSlotsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="SAMSlot" type="SAMSlot"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RefreshAvailableSlotsResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SelectSAMSlotResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ActivateSAMResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="ATR" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeactivateSAMResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SoftResetSAMResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="ATR" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SAMProcessAPDUResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="RAPDU" type="xs:hexBinary" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!-- END SAM READER INTERFACE -->
+  <!-- SOFTPHONE INTERFACE -->
+  <!--   COMMANDS-->
+  <xs:complexType name="SoftphoneCommand">
+    <xs:choice>
+      <xs:element name="GetConnectStatusCommand" type="GetConnectStatusCommand"/>
+      <xs:element name="GetCallStatusCommand" type="GetCallStatusCommand"/>
+      <xs:element name="GetPhonenumberCommand" type="GetPhonenumberCommand"/>
+      <xs:element name="SetPhonenumberCommand" type="SetPhonenumberCommand"/>
+      <xs:element name="GetVoipProtocolCommand" type="GetVoipProtocolCommand"/>
+      <xs:element name="GetVoipAccountCommand" type="GetVoipAccountCommand"/>
+      <xs:element name="SetVoipAccountCommand" type="SetVoipAccountCommand"/>
+      <xs:element name="LiftReceiverCommand" type="LiftReceiverCommand"/>
+      <xs:element name="HangupReceiverCommand" type="HangupReceiverCommand"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetConnectStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCallStatusCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPhonenumberCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetPhonenumberCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="Phonenumber" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetVoipProtocolCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetVoipAccountCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetVoipAccountCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence>
+          <xs:element name="VoipAccount" type="VoipAccount"/>
+        </xs:sequence>
+      </xs:extension>
+      <!--<xs:attribute name="serverName" type="xs:string" use="required"/>
+        <xs:attribute name="uri" type="xs:string" use="required"/>
+        <xs:attribute name="accountName" type="xs:string" use="required"/>
+        <xs:attribute name="accountpassword" type="xs:string" use="optional"/>
+        <xs:attribute name="transport" type="xs:string" use="optional"/>
+        <xs:attribute name="authtype" type="xs:string" use="optional"/>-->
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LiftReceiverCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:attribute name="PhoneNumber" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HangupReceiverCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END COMMANDS-->
+  <!--   EVENTS-->
+  <xs:complexType name="VoipAccount">
+    <xs:attribute name="serverName" type="xs:string" use="required"/>
+    <xs:attribute name="uri" type="xs:string" use="required"/>
+    <xs:attribute name="accountName" type="xs:string" use="required"/>
+    <xs:attribute name="accountpassword" type="xs:string" use="optional"/>
+    <xs:attribute name="transport" type="xs:string" use="optional"/>
+    <xs:attribute name="authtype" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:simpleType name="ConnectStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Registering"/>
+      <xs:enumeration value="Ready"/>
+      <xs:enumeration value="RegistrationFailed"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CallStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown"/>
+      <xs:enumeration value="Idle"/>
+      <xs:enumeration value="Disconnected"/>
+      <xs:enumeration value="InProgress"/>
+      <xs:enumeration value="Connecting"/>
+      <xs:enumeration value="Connected"/>
+      <xs:enumeration value="IncomingCall"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VoipProtocol">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SIP"/>
+      <xs:enumeration value="H.323 "/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="CallStateChanged">
+    <xs:attribute name="CallState" type="CallStatus" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ConnectStateChanged">
+    <xs:attribute name="ConnectStatus" type="ConnectStatus" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="IncomingCall">
+    <xs:attribute name="PhoneNumber" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="SoftphoneEvent">
+    <xs:choice>
+      <xs:element name="CallStateChanged" type="CallStateChanged"/>
+      <xs:element name="ConnectStateChanged" type="ConnectStateChanged"/>
+      <xs:element name="IncomingCall" type="IncomingCall"/>
+    </xs:choice>
+  </xs:complexType>
+  <!--   END EVENTS-->
+  <!--   RESPONSES-->
+  <xs:complexType name="SoftphoneResponse">
+    <xs:choice>
+      <xs:element name="GetCallStatusResponse" type="GetCallStatusResponse"/>
+      <xs:element name="GetConnectStatusResponse" type="GetConnectStatusResponse"/>
+      <xs:element name="GetPhonenumberResponse" type="GetPhonenumberResponse"/>
+      <xs:element name="SetPhonenumberResponse" type="SetPhonenumberResponse"/>
+      <xs:element name="GetVoipProtocolResponse" type="GetVoipProtocolResponse"/>
+      <xs:element name="GetVoipAccountResponse" type="GetVoipAccountResponse"/>
+      <xs:element name="SetVoipAccountResponse" type="SetVoipAccountResponse"/>
+      <xs:element name="LiftReceiverResponse" type="LiftReceiverResponse"/>
+      <xs:element name="HangupReceiverResponse" type="HangupReceiverResponse"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="GetConnectStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="ConnectStatus" type="ConnectStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetCallStatusResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="CallStatus" type="CallStatus" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetPhonenumberResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Phonenumber" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetPhonenumberResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:attribute name="Phonenumber" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetVoipProtocolResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="VoipProtocol" type="VoipProtocol"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GetVoipAccountResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse">
+        <xs:sequence>
+          <xs:element name="VoipAccount" type="VoipAccount"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetVoipAccountResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LiftReceiverResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="HangupReceiverResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--   END RESPONSES-->
+  <!-- END SOFTPHONE INTERFACE -->
+  <xs:element name="TerminalMessage">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="TerminalCommand" type="TerminalCommand"/>
+        <xs:element name="TerminalResponse" type="TerminalResponse"/>
+        <xs:element name="TerminalEvent" type="TerminalEvent"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
