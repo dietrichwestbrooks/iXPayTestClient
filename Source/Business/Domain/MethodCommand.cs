@@ -14,12 +14,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
         protected virtual Func<CommandParameters, BaseCommand> CreateInvokeCommand { get; set; }
         //protected virtual Func<BaseResponse, bool> ProcessResponse { get; set; }
 
-        public TerminalMessage GetMessage()
-        {
-            return GetMessage(new CommandParameters());
-        }
-
-        public virtual TerminalMessage GetMessage(CommandParameters parameters)
+        public virtual TerminalMessage GetInvokeMessage(CommandParameters parameters)
         {
             return GetMessage(CreateInvokeCommand(parameters));
         }
@@ -44,7 +39,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
         public new Func<CommandParameters, TInvokeCommand> CreateInvokeCommand { get; set; }
         //public new Func<TResponse, bool> ProcessResponse { get; set; }
 
-        public override TerminalMessage GetMessage(CommandParameters parameters)
+        public override TerminalMessage GetInvokeMessage(CommandParameters parameters)
         {
             return GetMessage(CreateInvokeCommand(parameters));
         }

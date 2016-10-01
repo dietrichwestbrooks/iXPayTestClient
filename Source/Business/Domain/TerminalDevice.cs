@@ -31,7 +31,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
 
             try
             {
-                var property = Properties.FirstOrDefault(p => p.Name == binder.Name);
+                var property = Properties.FirstOrDefault(p => $"get_{p.Name}" == binder.Name || $"set_{p.Name}" == binder.Name);
 
                 if (property == null)
                 {
@@ -40,24 +40,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
 
                     if (method == null)
                         return false;
-
-                    _callStack.Push(binder.Name);
-
-                    result = this;
-
-                    return true;
                 }
 
-                TerminalMessage message = property.GetGetMessage(new CommandParameters());
+                _callStack.Push(binder.Name);
 
-                object response = SendMessageAsync(message).Result;
-
-                property.ProcessGetResponse(response);
-
-                if (!property.Result)
-                    throw new InvalidOperationException(property.ResultMessage);
-
-                result = property.Value;
+                result = this;
 
                 return true;
             }
@@ -67,83 +54,113 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
             }
         }
 
-        public override bool TrySetMember(SetMemberBinder binder, object value)
-        {
-            try
-            {
-                var property = Properties.FirstOrDefault(p => p.Name == binder.Name);
+        //public override bool TrySetMember(SetMemberBinder binder, object value)
+        //{
+        //    try
+        //    {
+        //        var property = Properties.FirstOrDefault(p => p.Name == binder.Name);
 
-                if (property == null)
-                    return false;
+        //        if (property == null)
+        //            return false;
 
-                var parameters = new CommandParameters();
+        //        var parameters = new CommandParameters();
 
-                parameters.Add("value", value);
+        //        parameters.Add("value", value);
 
-                TerminalMessage message = property.GetSetMessage(parameters);
+        //        TerminalMessage message = property.GetSetMessage(parameters);
 
-                object response = SendMessageAsync(message).Result;
+        //        object response = SendMessageAsync(message).Result;
 
-                property.ProcessSetResponse(response);
+        //        property.ProcessSetResponse(response);
 
-                if (!property.Result)
-                    throw new InvalidOperationException(property.ResultMessage);
+        //        if (!property.Result)
+        //            throw new InvalidOperationException(property.ResultMessage);
 
-                return true;
-            }
-            catch (AggregateException ex)
-            {
-                throw ex.InnerException;
-            }
-        }
+        //        return true;
+        //    }
+        //    catch (AggregateException ex)
+        //    {
+        //        throw ex.InnerException;
+        //    }
+        //}
 
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
         {
             result = null;
-            
-            var method = Methods.FirstOrDefault(m => m.Name == _callStack.Peek());
 
-            if (method == null)
-                return false;
+            var methodName = _callStack.Peek();
 
-            var methodName = _callStack.Pop();
+            ITerminalDeviceProperty property = Properties.FirstOrDefault(p => $"get_{p.Name}" == methodName || $"set_{p.Name}" == methodName);
 
-            return TryInvoke(methodName, binder.CallInfo.ArgumentNames, args, out result);
+            if (property != null)
+            {
+                _callStack.Pop();
+                return TryInvoke(property, methodName, binder.CallInfo.ArgumentNames, args, out result);
+            }
+
+
+            ITerminalDeviceMethod method = Methods.FirstOrDefault(m => m.Name == methodName);
+
+            if (method != null)
+            {
+                _callStack.Pop();
+                return TryInvoke(method, methodName, binder.CallInfo.ArgumentNames, args, out result);
+            }
+
+            return false;
         }
 
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            return TryInvoke(binder.Name, binder.CallInfo.ArgumentNames, args, out result);
+            result = null;
+
+            var method = Methods.FirstOrDefault(m => m.Name == binder.Name);
+
+            if (method == null)
+                return false;
+
+            return TryInvoke(method, binder.Name, binder.CallInfo.ArgumentNames, args, out result);
         }
 
-        private bool TryInvoke(string methodName, IReadOnlyCollection<string> argNames, object[] args, out object result)
+        private bool TryInvoke(ITerminalDeviceCommand command, string methodName, IReadOnlyCollection<string> argNames, object[] args, out object result)
         {
             result = null;
 
             try
             {
-                var method = Methods.FirstOrDefault(m => m.Name == methodName);
-
-                if (method == null)
-                    return false;
-
                 var parameters = new CommandParameters();
 
-                foreach (var parameter in argNames.Zip(args, (name, arg) => new {Name = name, Value = arg}))
+                foreach (var parameter in argNames.Zip(args, (name, arg) => new { Name = name, Value = arg }))
                 {
                     parameters.Add(parameter.Name, parameter.Value);
                 }
 
-                TerminalMessage message = method.GetMessage(parameters);
+                if (methodName.StartsWith("set_"))
+                {
+                    var property = (ITerminalDeviceProperty)command;
+                    TerminalMessage message = property.GetSetMessage(parameters);
+                    object response = SendMessageAsync(message).Result;
+                    property.ProcessSetResponse(response);
+                }
+                else if (methodName.StartsWith("get_"))
+                {
+                    var property = (ITerminalDeviceProperty)command;
+                    TerminalMessage message = property.GetGetMessage(parameters);
+                    object response = SendMessageAsync(message).Result;
+                    property.ProcessGetResponse(response);
+                }
+                else
+                {
+                    var method = (ITerminalDeviceMethod)command;
+                    TerminalMessage message = method.GetInvokeMessage(parameters);
+                    object response = SendMessageAsync(message).Result;
+                    method.ProcessInvokeResponse(response);
+                }
 
-                object response = SendMessageAsync(message).Result;
+                if (!command.Result)
+                    throw new InvalidOperationException(command.ResultMessage);
 
-                method.ProcessInvokeResponse(response);
-
-                if (!method.Result)
-                    throw new InvalidOperationException(method.ResultMessage);
-
-                result = method.Result;
+                result = command.Result;
 
                 return true;
             }

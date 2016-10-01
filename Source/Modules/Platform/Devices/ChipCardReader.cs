@@ -27,6 +27,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
             Successor = terminal.Devices["Terminal"];
         }
+
+        #region Convenience Methods and Properties
+        // Add methods and properties that make it more convienent to send commands
+        // to this device from scripting environment
+
+        #endregion
     }
 
     public class OpenChipCardReaderMethod : MethodCommandT<OpenChipCardReaderCommand, OpenChipCardReaderResponse>
@@ -34,22 +40,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public OpenChipCardReaderMethod()
             : base("Open")
         {
-            CreateInvokeCommand = p => InternalCreateCommand(
-                p.GetValue<bool>("allowMagStripeFallback", 0),
-                p.GetValue<bool>("allowMagStripeFallbackSpecified", 0),
-                p.GetValue("timeout", 0, -1),
-                p.GetValue<bool>("timeoutSpecified", 1));
-        }
-
-        private OpenChipCardReaderCommand InternalCreateCommand(bool allowMagStripeFallback,
-            bool allowMagStripeFallbackSpecified, int timeout, bool timeoutSpecified)
-        {
-            return new OpenChipCardReaderCommand
+            CreateInvokeCommand = p => new OpenChipCardReaderCommand
                 {
-                    AllowMagStripeFallback = allowMagStripeFallback,
-                    AllowMagStripeFallbackSpecified = allowMagStripeFallbackSpecified,
-                    Timeout = timeout,
-                    TimeoutSpecified = timeoutSpecified,
+                    AllowMagStripeFallback = p.GetValue<bool>("allowMagStripeFallback", 0),
+                    AllowMagStripeFallbackSpecified = p.GetValue<bool>("allowMagStripeFallbackSpecified", 1),
+                    Timeout = p.GetValue("timeout", 2, -1),
+                    TimeoutSpecified = p.GetValue<bool>("timeoutSpecified", 3)
                 };
         }
     }

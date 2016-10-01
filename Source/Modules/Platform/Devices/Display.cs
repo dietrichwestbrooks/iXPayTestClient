@@ -36,6 +36,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
             Successor = terminal.Devices["Terminal"];
         }
+
+        #region Convenience Methods and Properties
+        // Add methods and properties that make it more convienent to send commands
+        // to this device from scripting environment
+
+        #endregion
     }
 
     public class CurrentLanguageProperty : PropertyCommandT<string,
@@ -48,16 +54,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             CreateGetCommand = p => new GetCurrentLanguageCommand();
             //ProcessGetResponse = response => response.Language;
 
-            CreateSetCommand = p => InternalCreateGetCommand(
-               p.GetValue("value", 0, "en"));
-        }
-
-        private SetCurrentLanguageCommand InternalCreateGetCommand(string language)
-        {
-            return new SetCurrentLanguageCommand
-            {
-                Language = language,
-            };
+            CreateSetCommand = p => new SetCurrentLanguageCommand
+                {
+                    Language = p.GetValue("value", 0, "en"),
+                };
         }
 
         public override bool ProcessGetResponse(GetCurrentLanguageResponse response)
@@ -109,9 +109,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             //ProcessGetResponse = response => response.PromptDetails;
 
             CreateSetCommand = p => new SetPromptDetailsCommand
-            {
-                PromptDetails = p.GetValue<PromptDetails>("value", 0)
-            };
+                {
+                    Language = p.GetValue("language", 0, "en"),
+                    PromptDetails = p.GetValue<PromptDetails>("value", 1),
+                };
         }
 
         public override bool ProcessGetResponse(GetPromptDetailsResponse response)
@@ -135,23 +136,15 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             CreateGetCommand = p => new GetImageDetailsCommand();
             //ProcessGetResponse = response => response.Value;
 
-            CreateSetCommand = p => InternalCreateSetCommand(p.GetValue<ImageDetails>("value", 0));
-        }
-
-        private SetImageDetailsCommand InternalCreateSetCommand(ImageDetails value)
-        {
-            Value = value;
-
-            return new SetImageDetailsCommand
-            {
-                ImageId = value.ImageId,
-                Description = value.Description,
-                Filename = value.Filename,
-                Language = value.Language,
-                TransparentColor = value.TransparentColor,
-                Value = value.Value,
-            };
-
+            CreateSetCommand = p => new SetImageDetailsCommand
+                {
+                    ImageId = p.GetValue("imageId", 0, 1),
+                    Filename = p.GetValue("filename", 1, "bac1re1.bmp"),
+                    Description = p.GetValue<string>("description", 2),
+                    Language = p.GetValue("language", 3, "en"),
+                    TransparentColor = p.GetValue<byte[]>("transparentColor", 4),
+                    Value = p.GetValue<byte[]>("value", 5),
+                };
         }
 
         public override bool ProcessGetResponse(GetImageDetailsResponse response)
@@ -170,25 +163,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public DisplayPromptMethod()
             : base("DisplayPrompt")
         {
-            CreateInvokeCommand = p => InternalCreateCommand(
-                p.GetValue("id", 0, -1),
-                p.GetValue<string>("language", 1),
-                p.GetValue("ignoreSoftKeySet", 2, false),
-                p.GetValue("ignoreSoftKeySetSpecified", 3, false),
-                p.GetArray<SubstituteParameter>("SubstituteParameter", 4));
-        }
-
-        private DisplayPromptCommand InternalCreateCommand(int id, string language, bool ignoreSoftKeySet,
-            bool ignoreSoftKeySetSpecified, SubstituteParameter[] substituteParameter)
-        {
-            return new DisplayPromptCommand
-            {
-                Id = id,
-                Language = language,
-                IgnoreSoftKeySet = ignoreSoftKeySet,
-                IgnoreSoftKeySetSpecified = ignoreSoftKeySetSpecified,
-                SubstituteParameter = substituteParameter ?? new[] { new SubstituteParameter { Text = "A Text" } },
-            };
+            CreateInvokeCommand = p => new DisplayPromptCommand
+                {
+                    Id = p.GetValue("id", 0, -1),
+                    Language = p.GetValue<string>("language", 1),
+                    IgnoreSoftKeySet = p.GetValue("ignoreSoftKeySet", 2, false),
+                    IgnoreSoftKeySetSpecified = p.GetValue("ignoreSoftKeySetSpecified", 3, false),
+                    SubstituteParameter = p.GetArray("SubstituteParameter", 4, new[]
+                        {
+                            new SubstituteParameter {Text = "A Text"}
+                        })
+                };
         }
     }
 
@@ -197,18 +182,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public DeletePromptMethod()
             : base("DeletePrompt")
         {
-            CreateInvokeCommand = p => InternalCreateCommand(
-                p.GetValue("id", 0, -1),
-                p.GetValue("language", 1, "en"));
-        }
-
-        private DeletePromptCommand InternalCreateCommand(int id, string language)
-        {
-            return new DeletePromptCommand
-            {
-                Id = id,
-                Language = language,
-            };
+            CreateInvokeCommand = p => new DeletePromptCommand
+                {
+                    Id = p.GetValue("id", 0, -1),
+                    Language = p.GetValue("language", 1, "en")
+                };
         }
     }
 
@@ -217,18 +195,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public DisplayStringMethod()
             : base("DisplayString")
         {
-            CreateInvokeCommand = p => InternalCreateCommand(
-                p.GetValue("message", 0, "Please Pay inside (E01)"),
-                p.GetValue("showDataEntry", 1, false));
-        }
-
-        private DisplayStringCommand InternalCreateCommand(string message, bool showDataEntry)
-        {
-            return new DisplayStringCommand
-            {
-                Message = message,
-                ShowDataEntry = showDataEntry,
-            };
+            CreateInvokeCommand = p => new DisplayStringCommand
+                {
+                    Message = p.GetValue("message", 0, "Please Pay inside (E01)"),
+                    ShowDataEntry = p.GetValue("showDataEntry", 1, false)
+                };
         }
     }
 }

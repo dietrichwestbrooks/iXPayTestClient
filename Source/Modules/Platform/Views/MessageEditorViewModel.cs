@@ -66,7 +66,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
             if (method != null)
             {
-                Message = method.GetMessage().Serialize();
+                Message = method.GetInvokeMessage(new CommandParameters()).Serialize();
             }
         }
 

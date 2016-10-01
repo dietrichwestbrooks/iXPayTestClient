@@ -27,6 +27,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
             Successor = terminal.Devices["Terminal"];
         }
+
+        #region Convenience Methods and Properties
+        // Add methods and properties that make it more convienent to send commands
+        // to this device from scripting environment
+
+        #endregion
     }
 
     public class OpenMagStripeReaderMethod : MethodCommandT<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>
@@ -34,18 +40,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public OpenMagStripeReaderMethod()
              : base("Open")
         {
-            CreateInvokeCommand = p => InternalCreateCommand(
-                p.GetValue("timeout", 0, -1),
-                p.GetValue<bool>("timeoutSpecified", 1));
-        }
-
-        private OpenMagStripeReaderCommand InternalCreateCommand(int timeout, bool timeoutSpecified)
-        {
-            return new OpenMagStripeReaderCommand
-            {
-                Timeout = timeout,
-                TimeoutSpecified = timeoutSpecified,
-            };
+            CreateInvokeCommand = p => new OpenMagStripeReaderCommand
+                {
+                    Timeout = p.GetValue("timeout", 0, -1),
+                    TimeoutSpecified = p.GetValue<bool>("timeoutSpecified", 1)
+                };
         }
     }
 }

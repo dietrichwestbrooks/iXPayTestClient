@@ -2,8 +2,7 @@
 {
     public interface ITerminalDeviceMethod : ITerminalDeviceCommand
     {
-        TerminalMessage GetMessage();
-        TerminalMessage GetMessage(CommandParameters parameters);
+        TerminalMessage GetInvokeMessage(CommandParameters parameters);
         bool ProcessInvokeResponse(object response);
     }
 }
