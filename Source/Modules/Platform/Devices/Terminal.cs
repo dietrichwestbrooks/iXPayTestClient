@@ -1,4 +1,4 @@
-﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {

@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Practices.ServiceLocation;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
     [Export(typeof(ITerminalClient))]
     public class TerminalClient : ITerminalClient

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
     public interface ITerminalDeviceCollection : IEnumerable<ITerminalDevice>
     {

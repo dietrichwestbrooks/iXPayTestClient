@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
     public abstract class PropertyCommand : CommandObject, ITerminalDeviceProperty
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{1FA9FC35-D895-457F-875A-9BD558BC2311}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Wayne.Payment.Tools.iXPayTestClient.Business.Domain</RootNamespace>
-    <AssemblyName>iXPayTestClient.Business.Domain</AssemblyName>
+    <RootNamespace>Wayne.Payment.Tools.iXPayTestClient.Business.Messaging</RootNamespace>
+    <AssemblyName>iXPayTestClient.Business.Messaging</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

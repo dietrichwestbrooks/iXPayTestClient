@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class TerminalDeviceAttribute : ExportAttribute

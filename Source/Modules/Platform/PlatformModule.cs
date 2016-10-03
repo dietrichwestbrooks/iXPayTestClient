@@ -2,7 +2,7 @@
 using System.Reflection;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Mef.Modularity;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;

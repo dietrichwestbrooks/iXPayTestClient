@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
     [Export(typeof(ITerminalMessageSerializer))]
     public class TerminalMessageSerializer : ITerminalMessageSerializer

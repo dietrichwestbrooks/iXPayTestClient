@@ -168,9 +168,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Business\Domain\iXPayTestClient.Business.Domain.csproj">
+    <ProjectReference Include="..\Business\Domain\iXPayTestClient.Business.Messaging.csproj">
       <Project>{1fa9fc35-d895-457f-875a-9bd558bc2311}</Project>
-      <Name>iXPayTestClient.Business.Domain</Name>
+      <Name>iXPayTestClient.Business.Messaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\iXPayTestClient.Infrastructure.csproj">
       <Project>{138afa9b-e95b-43b4-9ba9-a05682dcdd5e}</Project>

@@ -3,7 +3,7 @@ using System.ComponentModel.Composition;
 using System.Net;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Logging;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;

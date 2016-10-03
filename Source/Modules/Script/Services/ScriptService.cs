@@ -7,7 +7,7 @@ using IronPython.Hosting;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using Prism.Logging;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Services;
@@ -145,7 +145,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 import clr
 clr.AddReference('IronPython')
 clr.AddReference('IronPython.Modules')
-clr.AddReference('iXPayTestClient.Business.Domain')
+clr.AddReference('iXPayTestClient.Business.Messaging')
 clr.AddReference('Microsoft.Scripting.Metadata')
 clr.AddReference('Microsoft.Scripting')
 clr.AddReference('Microsoft.Dynamic')

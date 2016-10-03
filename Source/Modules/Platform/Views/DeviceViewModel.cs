@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows.Input;
 using Prism.Commands;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;

@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Wayne.Payment.Tools.iXPayTestClient.Desktop.Properties;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
@@ -22,7 +21,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop.Views
         {
             //IconSource = new BitmapImage(new Uri("pack://application:,,,/AssemblyName;component/App.ico"));
 
-            IconSource = Imaging.CreateBitmapSourceFromHIcon(Resources.AppIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            IconSource = Imaging.CreateBitmapSourceFromHIcon(Properties.Resources.AppIcon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
             EventAggregator.GetEvent<ConnectionStatusEvent>().Subscribe(OnConnectionStatus);
         }

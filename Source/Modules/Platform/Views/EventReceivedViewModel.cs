@@ -1,5 +1,5 @@
-﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain.Extensions;
+﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;

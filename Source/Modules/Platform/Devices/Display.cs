@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Events;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Convert = Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Utility.Convert;
@@ -46,37 +46,37 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
         public void SetPromptWithImage(int promptId, string promptText, int promptLeft, int promptTop, string language, int imageLeft, int imageTop, int imageId, string imagePath)
         {
-            IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
-            eventAggregator.GetEvent<MessageSentEvent>().Publish(Methods.First().GetInvokeMessage(new CommandParameters()));
-            eventAggregator.GetEvent<ResponseReceivedEvent>().Publish(new TerminalMessage
-            {
-                Item = new TerminalResponse
-                {
-                    Item = new DisplayResponse
-                    {
-                        Item = new DisplayPromptResponse
-                        {
-                            Success = true,
-                            Message = "OK"
-                        }
-                    }
-                }
-            });
+            //IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
+            //eventAggregator.GetEvent<MessageSentEvent>().Publish(Methods.First().GetInvokeMessage(new CommandParameters()));
+            //eventAggregator.GetEvent<ResponseReceivedEvent>().Publish(new TerminalMessage
+            //{
+            //    Item = new TerminalResponse
+            //    {
+            //        Item = new DisplayResponse
+            //        {
+            //            Item = new DisplayPromptResponse
+            //            {
+            //                Success = true,
+            //                Message = "OK"
+            //            }
+            //        }
+            //    }
+            //});
 
-            eventAggregator.GetEvent<EventReceivedEvent>().Publish(new TerminalMessage
-            {
-                Item = new TerminalEvent
-                {
-                    Item = new DisplayEvent
-                    {
-                        Item = new CurrentLanguageChanged
-                        {
-                            Language = "en"
-                        }
-                    }
-                }
-            });
-            return;
+            //eventAggregator.GetEvent<EventReceivedEvent>().Publish(new TerminalMessage
+            //{
+            //    Item = new TerminalEvent
+            //    {
+            //        Item = new DisplayEvent
+            //        {
+            //            Item = new CurrentLanguageChanged
+            //            {
+            //                Language = "en"
+            //            }
+            //        }
+            //    }
+            //});
+            //return;
 
             var imageValue = new Convert().ToImageByteArray(imagePath);
             var filename = Path.GetFileNameWithoutExtension(imagePath);

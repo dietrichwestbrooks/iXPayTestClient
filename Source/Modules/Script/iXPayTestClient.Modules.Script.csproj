@@ -147,9 +147,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Business\Domain\iXPayTestClient.Business.Domain.csproj">
+    <ProjectReference Include="..\..\Business\Domain\iXPayTestClient.Business.Messaging.csproj">
       <Project>{1FA9FC35-D895-457F-875A-9BD558BC2311}</Project>
-      <Name>iXPayTestClient.Business.Domain</Name>
+      <Name>iXPayTestClient.Business.Messaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\iXPayTestClient.Infrastructure.csproj">
       <Project>{138AFA9B-E95B-43B4-9BA9-A05682DCDD5E}</Project>

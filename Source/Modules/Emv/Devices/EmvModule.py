@@ -1,5 +1,5 @@
 import clr
-from Wayne.Payment.Tools.iXPayTestClient.Business.Domain import *
+from Wayne.Payment.Tools.iXPayTestClient.Business.Messaging import *
 
 # define SetTimeout method command
 class SetTimeoutMethod(MethodCommand):

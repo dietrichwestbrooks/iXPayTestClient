@@ -8,7 +8,7 @@ using Prism.Logging;
 using Prism.Mef;
 using Prism.Modularity;
 using Prism.Regions;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Desktop.Views;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;

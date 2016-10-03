@@ -10,6 +10,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
+        <Grid.Resources>
+            <Style BasedOn="{StaticResource MetroDataGridColumnHeader}" TargetType="{x:Type DataGridColumnHeader}">
+                <Setter Property="Background" Value="{StaticResource AccentColorBrush}" />
+            </Style>
+        </Grid.Resources>
         <DockPanel LastChildFill="True">
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
                 <CheckBox IsChecked="True" Content="Clear on Run" />
@@ -32,7 +37,11 @@
                     </Button>
                 </ToolBar>
             </ToolBarTray>
-            <DataGrid DockPanel.Dock="Top" AutoGenerateColumns="False" HeadersVisibility="All" IsReadOnly="True" ItemsSource="{Binding Messages}">
+            <DataGrid DockPanel.Dock="Top" 
+                      AutoGenerateColumns="False" 
+                      HeadersVisibility="All" 
+                      IsReadOnly="True" 
+                      ItemsSource="{Binding Messages}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Sequence" Binding="{Binding SequenceNumber}" />
                     <DataGridTextColumn Header="Command" Binding="{Binding Title}" />

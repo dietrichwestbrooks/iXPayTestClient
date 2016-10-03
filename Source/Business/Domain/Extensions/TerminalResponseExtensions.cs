@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain.Extensions
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions
 {
     public static class TerminalResponseExtensions
     {

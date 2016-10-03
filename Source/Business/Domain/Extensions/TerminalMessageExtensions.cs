@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.Practices.ServiceLocation;
 
-namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain.Extensions
+namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions
 {
     public static class TerminalMessageExtensions
     {

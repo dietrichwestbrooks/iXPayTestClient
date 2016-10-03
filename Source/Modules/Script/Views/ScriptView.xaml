@@ -87,9 +87,9 @@
                 <ixpay:BindableAvalonEditTextBehavior Text="{Binding Code, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </i:Interaction.Behaviors>
         </avalonedit:TextEditor>
-        <GridSplitter Grid.Column="1" Grid.Row="1" Margin="0,3,0,0" Height="3" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-        <DockPanel Grid.Column="1" Grid.Row="1" Margin="0,6,0,0" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Margin="0,3" Typography.Capitals="AllSmallCaps">Output</TextBlock>
+        <GridSplitter Grid.Column="1" Grid.Row="1" Margin="0,0,0,0" Height="3" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+        <DockPanel Grid.Column="1" Grid.Row="1" Margin="0,3,0,0" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" Padding="3,5" FontWeight="SemiBold" Background="{StaticResource AccentColorBrush}" Typography.Capitals="AllSmallCaps">OUTPUT</TextBlock>
             <TextBox DockPanel.Dock="Top" IsReadOnly="True" VerticalScrollBarVisibility="Visible"  TextWrapping="Wrap" Text="{Binding OutputText, Mode=OneWay}" />
         </DockPanel>
     </Grid>
