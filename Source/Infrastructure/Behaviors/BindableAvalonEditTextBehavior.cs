@@ -43,8 +43,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Behaviors
 
             var textEditor = AssociatedObject as ITextEditorComponent;
 
-            if (textEditor?.Document != null)
-                textEditor.Document.TextChanged += OnTextEditorTextChanged;
+            if (textEditor?.Document == null)
+                return;
+
+            if (Text != (string)TextProperty.DefaultMetadata.DefaultValue)
+                textEditor.Document.Text = Text;
+
+            textEditor.Document.TextChanged += OnTextEditorTextChanged;
         }
 
         protected override void OnDetaching()

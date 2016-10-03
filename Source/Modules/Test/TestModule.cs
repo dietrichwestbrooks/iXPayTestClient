@@ -12,7 +12,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Test
     {
         protected override void RegisterViews()
         {
-            RegionManager.Regions[RegionNames.MainDockRegion].Add(ServiceLocator.Current.GetInstance<ITestListView>());
+            //RegionManager.Regions[RegionNames.MainDockRegion].Add(ServiceLocator.Current.GetInstance<ITestListView>());
         }
     }
 }

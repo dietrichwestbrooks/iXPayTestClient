@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
-using iXPayTestClient.Modules.Script.Views;
+using Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Mef.Modularity;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
 
-namespace iXPayTestClient.Modules.Script
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script
 {
     [ModuleExport("ScriptModule", typeof(Module), DependsOnModuleNames = new[] { "CoreModule" })]
     public class ScriptModule : ModuleBase

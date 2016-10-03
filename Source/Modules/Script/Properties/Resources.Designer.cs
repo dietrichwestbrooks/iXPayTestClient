@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace iXPayTestClient.Modules.Script.Properties {
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace iXPayTestClient.Modules.Script.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("iXPayTestClient.Modules.Script.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

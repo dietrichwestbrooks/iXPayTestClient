@@ -12,7 +12,7 @@ using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Services;
 
-namespace iXPayTestClient.Modules.Script.Services
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 {
     [Export(typeof(IScriptService))]
     public class ScriptService : ServiceBase, IScriptService
@@ -40,7 +40,7 @@ namespace iXPayTestClient.Modules.Script.Services
 
             CreateScope();
 
-            SetVariable("Utility", new Utility(), true);
+            SetVariable("Convert", new Infrastructure.Utility.Convert(), true);
         }
 
         public void ExecuteScript(string code)

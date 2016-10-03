@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientErrorEventArg.cs" />
+    <Compile Include="CommandMessageType.cs" />
     <Compile Include="CommandObject.cs" />
     <Compile Include="CommandParameters.cs" />
     <Compile Include="Enums.cs" />

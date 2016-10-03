@@ -50,7 +50,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
         {
             _sequenceNumber = _terminalClient.SendMessage(_message);
 
-            if (!_responseReceived.Wait(10000))
+            if (!_responseReceived.Wait(30000))
                 throw new TimeoutException("Timeout waiting for message response");
 
             if (_exception != null)

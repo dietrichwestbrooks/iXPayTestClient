@@ -3,7 +3,7 @@ using System.Xml;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 
-namespace iXPayTestClient.Modules.Script.Views
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 {
     /// <summary>
     /// Interaction logic for ScriptView.xaml

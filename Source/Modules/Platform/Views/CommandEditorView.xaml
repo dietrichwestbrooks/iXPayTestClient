@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <xctk:PropertyGrid NameColumnWidth="110" AutoGenerateProperties="True" SelectedObject="{Binding Command}">
+        <xctk:PropertyGrid NameColumnWidth="110" Foreground="#000" AutoGenerateProperties="True" SelectedObject="{Binding Command}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="PropertyValueChanged">
                     <i:InvokeCommandAction Command="{Binding PropertyChangedCommand}" CommandParameter="{Binding SelectedObject, RelativeSource={RelativeSource AncestorType={x:Type xctk:PropertyGrid}, Mode=FindAncestor}}" />

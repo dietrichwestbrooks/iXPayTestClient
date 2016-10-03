@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using MahApps.Metro;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
@@ -18,7 +12,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
         {
             //Tuple<AppTheme, Accent> appStyle = ThemeManager.DetectAppStyle(Current);
 
-            ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent("Blue"), ThemeManager.GetAppTheme("BaseLight"));
+            //ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent("Blue"), ThemeManager.GetAppTheme("BaseLight"));
+            ThemeManager.ChangeAppStyle(Current, ThemeManager.GetAccent("Steel"), ThemeManager.GetAppTheme("BaseDark"));
 
             base.OnStartup(e);
 

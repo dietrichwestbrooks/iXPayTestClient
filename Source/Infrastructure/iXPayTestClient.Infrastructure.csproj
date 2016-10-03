@@ -64,6 +64,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Wpf.6.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -129,6 +130,7 @@
     <Compile Include="Services\FlyoutService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\ServiceBase.cs" />
+    <Compile Include="Utility\Convert.cs" />
     <Compile Include="Views\TitleViewModel.cs" />
     <Compile Include="Views\ViewModelBase.cs" />
     <Compile Include="Views\ViewModelDialogPopupBase.cs" />

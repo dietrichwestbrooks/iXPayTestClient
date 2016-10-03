@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace iXPayTestClient.Modules.Script.Services
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 {
     internal class ScriptOuputWriter : StreamWriter
     {

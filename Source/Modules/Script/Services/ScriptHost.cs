@@ -2,11 +2,10 @@
 using Microsoft.Practices.ServiceLocation;
 using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Domain;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
-namespace iXPayTestClient.Modules.Script.Services
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 {
     public class ScriptHost
     {

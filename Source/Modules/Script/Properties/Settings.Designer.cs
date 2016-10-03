@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace iXPayTestClient.Modules.Script.Properties {
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

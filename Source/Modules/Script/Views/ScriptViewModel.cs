@@ -6,7 +6,7 @@ using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
-namespace iXPayTestClient.Modules.Script.Views
+namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 {
     [Export(typeof(IScriptViewModel))]
     public class ScriptViewModel : ViewModelBase, IScriptViewModel

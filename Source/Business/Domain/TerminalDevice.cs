@@ -25,70 +25,85 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
 
         public ITerminalDevicePropertyCollection Properties { get; } = new TerminalDevicePropertyCollection();
 
+        public virtual ITerminalRequestHandler Successor { get; protected set; }
+
+        public virtual object HandleRequest(object command)
+        {
+            var outerCommand = Activator.CreateInstance(CommandType);
+
+            outerCommand.GetType().InvokeMember("Item",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty,
+                Type.DefaultBinder, outerCommand, new[] { command });
+
+            return outerCommand;
+        }
+
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
             result = null;
 
-            try
+            var property = Properties.FirstOrDefault(p => p.Name == binder.Name);
+
+            if (property != null)
+                return TryInvoke(property, $"get_{property.Name}", null, null, out result);
+
+            property = Properties.FirstOrDefault(p => $"get_{p.Name}" == binder.Name || $"set_{p.Name}" == binder.Name);
+
+            if (property != null)
             {
-                var property = Properties.FirstOrDefault(p => $"get_{p.Name}" == binder.Name || $"set_{p.Name}" == binder.Name);
-
-                if (property == null)
-                {
-                    // Check to see if it is a method call
-                    var method = Methods.FirstOrDefault(m => m.Name == binder.Name);
-
-                    if (method == null)
-                        return false;
-                }
-
                 _callStack.Push(binder.Name);
-
                 result = this;
-
                 return true;
             }
-            catch (AggregateException ex)
+
+            var method = Methods.FirstOrDefault(m => m.Name == binder.Name);
+
+            if (method != null)
             {
-                throw ex.InnerException;
+                _callStack.Push(method.Name);
+                result = this;
+                return true;
             }
+
+            return false;
         }
 
-        //public override bool TrySetMember(SetMemberBinder binder, object value)
-        //{
-        //    try
-        //    {
-        //        var property = Properties.FirstOrDefault(p => p.Name == binder.Name);
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            var property = Properties.FirstOrDefault(p => p.Name == binder.Name);
 
-        //        if (property == null)
-        //            return false;
+            if (property == null)
+                return false;
 
-        //        var parameters = new CommandParameters();
+            object result;
 
-        //        parameters.Add("value", value);
+            return TryInvoke(property, $"set_{property.Name}", new[] {"value"}, new[] {value}, out result);
+        }
 
-        //        TerminalMessage message = property.GetSetMessage(parameters);
+        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        {
+            result = null;
 
-        //        object response = SendMessageAsync(message).Result;
+            string methodName = binder.Name;
 
-        //        property.ProcessSetResponse(response);
+            ITerminalDeviceProperty property = Properties.FirstOrDefault(p => $"get_{p.Name}" == methodName || $"set_{p.Name}" == methodName);
 
-        //        if (!property.Result)
-        //            throw new InvalidOperationException(property.ResultMessage);
+            if (property != null)
+                return TryInvoke(property, methodName, binder.CallInfo.ArgumentNames, args, out result);
 
-        //        return true;
-        //    }
-        //    catch (AggregateException ex)
-        //    {
-        //        throw ex.InnerException;
-        //    }
-        //}
+            ITerminalDeviceMethod method = Methods.FirstOrDefault(m => m.Name == methodName);
+
+            if (method != null)
+                return TryInvoke(method, methodName, binder.CallInfo.ArgumentNames, args, out result);
+
+            return false;
+        }
 
         public override bool TryInvoke(InvokeBinder binder, object[] args, out object result)
         {
             result = null;
 
-            var methodName = _callStack.Peek();
+            string methodName = _callStack.Peek();
 
             ITerminalDeviceProperty property = Properties.FirstOrDefault(p => $"get_{p.Name}" == methodName || $"set_{p.Name}" == methodName);
 
@@ -97,7 +112,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
                 _callStack.Pop();
                 return TryInvoke(property, methodName, binder.CallInfo.ArgumentNames, args, out result);
             }
-
 
             ITerminalDeviceMethod method = Methods.FirstOrDefault(m => m.Name == methodName);
 
@@ -110,19 +124,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
             return false;
         }
 
-        public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
-        {
-            result = null;
-
-            var method = Methods.FirstOrDefault(m => m.Name == binder.Name);
-
-            if (method == null)
-                return false;
-
-            return TryInvoke(method, binder.Name, binder.CallInfo.ArgumentNames, args, out result);
-        }
-
-        private bool TryInvoke(ITerminalDeviceCommand command, string methodName, IReadOnlyCollection<string> argNames, object[] args, out object result)
+        protected bool TryInvoke(ITerminalDeviceCommand command, string methodName, IReadOnlyCollection<string> argNames, object[] args, out object result)
         {
             result = null;
 
@@ -130,9 +132,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
             {
                 var parameters = new CommandParameters();
 
-                foreach (var parameter in argNames.Zip(args, (name, arg) => new { Name = name, Value = arg }))
+                // todo change to work with unnamed parameters as well
+                if (argNames != null && args != null)
                 {
-                    parameters.Add(parameter.Name, parameter.Value);
+                    foreach (var parameter in argNames.Zip(args, (name, arg) => new { Name = name, Value = arg }))
+                    {
+                        parameters.Add(parameter.Name, parameter.Value);
+                    } 
                 }
 
                 if (methodName.StartsWith("set_"))
@@ -170,17 +176,49 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Domain
             }
         }
 
-        public virtual ITerminalRequestHandler Successor { get; protected set; }
-
-        public virtual object HandleRequest(object command)
+        protected void Set(string propName, IDictionary<string, object> parameters)
         {
-            var outerCommand = Activator.CreateInstance(CommandType);
+            ITerminalDeviceProperty property = Properties.First(p => p.Name == propName);
 
-            outerCommand.GetType().InvokeMember("Item",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty,
-                Type.DefaultBinder, outerCommand, new[] { command });
+            if (property == null)
+                throw new InvalidOperationException($"'{Name}' object has no property '{propName}'");
 
-            return outerCommand;
+            object result;
+
+            TryInvoke(property, $"set_{propName}", parameters.Keys.ToArray(), parameters.Values.ToArray(), out result);
+
+            if (!property.Result)
+                throw new InvalidOperationException(property.ResultMessage);
+        }
+
+        protected void Get(string propName, IDictionary<string, object> parameters)
+        {
+            ITerminalDeviceProperty property = Properties.First(p => p.Name == propName);
+
+            if (property == null)
+                throw new InvalidOperationException($"'{Name}' object has no property '{propName}'");
+
+            object result;
+
+            TryInvoke(property, $"get_{propName}", parameters.Keys.ToArray(), parameters.Values.ToArray(), out result);
+
+            if (!property.Result)
+                throw new InvalidOperationException(property.ResultMessage);
+        }
+
+        protected void Invoke(string methodName, IDictionary<string, object> parameters)
+        {
+            ITerminalDeviceMethod method = Methods.First(p => p.Name == methodName);
+
+            if (method == null)
+                throw new InvalidOperationException($"'{Name}' object has no method '{methodName}'");
+
+            object result;
+
+            TryInvoke(method, methodName, parameters.Keys.ToArray(), parameters.Values.ToArray(), out result);
+
+            if (!method.Result)
+                throw new InvalidOperationException(method.ResultMessage);
         }
 
         protected Task<object> SendMessageAsync(TerminalMessage message)

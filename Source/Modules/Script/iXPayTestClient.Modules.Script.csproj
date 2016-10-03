@@ -7,7 +7,7 @@
     <ProjectGuid>{A5C81C02-7252-4C75-8BB4-B1A0C0C28081}</ProjectGuid>
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>iXPayTestClient.Modules.Script</RootNamespace>
+    <RootNamespace>Wayne.Payment.Tools.iXPayTestClient.Modules.Script</RootNamespace>
     <AssemblyName>iXPayTestClient.Modules.Script</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -127,7 +127,6 @@
     <Compile Include="ScriptModule.cs" />
     <Compile Include="Services\ScriptHost.cs" />
     <Compile Include="Services\ScriptService.cs" />
-    <Compile Include="Services\Utility.cs" />
     <Compile Include="Views\IScriptView.cs" />
     <Compile Include="Views\IScriptViewModel.cs" />
     <Compile Include="Services\ScriptOuputWriter.cs" />

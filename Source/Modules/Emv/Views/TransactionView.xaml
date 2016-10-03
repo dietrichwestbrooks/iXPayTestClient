@@ -4,41 +4,110 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Wayne.Payment.Tools.iXPayTestClient.Modules.Emv.Views"
+             xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay"
+             xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
-            <StackPanel Orientation="Horizontal" Margin="0,5">
-                <TextBlock Text="Initiate Transaction Command" />
-                <TextBox Width="100" Margin="2,0,5,0" />
-                <Button Content="Save" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Expander Header="Initiate Transaction Command" IsExpanded="True">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBox Width="200" Text="InitiateCommData.txt" />
+                            <Button Command="{Binding SaveFileCommand}"
+                                Height="20"
+                                Margin="5,0,0,0"
+                                Foreground="#fff">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="12" 
+                                           Height="12"
+                                           Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                                        <Rectangle.OpacityMask>
+                                            <VisualBrush Stretch="Fill"
+                                                     Visual="{DynamicResource appbar_save}" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <avalonedit:TextEditor Background="#eee" 
+                                           FontFamily="Consolas" 
+                                           FontSize="10pt" 
+                                           ShowLineNumbers="True" 
+                                           SyntaxHighlighting="XML">
+                            <i:Interaction.Behaviors>
+                                <ixpay:BindableAvalonEditTextBehavior Text="{Binding InitiateTransactionCommandXml, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            </i:Interaction.Behaviors>
+                        </avalonedit:TextEditor>
+                    </StackPanel>
+                </Expander>
+                <Expander Header="Set Amounts Command" IsExpanded="True">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBox Width="200" Text="SetAmountsCommData.txt" />
+                            <Button Command="{Binding SaveFileCommand}"
+                                Height="20"
+                                Margin="5,0,0,0"
+                                Foreground="#fff">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="12" 
+                                           Height="12"
+                                           Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                                        <Rectangle.OpacityMask>
+                                            <VisualBrush Stretch="Fill"
+                                                     Visual="{DynamicResource appbar_save}" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                </StackPanel>
+                            </Button>
+                            <CheckBox Margin="15,0,0,0" Content="Use Set Amounts Command" />
+                        </StackPanel>
+                        <avalonedit:TextEditor Background="#eee" 
+                                           FontFamily="Consolas" 
+                                           FontSize="10pt" 
+                                           ShowLineNumbers="True" 
+                                           SyntaxHighlighting="XML">
+                            <i:Interaction.Behaviors>
+                                <ixpay:BindableAvalonEditTextBehavior Text="{Binding SetAmountsCommandXml, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            </i:Interaction.Behaviors>
+                        </avalonedit:TextEditor>
+                    </StackPanel>
+                </Expander>
+                <Expander Header="Continue Transaction Command" IsExpanded="True">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBox Width="200" Text="ContinueCommData.txt" />
+                            <Button Command="{Binding SaveFileCommand}"
+                                Height="20"
+                                Margin="5,0,0,0"
+                                Foreground="#fff">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="12" 
+                                           Height="12"
+                                           Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                                        <Rectangle.OpacityMask>
+                                            <VisualBrush Stretch="Fill"
+                                                     Visual="{DynamicResource appbar_save}" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <avalonedit:TextEditor Background="#eee" 
+                                           FontFamily="Consolas" 
+                                           FontSize="10pt" 
+                                           ShowLineNumbers="True" 
+                                           SyntaxHighlighting="XML">
+                            <i:Interaction.Behaviors>
+                                <ixpay:BindableAvalonEditTextBehavior Text="{Binding ContinueTransactionCommandXml, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            </i:Interaction.Behaviors>
+                        </avalonedit:TextEditor>
+                    </StackPanel>
+                </Expander>
             </StackPanel>
-            <TextBox Height="150" AcceptsReturn="True" TextWrapping="Wrap"/>
-        </StackPanel>
-        <GridSplitter Grid.Row="1" Height="2" HorizontalAlignment="Stretch"/>
-        <StackPanel Grid.Row="2">
-            <StackPanel Orientation="Horizontal" Margin="0,5">
-                <TextBlock Text="Set Amounts Command" />
-                <TextBox Width="100" />
-                <Button Content="Save" />
-            </StackPanel>
-            <TextBox Height="150" AcceptsReturn="True" TextWrapping="Wrap"/>
-        </StackPanel>
-        <GridSplitter Grid.Row="3" Height="2" HorizontalAlignment="Stretch"/>
-        <StackPanel Grid.Row="4">
-            <StackPanel Orientation="Horizontal" Margin="0,5">
-                <TextBlock Text="Continue Transaction Command" />
-                <TextBox Width="100" />
-                <Button Content="Save" />
-            </StackPanel>
-            <TextBox Height="150" AcceptsReturn="True" TextWrapping="Wrap"/>
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>
