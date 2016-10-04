@@ -7,4 +7,15 @@
     <ixpay:IPEndPointValueConverter x:Key="ipEndPointValueConverter" />
     <BitmapImage x:Key="propertyImageSource" UriSource="pack://application:,,,/Images/wrench_16x16.png" />
     <BitmapImage x:Key="methodImageSource" UriSource="pack://application:,,,/Images/cube_32x32.png" />
+    <BitmapImage x:Key="forwardIconImageSource" UriSource="pack://application:,,,/Images/forward_16x16.png" />
+    <BitmapImage x:Key="tickIconImageSource" UriSource="pack://application:,,,/Images/tick_16x16.png" />
+    <BitmapImage x:Key="hourglassIconImageSource" UriSource="pack://application:,,,/Images/hourglass_16x16.png" />
+    <BitmapImage x:Key="cancelIconImageSource" UriSource="pack://application:,,,/Images/cancel_16x16.png" />
+    <BitmapImage x:Key="likeIconImageSource" UriSource="pack://application:,,,/Images/like_16x16.png" />
+    <BitmapImage x:Key="unlikeIconImageSource" UriSource="pack://application:,,,/Images/unlike_16x16.png" />
+    <BitmapImage x:Key="warningIconImageSource" UriSource="pack://application:,,,/Images/warning_24x24.png" />
+    <BitmapImage x:Key="changeDirGreenGreenIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Green_16x16.png" />
+    <BitmapImage x:Key="changeDirGreenRedIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Red_16x16.png" />
+    <BitmapImage x:Key="changeDirGreenYellowIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Yellow_16x16.png" />
+    <BitmapImage x:Key="changeDirGreenGrayIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Gray_16x16.png" />
 </ResourceDictionary>

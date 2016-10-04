@@ -1,12 +1,35 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.Practices.ServiceLocation;
+using static System.String;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions
 {
     public static class TerminalMessageExtensions
     {
+        public static object GetLastItem(this TerminalMessage source)
+        {
+            object lastItem = null;
+
+            object item = source.Item;
+
+            while (item != null)
+            {
+                lastItem = item;
+
+                if (!lastItem.GetType().GetProperties().Any(p => p.Name == "Item"))
+                    break;
+
+                item = lastItem.GetType().InvokeMember("Item",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty,
+                    Type.DefaultBinder, item, null);
+            }
+
+            return lastItem;
+        }
+
         public static object GetBaseCommand(this TerminalMessage source)
         {
             object command = null;
@@ -85,6 +108,34 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions
             var hexCommand = command as BaseSimpleHexCommand;
 
             return hexCommand?.SequenceNumber ?? 0;
+        }
+
+        public static bool GetResponseSuccess(this TerminalMessage source)
+        {
+            object response = source.GetBaseResponse();
+
+            var baseResponse = response as BaseResponse;
+
+            if (baseResponse != null)
+                return baseResponse.Success;
+
+            var hexResponse = response as BaseSimpleHexResponse;
+
+            return hexResponse?.Success ?? false;
+        }
+
+        public static string GetResponseMessage(this TerminalMessage source)
+        {
+            object response = source.GetBaseResponse();
+
+            var baseResponse = response as BaseResponse;
+
+            if (baseResponse != null)
+                return baseResponse.Message;
+
+            var hexResponse = response as BaseSimpleHexResponse;
+
+            return hexResponse?.Message ?? Empty;
         }
 
         public static object GetBaseEvent(this TerminalMessage source)

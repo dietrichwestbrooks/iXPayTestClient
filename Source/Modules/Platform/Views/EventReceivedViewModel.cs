@@ -1,4 +1,5 @@
-﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using System;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -8,16 +9,21 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 {
     public class EventReceivedViewModel : ViewModelBase, IViewModel
     {
-        private object _event;
         private string _title;
         private string _xml;
+        private DateTime _time;
 
         public EventReceivedViewModel(TerminalMessage message)
         {
-            _event = message.GetBaseEvent();
-
-            Title = _event.GetType().Name;
+            Time = DateTime.Now;
+            Title = message.GetLastItem().GetType().Name;
             Xml = message.Serialize();
+        }
+
+        public DateTime Time
+        {
+            get { return _time; }
+            set { SetProperty(ref _time, value); }
         }
 
         public string Title

@@ -195,6 +195,32 @@
     <Resource Include="Images\cube_32x32.png" />
     <Resource Include="Images\wrench_16x16.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Cancel_16x16.png" />
+    <Resource Include="Images\Forward_16x16.png" />
+    <Resource Include="Images\Hourglass_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\tick_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\like_32x32.png" />
+    <Resource Include="Images\unlike_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Warning_24x24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\like_16x16.png" />
+    <Resource Include="Images\unlike_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Change_Direction_Arrows_Green-Black_16x16.png" />
+    <Resource Include="Images\Change_Direction_Arrows_Green-Gray_16x16.png" />
+    <Resource Include="Images\Change_Direction_Arrows_Green-Green_16x16.png" />
+    <Resource Include="Images\Change_Direction_Arrows_Green-Red_16x16.png" />
+    <Resource Include="Images\Change_Direction_Arrows_Green-Yellow_16x16.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\XamlSpy.3.0.4\build\XamlSpy.targets" Condition="Exists('..\packages\XamlSpy.3.0.4\build\XamlSpy.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

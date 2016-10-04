@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Convert = Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Utility.Convert;
@@ -44,40 +47,57 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         // Add methods and properties that make it more convienent to send commands
         // to this device from scripting environment
 
+        public void Simulator()
+        {
+            IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
+
+            for (int i = 0; i < 8; i++)
+            {
+                var message = Methods.First().GetInvokeMessage(new CommandParameters());
+                message.SetCommandSequenceNumber(i + 1);
+                eventAggregator.GetEvent<MessageSentEvent>().Publish(message);
+            }
+
+            var r = new Random();
+
+            for (int i = 0; i < 8; i++)
+            {
+                Thread.Sleep(5000);
+
+                eventAggregator.GetEvent<ResponseReceivedEvent>().Publish(new TerminalMessage
+                {
+                    Item = new TerminalResponse
+                    {
+                        Item = new DisplayResponse
+                        {
+                            Item = new DisplayPromptResponse
+                            {
+                                SequenceNumber = r.Next(1, 9),
+                                Success = true,
+                                Message = "OK"
+                            }
+                        }
+                    }
+                });
+            }
+
+            eventAggregator.GetEvent<EventReceivedEvent>().Publish(new TerminalMessage
+            {
+                Item = new TerminalEvent
+                {
+                    Item = new DisplayEvent
+                    {
+                        Item = new CurrentLanguageChanged
+                        {
+                            Language = "en"
+                        }
+                    }
+                }
+            });
+        }
+
         public void SetPromptWithImage(int promptId, string promptText, int promptLeft, int promptTop, string language, int imageLeft, int imageTop, int imageId, string imagePath)
         {
-            //IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
-            //eventAggregator.GetEvent<MessageSentEvent>().Publish(Methods.First().GetInvokeMessage(new CommandParameters()));
-            //eventAggregator.GetEvent<ResponseReceivedEvent>().Publish(new TerminalMessage
-            //{
-            //    Item = new TerminalResponse
-            //    {
-            //        Item = new DisplayResponse
-            //        {
-            //            Item = new DisplayPromptResponse
-            //            {
-            //                Success = true,
-            //                Message = "OK"
-            //            }
-            //        }
-            //    }
-            //});
-
-            //eventAggregator.GetEvent<EventReceivedEvent>().Publish(new TerminalMessage
-            //{
-            //    Item = new TerminalEvent
-            //    {
-            //        Item = new DisplayEvent
-            //        {
-            //            Item = new CurrentLanguageChanged
-            //            {
-            //                Language = "en"
-            //            }
-            //        }
-            //    }
-            //});
-            //return;
-
             var imageValue = new Convert().ToImageByteArray(imagePath);
             var filename = Path.GetFileNameWithoutExtension(imagePath);
 

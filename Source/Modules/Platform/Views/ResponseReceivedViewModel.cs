@@ -1,4 +1,5 @@
-﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using System;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -8,18 +9,33 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 {
     public class ResponseReceivedViewModel : ViewModelBase, IViewModel
     {
-        private readonly object _response;
         private string _title;
         private string _xml;
         private int _sequenceNumber;
+        private DateTime _time;
+        private bool _success;
+        private string _responseMessage;
 
         public ResponseReceivedViewModel(TerminalMessage message)
         {
-            _response = message.GetBaseResponse();
-
+            Success = message.GetResponseSuccess();
+            ResponseMessage = message.GetResponseMessage();
+            Time = DateTime.Now;
             SequenceNumber = message.GetResponseSequenceNumber();
-            Title = _response.GetType().Name;
+            Title = message.GetBaseResponse().GetType().Name;
             Xml = message.Serialize();
+        }
+
+        public string ResponseMessage
+        {
+            get { return _responseMessage; }
+            set { SetProperty(ref _responseMessage, value); }
+        }
+
+        public DateTime Time
+        {
+            get { return _time; }
+            set { SetProperty(ref _time, value); }
         }
 
         public string Title
@@ -38,6 +54,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         {
             get { return _xml?.FormattedXml(); }
             set { SetProperty(ref _xml, value); }
+        }
+
+        public bool Success
+        {
+            get { return _success; }
+            set { SetProperty(ref _success, value); }
         }
     }
 }

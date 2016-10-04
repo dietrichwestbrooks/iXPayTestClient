@@ -16,7 +16,7 @@
             </StackPanel>
             <ToolBarTray DockPanel.Dock="Top" Margin="0,10">
                 <ToolBar>
-                    <Button Command="{Binding OpenFileCommand}"
+                    <Button Command="{Binding DelteAllCommand}"
                             Height="40"
                             Margin="0,0,5,0"
                             Foreground="#fff">
@@ -32,10 +32,49 @@
                     </Button>
                 </ToolBar>
             </ToolBarTray>
-            <DataGrid DockPanel.Dock="Top" AutoGenerateColumns="False" HeadersVisibility="All" IsReadOnly="True" ItemsSource="{Binding Messages}">
+            <DataGrid DockPanel.Dock="Top" 
+                      AutoGenerateColumns="False" 
+                      HeadersVisibility="All" 
+                      IsReadOnly="True" 
+                      ItemsSource="{Binding Messages}"
+                      PreviewMouseDown="DataGrid_OnPreviewMouseDown">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Sequence" Binding="{Binding SequenceNumber}" />
+                    <DataGridTemplateColumn Header="Sequence">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Center" Text="{Binding SequenceNumber}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Response" Binding="{Binding Title}" />
+                    <DataGridTextColumn Header="Received" Binding="{Binding Time, StringFormat='hh:mm:ss.fff'}" />
+                    <DataGridTemplateColumn Header="Succeeded">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Width="16" HorizontalAlignment="Center">
+                                    <Image.Style>
+                                        <Style TargetType="{x:Type Image}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Success}" Value="True">
+                                                    <Setter Property="Source" Value="{StaticResource tickIconImageSource}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Success}" Value="False">
+                                                    <Setter Property="Source" Value="{StaticResource forwardIconImageSource}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Message" Width="200">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding ResponseMessage}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate>

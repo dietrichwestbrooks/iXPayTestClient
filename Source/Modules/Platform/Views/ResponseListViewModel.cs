@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Windows.Input;
 using System.Windows.Threading;
+using Prism.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
@@ -19,7 +21,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             _dispatcher = Dispatcher.CurrentDispatcher;
 
             EventAggregator.GetEvent<ResponseReceivedEvent>().Subscribe(OnResponseReceived);
+
+            DelteAllCommand = new DelegateCommand(OnDeleteAll);
         }
+
+        public ICommand DelteAllCommand { get; }
 
         private void OnResponseReceived(TerminalMessage message)
         {
@@ -33,5 +39,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         }
 
         public ObservableCollection<ResponseReceivedViewModel> Messages { get; } = new ObservableCollection<ResponseReceivedViewModel>();
+
+        private void OnDeleteAll()
+        {
+            Messages.Clear();
+        }
     }
 }
