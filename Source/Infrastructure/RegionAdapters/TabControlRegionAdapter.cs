@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel.Composition;
+using System.Windows;
 using System.Windows.Controls;
 using Prism.Regions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -16,6 +17,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.RegionAdapters
 
         }
 
+        public bool LastSelected { get; set; }
+
         protected override void Adapt(IRegion region, TabControl regionTarget)
         {
             region.Views.CollectionChanged += (s, e) =>
@@ -24,14 +27,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.RegionAdapters
                 {
                     foreach (var view in e.NewItems)
                     {
-                        var tabItem = new TabItem
-                            {
-                                Content = view,
-                                Header = ((IViewModel) ((IView) view).DataContext).Title
-                            };
-
-                        if (regionTarget.Items.Add(tabItem) == 0)
-                            regionTarget.SelectedItem = tabItem;
+                        if (LastSelected || regionTarget.Items.Add(view) == 0)
+                            regionTarget.SelectedItem = view;
+                    }
+                }
+                else if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (var view in e.OldItems)
+                    {
+                        if (regionTarget.Items.Contains(view))
+                            regionTarget.Items.Remove(view);
                     }
                 }
             };
@@ -39,7 +44,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.RegionAdapters
 
         protected override IRegion CreateRegion()
         {
-            return new AllActiveRegion();
+            return new SingleActiveRegion();
         }
     }
 }

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Windows.Input;
 using Microsoft.Practices.ServiceLocation;
+using Prism.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
@@ -13,7 +17,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
     public class MessageEditorViewModel : ViewModelBase, IMessageEditorViewModel
     {
         private string _title = "Message Editor";
-        private string _message;
+        private string _xml;
+        private bool _enableMessageEditedEvent = true;
 
         public MessageEditorViewModel()
         {
@@ -24,9 +29,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
             if (MessageSerializer == null)
                 throw new InvalidOperationException("Unable to locate Terminal Message Serializer");
+
+            Terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+
+            if (Terminal == null)
+                throw new InvalidOperationException("Unable to locate Terminal Client Service");
+
+            ExecuteCommand = new DelegateCommand<string>(OnExecute, CanExecute);
         }
 
-        private ITerminalMessageSerializer MessageSerializer { get; set; }
+        public ICommand ExecuteCommand { get; }
 
         public string Title
         {
@@ -34,45 +46,66 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             set { SetProperty(ref _title, value); }
         }
 
-        public string Message
+        public string Xml
         {
-            get { return _message.FormattedXml(); }
+            get { return _xml; }
             set
             {
-                SetProperty(ref _message, value);
-                FireMessageEdited(value);
+                SetProperty(ref _xml, value);
+                if (_enableMessageEditedEvent)
+                    FireMessageEdited(value);
             }
         }
 
-        private void FireMessageEdited(string value)
+        private void FireMessageEdited(string xml)
         {
-            TerminalMessage terminalMessage;
+            TerminalMessage message;
 
-            if (MessageSerializer.TryDeserialize(value, out terminalMessage))
-                EventAggregator.GetEvent<MessageEditedEvent>().Publish(terminalMessage);
+            if (MessageSerializer.TryDeserialize(xml, out message))
+                EventAggregator.GetEvent<MessageEditedEvent>().Publish(message);
         }
+
+        private ITerminalClientService Terminal { get; }
+
+        private ITerminalMessageSerializer MessageSerializer { get; set; }
 
         private void OnCommandSelected(ITerminalDeviceCommand command)
         {
-            var property = command as ITerminalDeviceProperty;
+            TerminalMessage message = command.GetMessage();
 
-            if (property != null)
-            {
-                Message = property.GetGetMessage(new CommandParameters()).Serialize();
-                return;
-            }
+            string xml;
+            message.TrySerialize(out xml);
 
-            var method = command as ITerminalDeviceMethod;
-
-            if (method != null)
-            {
-                Message = method.GetInvokeMessage(new CommandParameters()).Serialize();
-            }
+            if (xml != null)
+                Xml = xml.FormattedXml();
         }
 
         private void OnCommandEdited(TerminalMessage message)
         {
-            Message = message.Serialize();
+            try
+            {
+                _enableMessageEditedEvent = false;
+
+                Xml = message.Serialize().FormattedXml();
+            }
+            finally
+            {
+                _enableMessageEditedEvent = true;
+            }
+        }
+
+        private bool CanExecute(string xml)
+        {
+            return true;
+        }
+
+        private void OnExecute(string xml)
+        {
+            EventAggregator.GetEvent<PreviewRunCommandsEvent>().Publish();
+
+            TerminalMessage message = MessageSerializer.Deserialize(xml);
+
+            Terminal.SendMessage(message);
         }
     }
 }

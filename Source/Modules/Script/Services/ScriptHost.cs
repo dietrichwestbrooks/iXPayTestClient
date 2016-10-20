@@ -14,9 +14,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
             EventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
         }
 
-        public void Write(string message)
+        public void Write(string text)
         {
-            EventAggregator.GetEvent<ScriptOutputEvent>().Publish(message);
+            EventAggregator.GetEvent<OutputTextEvent>().Publish(new OutputTextEventArgs
+                {
+                    Category = OutputTextCategory.Script,
+                    Text = text
+                });
         }
 
         public void WriteIf(bool condition, string message)

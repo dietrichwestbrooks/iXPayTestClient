@@ -101,41 +101,65 @@
                     <Grid Grid.Row="0">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="250" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="600" />
                             </Grid.ColumnDefinitions>
-                            <TabControl Grid.Column="0" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.LeftDockRegion}" >
-
+                            <TabControl Grid.Column="0" SelectedIndex="0" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.LeftDockRegion}">
+                                <TabControl.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                                        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
                             </TabControl>
                             <GridSplitter Grid.Column="1" Margin="3,0,0,0" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
-                            <TabControl Grid.Column="1" Margin="6,0,0,0" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.MainDockRegion}">
-
+                            <TabControl Grid.Column="1" SelectedIndex="0" Margin="6,0,0,0" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.MainDockRegion}">
+                                <TabControl.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                                        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
                             </TabControl>
                             <GridSplitter Grid.Column="2" Margin="3,0,0,0" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
-                            <TabControl Grid.Column="2" Margin="6,0,0,0" TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.RightDockRegion}">
-
+                            <TabControl Grid.Column="2" SelectedIndex="0" Margin="6,0,0,0" TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.RightDockRegion}">
+                                <TabControl.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                                        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
                             </TabControl>
                         </Grid>
                     </Grid>
-                    <GridSplitter Grid.Row="1" Margin="0,0,0,0" Height="6" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
+                    <GridSplitter Grid.Row="1" Margin="0,0,0,0" Height="6" Background="#555" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
                     <Grid Grid.Row="1" Margin="0,6,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="1.3*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TabControl Grid.Column="0" TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.BottomLeftDockRegion}">
-
+                            <TabControl Grid.Column="0" SelectedIndex="0" TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.BottomLeftDockRegion}">
+                                <TabControl.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                                        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
                             </TabControl>
                             <GridSplitter Grid.Column="1" Margin="3,0,0,0" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
-                            <TabControl Grid.Column="1" Margin="6,0,0,0"  TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.BottomDockRegion}">
-
+                            <TabControl Grid.Column="1" SelectedIndex="0" Margin="6,0,0,0"  TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.BottomDockRegion}">
+                                <TabControl.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                                        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
                             </TabControl>
                             <GridSplitter Grid.Column="2" Margin="3,0,0,0" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch" />
-                            <TabControl Grid.Column="2" Margin="6,0,0,0"  TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.BottomRightDockRegion}">
-
+                            <TabControl Grid.Column="2" SelectedIndex="0" Margin="6,0,0,0"  TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.BottomRightDockRegion}">
+                                <TabControl.ItemContainerStyle>
+                                    <Style BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
+                                        <Setter Property="Header" Value="{Binding DataContext.Title}" />
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
                             </TabControl>
                         </Grid>
                     </Grid>
@@ -151,7 +175,7 @@
                 <StatusBarItem HorizontalAlignment="Right" ToolTip="{Binding HostAddress}">
                     <Image Height="16" Width="16" Margin="0,6,6,6"   
                            Name="Heartbeat" Source="/Resources/heart_16.png" 
-                           Visibility="{Binding IsConnected, Converter={StaticResource booleanToVisibilityConverter}, FallbackValue=Hidden}"
+                           Visibility="{Binding IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Hidden}"
        VerticalAlignment="Bottom" HorizontalAlignment="Right"    
        Opacity=".05" Stretch="UniformToFill">
                         <Image.Resources>

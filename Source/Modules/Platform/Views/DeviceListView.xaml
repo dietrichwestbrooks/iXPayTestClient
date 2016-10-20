@@ -8,95 +8,75 @@
              xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <DataGrid Name="dgDevices" AutoGenerateColumns="False" HeadersVisibility="None" IsReadOnly="True" ItemsSource="{Binding Devices}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Devices" Binding="{Binding Title}" />
-            </DataGrid.Columns>
-            <DataGrid.RowDetailsTemplate>
-                <DataTemplate>
-                    <ListBox x:Name="_commands" ItemsSource="{Binding Commands}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Height="10">
-                                        <Image.Style>
-                                            <Style TargetType="{x:Type Image}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding CommandType}" Value="{x:Static local:CommandType.Property}">
-                                                        <Setter Property="Source" Value="{DynamicResource propertyImageSource}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding CommandType}" Value="{x:Static local:CommandType.Method}">
-                                                        <Setter Property="Source" Value="{DynamicResource methodImageSource}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Style>
-                                    </Image>
-                                    <ContentControl Margin="5 0 0 0" Content="{Binding Title}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="SelectionChanged">
-                                <i:InvokeCommandAction Command="{Binding CommandSelectedCommand}" CommandParameter="{Binding ElementName=_commands, Path=SelectedItem}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ListBox>
-                    <!--<StackPanel>
-                        <Expander Header="Properties" IsExpanded="True">
-                            <ListBox x:Name="_properties" ItemsSource="{Binding Properties}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <ContentControl Content="{Binding Title}" />
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                                <ListBox.Style>
-                                    <Style TargetType="{x:Type ListBox}">
+        <Grid.Resources>
+            <CollectionViewSource x:Key="Devices" Source="{Binding Path=Devices}" >
+                <CollectionViewSource.SortDescriptions>
+                    <componentModel:SortDescription PropertyName="Name" />
+                </CollectionViewSource.SortDescriptions>
+            </CollectionViewSource>
+        </Grid.Resources>
+        <DockPanel LastChildFill="True">
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar Padding="5,0">
+                    <CheckBox x:Name="_showEvents" Content="Show Events" IsChecked="True" />
+                </ToolBar>
+            </ToolBarTray>
+            <TreeView x:Name="_devices" ItemsSource="{Binding Source={StaticResource Devices}}">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Members}" DataType="{x:Type local:DeviceViewModel}">
+                        <TextBlock Text="{Binding Title}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Commands}" DataType="{x:Type local:DevicePropertyViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="10" Source="{DynamicResource propertyImageSource}" />
+                            <TextBlock Margin="5 0 0 0" Text="{Binding Title}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Commands}" DataType="{x:Type local:DeviceMethodViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="10" Source="{DynamicResource methodImageSource}" />
+                            <TextBlock Margin="5 0 0 0" Text="{Binding Title}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type local:DeviceEventViewModel}">
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=_showEvents, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Image Height="10" Source="{DynamicResource lightningIconImageSource}" />
+                            <TextBlock Margin="5 0 0 0" Text="{Binding Title}" />
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type local:DeviceCommandViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="10">
+                                <Image.Style>
+                                    <Style TargetType="{x:Type Image}">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=__methods, Path=SelectedItem}" Value="True">
-                                                <Setter Property="SelectedIndex" Value="-1" />
+                                            <DataTrigger Binding="{Binding InvokeType}" Value="{x:Static local:DeviceCommandInvokeType.Get}">
+                                                <Setter Property="Source" Value="{DynamicResource mailGetIconImageSource}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding InvokeType}" Value="{x:Static local:DeviceCommandInvokeType.Set}">
+                                                <Setter Property="Source" Value="{DynamicResource mailSendIconImageSource}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding InvokeType}" Value="{x:Static local:DeviceCommandInvokeType.Invoke}">
+                                                <Setter Property="Source" Value="{DynamicResource mail2SendIconImageSource}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </ListBox.Style>
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding PropertySelected}" CommandParameter="{Binding ElementName=_properties, Path=SelectedItem}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </ListBox>
-                        </Expander>
-                        <Expander Header="Actions" IsExpanded="True">
-                            <ListBox x:Name="_methods" ItemsSource="{Binding Methods}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <ContentControl Content="{Binding Title}" />
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                                <ListBox.Style>
-                                    <Style TargetType="{x:Type ListBox}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=_properties, Path=IsFocused}" Value="True">
-                                                <Setter Property="Background" Value="Black" />
-                                                <Setter Property="Foreground" Value="Black" />
-                                                <Setter Property="SelectedItem" Value="{x:Null}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ListBox.Style>
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding MethodSelected}" CommandParameter="{Binding ElementName=_methods, Path=SelectedItem}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </ListBox>
-                        </Expander>
-                    </StackPanel>-->
-                </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
-        </DataGrid>
+                                </Image.Style>
+                            </Image>
+                            <TextBlock Margin="5 0 0 0" Text="{Binding Title}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction Command="{Binding SelectedObjectChangedCommand}" CommandParameter="{Binding ElementName=_devices, Path=SelectedItem}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TreeView>
+        </DockPanel>
     </Grid>
 </UserControl>

@@ -36,9 +36,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\AvalonEdit.5.0.3\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
+    <Reference Include="MahApps.Metro, Version=1.3.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.1.3.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -60,7 +60,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Prism.Wpf.6.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\..\packages\MahApps.Metro.1.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -89,9 +89,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Devices\BarcodeReader.cs" />
+    <Compile Include="Devices\Beeper.cs" />
     <Compile Include="Devices\ChipCardReader.cs" />
     <Compile Include="Devices\Display.cs" />
+    <Compile Include="Devices\Keypad.cs" />
     <Compile Include="Devices\MagStripeReader.cs" />
+    <Compile Include="Devices\Printer.cs" />
+    <Compile Include="Devices\SecurityModule.cs" />
     <Compile Include="Devices\Terminal.cs" />
     <Compile Include="PlatformModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -112,11 +117,13 @@
       <DependentUpon>CommandEditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CommandEditorViewModel.cs" />
-    <Compile Include="Views\CommandType.cs" />
     <Compile Include="Views\ConnectView.xaml.cs">
       <DependentUpon>ConnectView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ConnectViewModel.cs" />
+    <Compile Include="Views\DeviceCommandInvokeType.cs" />
+    <Compile Include="Views\DeviceCommandViewModel.cs" />
+    <Compile Include="Views\DeviceEventViewModel.cs" />
     <Compile Include="Views\DeviceListView.xaml.cs">
       <DependentUpon>DeviceListView.xaml</DependentUpon>
     </Compile>
@@ -131,11 +138,16 @@
     <Compile Include="Views\EventReceivedViewModel.cs" />
     <Compile Include="Views\ICommandEditorView.cs" />
     <Compile Include="Views\ICommandEditorViewModel.cs" />
-    <Compile Include="Views\ICommandViewModel.cs" />
     <Compile Include="Views\IConnectView.cs" />
     <Compile Include="Views\IConnectViewModel.cs" />
+    <Compile Include="Views\IDeviceCommandViewModel.cs" />
+    <Compile Include="Views\IDeviceEventViewModel.cs" />
     <Compile Include="Views\IDeviceListView.cs" />
     <Compile Include="Views\IDeviceListViewModel.cs" />
+    <Compile Include="Views\IDeviceMemberViewModel.cs" />
+    <Compile Include="Views\IDeviceMethodViewModel.cs" />
+    <Compile Include="Views\IDevicePropertyViewModel.cs" />
+    <Compile Include="Views\IDeviceViewModel.cs" />
     <Compile Include="Views\IEventListView.cs" />
     <Compile Include="Views\IEventListViewModel.cs" />
     <Compile Include="Views\IMessageEditorView.cs" />
@@ -177,9 +189,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Business\Domain\iXPayTestClient.Business.Messaging.csproj">
+    <ProjectReference Include="..\..\Business\Messaging\iXPayTestClient.Business.Messaging.csproj">
       <Project>{1fa9fc35-d895-457f-875a-9bd558bc2311}</Project>
       <Name>iXPayTestClient.Business.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Business\TerminalCommands\iXPayTestClient.Business.TerminalCommands.csproj">
+      <Project>{df7aa295-bccd-42f3-9bc1-9ef831150e32}</Project>
+      <Name>iXPayTestClient.Business.TerminalCommands</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\iXPayTestClient.Infrastructure.csproj">
       <Project>{138afa9b-e95b-43b4-9ba9-a05682dcdd5e}</Project>

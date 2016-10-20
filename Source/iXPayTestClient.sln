@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iXPayTestClient.Desktop", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{4539CC6B-01F2-4C8D-8354-F5B3C9F63D85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iXPayTestClient.Business.Messaging", "Business\Domain\iXPayTestClient.Business.Messaging.csproj", "{1FA9FC35-D895-457F-875A-9BD558BC2311}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{8DC07416-4941-4054-92E1-4BAECB008AB0}"
 	ProjectSection(SolutionItems) = preProject
 		Images\address-book--pencil.png = Images\address-book--pencil.png
@@ -32,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iXPayTestClient.Modules.Emv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iXPayTestClient.Modules.Platform", "Modules\Platform\iXPayTestClient.Modules.Platform.csproj", "{0D1327A9-AAB1-48BE-9089-B8EA959D97E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iXPayTestClient.Business.TerminalCommands", "Business\TerminalCommands\iXPayTestClient.Business.TerminalCommands.csproj", "{DF7AA295-BCCD-42F3-9BC1-9EF831150E32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iXPayTestClient.Business.Messaging", "Business\Messaging\iXPayTestClient.Business.Messaging.csproj", "{1FA9FC35-D895-457F-875A-9BD558BC2311}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,10 +48,6 @@ Global
 		{F7F4C448-9DBF-4F49-A8E3-34900B38708B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7F4C448-9DBF-4F49-A8E3-34900B38708B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7F4C448-9DBF-4F49-A8E3-34900B38708B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6D0966BC-A881-4E3D-9970-BD5CAEAD3866}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6D0966BC-A881-4E3D-9970-BD5CAEAD3866}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D0966BC-A881-4E3D-9970-BD5CAEAD3866}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -70,16 +68,25 @@ Global
 		{0D1327A9-AAB1-48BE-9089-B8EA959D97E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D1327A9-AAB1-48BE-9089-B8EA959D97E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D1327A9-AAB1-48BE-9089-B8EA959D97E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF7AA295-BCCD-42F3-9BC1-9EF831150E32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF7AA295-BCCD-42F3-9BC1-9EF831150E32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF7AA295-BCCD-42F3-9BC1-9EF831150E32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF7AA295-BCCD-42F3-9BC1-9EF831150E32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FA9FC35-D895-457F-875A-9BD558BC2311}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1FA9FC35-D895-457F-875A-9BD558BC2311} = {4539CC6B-01F2-4C8D-8354-F5B3C9F63D85}
 		{6D0966BC-A881-4E3D-9970-BD5CAEAD3866} = {AB311F56-D1F2-48D1-BE00-10298C7A85BF}
 		{A5C81C02-7252-4C75-8BB4-B1A0C0C28081} = {AB311F56-D1F2-48D1-BE00-10298C7A85BF}
 		{B56E7648-A385-4F4A-8FEC-D5FA71959526} = {AB311F56-D1F2-48D1-BE00-10298C7A85BF}
 		{28771F80-DA5C-4205-8941-5E9218321B7F} = {AB311F56-D1F2-48D1-BE00-10298C7A85BF}
 		{0D1327A9-AAB1-48BE-9089-B8EA959D97E6} = {AB311F56-D1F2-48D1-BE00-10298C7A85BF}
+		{DF7AA295-BCCD-42F3-9BC1-9EF831150E32} = {4539CC6B-01F2-4C8D-8354-F5B3C9F63D85}
+		{1FA9FC35-D895-457F-875A-9BD558BC2311} = {4539CC6B-01F2-4C8D-8354-F5B3C9F63D85}
 	EndGlobalSection
 EndGlobal

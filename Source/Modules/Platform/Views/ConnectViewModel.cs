@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Net;
 using System.Windows.Input;
 using Microsoft.Practices.ServiceLocation;
@@ -21,6 +20,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         private bool _isConnecting;
         private bool _isConnected;
         private IPEndPoint _ipEndPoint;
+        private bool _autoReConnect;
 
         public ConnectViewModel()
         {
@@ -29,6 +29,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
             HostAddress = Configuration.HostAddress;
             HostPort = Configuration.HostPort;
+            AutoReConnect = true;
 
             ConnectCommand = new DelegateCommand<IPEndPoint>(OnConnect, CanConnect);
             DisconnectCommand = new DelegateCommand<IPEndPoint>(OnDisconnect, CanDisconnect);
@@ -56,6 +57,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         {
             get { return _hostPort; }
             set { SetProperty(ref _hostPort, value); }
+        }
+
+        public bool AutoReConnect
+        {
+            get { return _autoReConnect; }
+            set { SetProperty(ref _autoReConnect, value); }
         }
 
         public bool IsConnecting

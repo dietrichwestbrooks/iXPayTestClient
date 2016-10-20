@@ -4,6 +4,7 @@ using System.Net;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Logging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -14,15 +15,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
     [Export(typeof(ITerminalClientService))]
     public class TerminalClientService : ServiceBase, ITerminalClientService
     {
-        private Action<ITerminalDevice> _addDevice;
-        private ITerminalDeviceCollection _devices;
-
         public TerminalClientService()
         {
-            RegisterScriptVariables();
-
+            ScriptService = ServiceLocator.Current.GetInstance<IScriptService>();
             Client = ServiceLocator.Current.GetInstance<ITerminalClient>();
             Configuration = ServiceLocator.Current.GetInstance<IConfigurationService>();
+
+            OnSetupScript(ScriptService);
 
             Client.Connected += OnClientConnected;
             Client.Disconnected += OnClientDisconnected;
@@ -31,11 +30,15 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
             Client.EventReceived += OnClientEventReceived;
             Client.Pulse += OnClientPulse;
             Client.ResponseReceived += OnClientResponseReceived;
+
+            EventAggregator.GetEvent<SetupScriptEvent>().Subscribe(OnSetupScript);
+            EventAggregator.GetEvent<TeardownScriptEvent>().Subscribe(OnTeardownScript);
         }
 
         public bool IsConnected => Client.IsConnected;
 
-        public ITerminalDeviceCollection Devices => GetDevices();
+        public TerminalDeviceCollection Devices
+            => new TerminalDeviceCollection(ServiceLocator.Current.GetAllInstances<ITerminalDevice>());
 
         public void Connect(IPEndPoint endPoint)
         {
@@ -59,15 +62,15 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
             });
         }
 
+        public void SendMessage(TerminalMessage message)
+        {
+            Client.SendMessage(message);
+        }
+
         public void RegisterDevice(ITerminalDevice device)
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device));
-
-            // todo better implementation
-            GetDevices();
-
-            _addDevice(device);
 
             EventAggregator.GetEvent<DeviceRegisteredEvent>().Publish(device);
         }
@@ -107,11 +110,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
             Configuration.HostPort = endPoint.Port;
             Configuration.Save();
 
-            ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter()
-            {
-                Type = NotificationType.Succeeded,
-                Message = $"Connected to {endPoint}"
-            });
+            ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter
+                {
+                    Type = NotificationType.Succeeded,
+                    Message = $"Connected to {endPoint}"
+                });
 
             EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
             {
@@ -165,32 +168,21 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
 
         private ITerminalClient Client { get; }
 
-        private IConfigurationService Configuration { get; set; }
+        private IConfigurationService Configuration { get; }
 
-        private ITerminalDeviceCollection GetDevices()
+        private IScriptService ScriptService { get; }
+
+        private void OnTeardownScript(IScriptService scriptService)
         {
-            return _devices ??
-                   (_devices =
-                       new TerminalDeviceCollection(ServiceLocator.Current.GetAllInstances<ITerminalDevice>(),
-                           out _addDevice));
         }
 
-        private IScriptService ScriptService
+        private void OnSetupScript(IScriptService scriptService)
         {
-            get
+            foreach (var device in Devices)
             {
-                var scriptService = ServiceLocator.Current.GetInstance<IScriptService>();
-
-                if (scriptService == null)
-                    throw new InvalidOperationException("Unalble to locate script service");
-
-                return scriptService;
+                device.ClearEventHandlers();
+                scriptService.SetVariable(device.Name, device);
             }
-        }
-
-        private void RegisterScriptVariables()
-        {
-            ScriptService.SetVariable("Terminal", this, true);
         }
     }
 }

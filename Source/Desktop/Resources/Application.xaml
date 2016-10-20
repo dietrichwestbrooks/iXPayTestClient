@@ -3,8 +3,11 @@
                     xmlns:local="clr-namespace:Wayne.Payment.Tools.iXPayTestClient.Desktop.Resources"
                     xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay">
 
-    <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
-    <ixpay:IPEndPointValueConverter x:Key="ipEndPointValueConverter" />
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <ixpay:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    <ixpay:IPEndPointValueConverter x:Key="IpEndPointValueConverter" />
+    <ixpay:ObjectToTypeConverter x:Key="ObjectToTypeConverter" />
+
     <BitmapImage x:Key="propertyImageSource" UriSource="pack://application:,,,/Images/wrench_16x16.png" />
     <BitmapImage x:Key="methodImageSource" UriSource="pack://application:,,,/Images/cube_32x32.png" />
     <BitmapImage x:Key="forwardIconImageSource" UriSource="pack://application:,,,/Images/forward_16x16.png" />
@@ -18,4 +21,36 @@
     <BitmapImage x:Key="changeDirGreenRedIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Red_16x16.png" />
     <BitmapImage x:Key="changeDirGreenYellowIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Yellow_16x16.png" />
     <BitmapImage x:Key="changeDirGreenGrayIconImageSource" UriSource="pack://application:,,,/Images/Change_Direction_Arrows_Green-Gray_16x16.png" />
+    <BitmapImage x:Key="mailGetIconImageSource" UriSource="pack://application:,,,/Images/mail_get_16x16.png" />
+    <BitmapImage x:Key="mailSendIconImageSource" UriSource="pack://application:,,,/Images/mail_send_16x16.png" />
+    <BitmapImage x:Key="mail2SendIconImageSource" UriSource="pack://application:,,,/Images/mail2_send_48x48.png" />
+    <BitmapImage x:Key="lightningIconImageSource" UriSource="pack://application:,,,/Images/Lightning_24x24.png" />
+
+    <Style x:Key="tabCloseButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Foreground" Value="{StaticResource AccentColorBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                            VerticalAlignment="Stretch">
+                        <Rectangle Width="8" 
+                                   Height="8"
+                            Margin="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Padding}"
+                                   Fill="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Foreground}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_close}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource AccentColorBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource AccentSelectedColorBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

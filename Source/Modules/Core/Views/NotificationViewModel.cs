@@ -15,9 +15,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views
         private string _title = "Notifications";
         private string _message;
         private DispatcherTimer _hideTimer;
+        private Dispatcher _dispatcher;
 
         public NotificationViewModel()
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
+
             ShowNotificationCommand = new DelegateCommand<NotificationParameter>(OnShowNotification, parameter => true);
 
             var applicationCommands = ServiceLocator.Current.GetInstance<IApplicationCommands>();
@@ -51,7 +54,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views
         {
             Message = parameter?.Message;
 
-            ApplicationCommands.ShowFlyoutCommand.Execute(FlyoutNames.NotificationFlyout);
+            _dispatcher.BeginInvoke(DispatcherPriority.DataBind,
+                (Action) (() => ApplicationCommands.ShowFlyoutCommand.Execute(FlyoutNames.NotificationFlyout)));
+
             _hideTimer.Start();
         }
     }

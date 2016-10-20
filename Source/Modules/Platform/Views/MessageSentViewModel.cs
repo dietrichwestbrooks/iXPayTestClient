@@ -2,6 +2,7 @@
 using System.Threading;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -29,8 +30,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             Time = DateTime.Now;
             SequenceNumber = message.GetCommandSequenceNumber();
             Title = command.GetType().Name;
-            Xml = message.Serialize();
-
+            message.TrySerialize(out _xml);
         }
 
         public DateTime Time

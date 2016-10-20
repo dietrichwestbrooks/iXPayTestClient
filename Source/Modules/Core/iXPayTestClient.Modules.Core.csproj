@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Wayne.Payment.Tools.iXPayTestClient.Modules.Core</RootNamespace>
     <AssemblyName>iXPayTestClient.Modules.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -37,8 +37,8 @@
       <HintPath>..\..\packages\AvalonEdit.5.0.3\lib\Net40\ICSharpCode.AvalonEdit.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
+    <Reference Include="MahApps.Metro, Version=1.3.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MahApps.Metro.1.3.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -61,7 +61,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\..\packages\MahApps.Metro.1.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -95,6 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoreModule.cs" />
+    <Compile Include="Devices\FakeDevice.cs" />
+    <Compile Include="Devices\FakeDeviceCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -110,6 +112,8 @@
     </Compile>
     <Compile Include="Views\INotificationView.cs" />
     <Compile Include="Views\INotificationViewModel.cs" />
+    <Compile Include="Views\IOutputView.cs" />
+    <Compile Include="Views\IOutputViewModel.cs" />
     <Compile Include="Views\ISettingsView.cs" />
     <Compile Include="Views\ISettingsViewModel.cs" />
     <Compile Include="Views\NotificationView.xaml.cs">
@@ -119,6 +123,10 @@
     <Compile Include="Views\RightTitlebarCommands.xaml.cs">
       <DependentUpon>RightTitlebarCommands.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\OutputView.xaml.cs">
+      <DependentUpon>OutputView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\OutputViewModel.cs" />
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
@@ -137,9 +145,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Business\Domain\iXPayTestClient.Business.Messaging.csproj">
+    <ProjectReference Include="..\..\Business\Messaging\iXPayTestClient.Business.Messaging.csproj">
       <Project>{1fa9fc35-d895-457f-875a-9bd558bc2311}</Project>
       <Name>iXPayTestClient.Business.Messaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Business\TerminalCommands\iXPayTestClient.Business.TerminalCommands.csproj">
+      <Project>{df7aa295-bccd-42f3-9bc1-9ef831150e32}</Project>
+      <Name>iXPayTestClient.Business.TerminalCommands</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\iXPayTestClient.Infrastructure.csproj">
       <Project>{138afa9b-e95b-43b4-9ba9-a05682dcdd5e}</Project>
@@ -155,6 +167,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\RightTitlebarCommands.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\OutputView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

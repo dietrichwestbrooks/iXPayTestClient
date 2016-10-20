@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -28,6 +29,19 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions
             }
 
             return stringBuilder.ToString();
+        }
+
+        public static string ToTitleCase(this string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return source;
+
+            if (source.Length == 1)
+                return source.ToLower();
+
+            TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+
+            return textInfo.ToTitleCase(source);
         }
     }
 }

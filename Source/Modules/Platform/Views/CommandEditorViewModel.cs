@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
@@ -39,7 +40,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         {
             _message = message;
 
-            Command = _message.GetBaseCommand();
+            Command = _message.GetLastItem();
         }
 
         private void OnPropertyChanged(object obj)

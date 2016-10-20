@@ -1,19 +1,18 @@
-﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 {
-    public class DevicePropertyViewModel : ViewModelBase, ICommandViewModel
+    public class DevicePropertyViewModel : ViewModelBase, IDevicePropertyViewModel
     {
         private string _title;
-        private CommandType _commandType;
-        private ITerminalDeviceProperty _property;
 
         public DevicePropertyViewModel(ITerminalDeviceProperty property)
         {
-            _property = property;
-            Title = _property.Name;
-            _commandType = CommandType.Property;
+            Object = property;
+            Title = Object.Name;
         }
 
         public string Title
@@ -22,12 +21,23 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             set { SetProperty(ref _title, value); }
         }
 
-        public CommandType CommandType
+        public ObservableCollection<IDeviceCommandViewModel> Commands
         {
-            get { return _commandType; }
-            set { SetProperty(ref _commandType, value); }
+            get
+            {
+                List<IDeviceCommandViewModel> commands = new List<IDeviceCommandViewModel>
+                    {
+                        new DeviceCommandViewModel(Object.GetCommand, DeviceCommandInvokeType.Get)
+                    };
+
+
+                if (Object.SetCommand != null)
+                    commands.Add(new DeviceCommandViewModel(Object.SetCommand, DeviceCommandInvokeType.Set));
+
+                return new ObservableCollection<IDeviceCommandViewModel>(commands);
+            }
         }
 
-        public ITerminalDeviceCommand Object => _property;
+        public ITerminalDeviceProperty Object { get; }
     }
 }

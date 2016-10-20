@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.Composition;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
-using Convert = Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Utility.Convert;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv.Views
 {
@@ -34,7 +34,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv.Views
                                                     new EmvDataElement
                                                         {
                                                             Value =
-                                                                new Convert().ToHexByteArray(
+                                                                ConvertHelper.ToHexByteArray(
                                                                     "E11B9F02060000000005009F02060000000010009F0206000000002000")
                                                         }
                                                 }
@@ -56,7 +56,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv.Views
                                                     new EmvDataElement
                                                         {
                                                             Value =
-                                                                new Convert().ToHexByteArray(
+                                                                ConvertHelper.ToHexByteArray(
                                                                     "E11B9F02060000000005009F02060000000010009F0206000000002000")
                                                         }
                                                 }

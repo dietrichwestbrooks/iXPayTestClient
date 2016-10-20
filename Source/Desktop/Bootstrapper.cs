@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
-using System.Windows.Controls;
 using Prism.Events;
 using Prism.Logging;
 using Prism.Mef;
@@ -13,10 +12,8 @@ using Wayne.Payment.Tools.iXPayTestClient.Desktop.Views;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.RegionAdapters;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Services;
 using Wayne.Payment.Tools.iXPayTestClient.Modules.Core;
-using Xceed.Wpf.AvalonDock.Layout;
 using Application = System.Windows.Application;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
@@ -71,7 +68,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
 
             AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(Bootstrapper).Assembly));
             AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CoreModule).Assembly));
-            AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CommandObject).Assembly));
+            AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(TerminalClient).Assembly));
             AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(ModuleBase).Assembly));
 
             if (!Directory.Exists("Modules"))
@@ -103,10 +100,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
         {
             RegionAdapterMappings mappings = base.ConfigureRegionAdapterMappings();
 
-            mappings.RegisterMapping(typeof(LayoutAnchorGroup), Container.GetExportedValue<LayoutAnchorGroupRegionAdapter>());
-            mappings.RegisterMapping(typeof(LayoutDocumentPane), Container.GetExportedValue<LayoutDocumentPaneRegionAdapter>());
-            mappings.RegisterMapping(typeof(LayoutAnchorSide), Container.GetExportedValue<LayoutAnchorSideRegionAdapter>());
-            mappings.RegisterMapping(typeof(TabControl), Container.GetExportedValue<TabControlRegionAdapter>());
+            //mappings.RegisterMapping(typeof(LayoutAnchorGroup), Container.GetExportedValue<LayoutAnchorGroupRegionAdapter>());
+            //mappings.RegisterMapping(typeof(LayoutDocumentPane), Container.GetExportedValue<LayoutDocumentPaneRegionAdapter>());
+            //mappings.RegisterMapping(typeof(LayoutAnchorSide), Container.GetExportedValue<LayoutAnchorSideRegionAdapter>());
+            //mappings.RegisterMapping(typeof(TabControl), Container.GetExportedValue<TabControlRegionAdapter>());
+            //mappings.RegisterMapping(typeof(MetroTabControl), Container.GetExportedValue<MetroTabControlRegionAdapter>());
 
             return mappings;
         }

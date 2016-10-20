@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using IronPython.Hosting;
+using IronPython.Runtime;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using Prism.Logging;
@@ -39,8 +40,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
             _py.Runtime.IO.SetErrorOutput(ms, outputWriter);
 
             CreateScope();
-
-            SetVariable("Convert", new Infrastructure.Utility.Convert(), true);
         }
 
         public void ExecuteScript(string code)
@@ -95,6 +94,20 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
             return device;
         }
 
+        public TFunc GetFunction<TFunc>(object function)
+            where TFunc : class
+        {
+            if (!typeof(TFunc).IsSubclassOf(typeof(Delegate)))
+                throw new ArgumentException(typeof(TFunc).Name + " is not a delegate type");
+
+            var pyFunction = function as PythonFunction;
+
+            if (pyFunction == null)
+                return default(TFunc);
+
+            return _pyScope.GetVariable(pyFunction.func_name);
+        }
+
         public void SetVariable(string name, object value, bool global = false)
         {
             _pyScope.SetVariable(name, value);
@@ -145,7 +158,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 import clr
 clr.AddReference('IronPython')
 clr.AddReference('IronPython.Modules')
-clr.AddReference('iXPayTestClient.Business.Messaging')
+clr.AddReference('iXPayTestClient.Business.TerminalCommands')
 clr.AddReference('Microsoft.Scripting.Metadata')
 clr.AddReference('Microsoft.Scripting')
 clr.AddReference('Microsoft.Dynamic')
@@ -159,7 +172,7 @@ clr.AddReference('System.Data')
 
                 RegisterVariables();
 
-                EventAggregator.GetEvent<PrepareScriptEvent>().Publish(this);
+                EventAggregator.GetEvent<SetupScriptEvent>().Publish(this);
             }
             catch (Exception ex)
             {
@@ -186,13 +199,20 @@ clr.AddReference('System.Data')
             }
             catch (Exception ex)
             {
-                EventAggregator.GetEvent<ScriptOutputEvent>().Publish(ex.Message);
+                EventAggregator.GetEvent<OutputTextEvent>().Publish(new OutputTextEventArgs
+                    {
+                        Category = OutputTextCategory.Script,
+                        Text = ex.Message
+                    });
+
                 Logger.Log(ex.Message, Category.Exception, Priority.Medium);
             }
         }
 
         private void OnScriptCompleted()
         {
+            EventAggregator.GetEvent<TeardownScriptEvent>().Publish(this);
+
             CreateScope();
         }
     }

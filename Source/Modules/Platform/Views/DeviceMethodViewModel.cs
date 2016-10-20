@@ -1,19 +1,18 @@
-﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 {
-    public class DeviceMethodViewModel : ViewModelBase, ICommandViewModel
+    public class DeviceMethodViewModel : ViewModelBase, IDeviceMethodViewModel
     {
         private string _title;
-        private CommandType _commandType;
-        private ITerminalDeviceMethod _method;
 
         public DeviceMethodViewModel(ITerminalDeviceMethod method)
         {
-            _method = method;
-            Title = _method.Name;
-            _commandType = CommandType.Method;
+            Object = method;
+            Title = Object.Name;
         }
 
         public string Title
@@ -22,13 +21,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             set { SetProperty(ref _title, value); }
         }
 
+        public ObservableCollection<IDeviceCommandViewModel> Commands
+            => new ObservableCollection<IDeviceCommandViewModel>(Enumerable.Repeat(new DeviceCommandViewModel(Object.InvokeCommand, DeviceCommandInvokeType.Invoke), 1));
 
-        public CommandType CommandType
-        {
-            get { return _commandType; }
-            set { SetProperty(ref _commandType, value); }
-        }
-
-        public ITerminalDeviceCommand Object => _method;
+        public ITerminalDeviceMethod Object { get; }
     }
 }

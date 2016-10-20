@@ -28,7 +28,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv
                 if (terminalService == null)
                     throw new InvalidOperationException("Unable to locate terminal service");
 
-                terminalService.RegisterDeviceFromFile(Path.Combine(Directory.GetCurrentDirectory(), @"Scripts\EmvModule.py"));
+                //terminalService.RegisterDeviceFromFile(Path.Combine(Directory.GetCurrentDirectory(), @"Scripts\EmvModule.py"));
             }
             catch (Exception ex)
             {

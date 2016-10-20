@@ -20,7 +20,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform
 
         protected override void RegisterServices()
         {
-            ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            //todo find a better way to preload devices or get successors other than module intialized
+            ServiceLocator.Current.GetInstance<ITerminalClientService>().Devices.GetEnumerator();
 
             EventAggregator.GetEvent<DeviceRegisteredEvent>().Subscribe(OnDeviceRegistered);
         }

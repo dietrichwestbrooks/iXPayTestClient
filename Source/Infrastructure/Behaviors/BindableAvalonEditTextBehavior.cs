@@ -34,7 +34,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Behaviors
 
             var caretOffset = textEditor.CaretOffset;
             textEditor.Document.Text = text;
-            textEditor.CaretOffset = caretOffset;
+            if (!textEditor.IsReadOnly && caretOffset <= textEditor.Text.Length)
+                textEditor.CaretOffset = caretOffset;
         }
 
         protected override void OnAttached()

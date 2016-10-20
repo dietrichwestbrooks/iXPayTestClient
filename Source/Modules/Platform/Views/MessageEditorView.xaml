@@ -20,7 +20,7 @@
                 <Button Command="{Binding ExecuteCommand}"
                     Height="20"
                     Margin="0,0,0,5"
-                    CommandParameter="{Binding ElementName=CodeTextEditor, Path=Document.Text}"
+                    CommandParameter="{Binding ElementName=XmlTextEditor, Path=Document.Text}"
                     Foreground="SeaGreen">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Width="12" Height="12"
@@ -76,12 +76,27 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        <TabControl Grid.Column="1" TabStripPlacement="Bottom" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.MesssageEditorRegion}">
+        <TabControl Grid.Column="1" TabStripPlacement="Right" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.MesssageEditorRegion}">
+            <TabControl.Resources>
+                <Style BasedOn="{StaticResource MetroTabItem}" TargetType="{x:Type TabItem}">
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <ContentPresenter Margin="0 0 0 10"  Content="{TemplateBinding Content}" TextBlock.FontSize="12"  TextOptions.TextFormattingMode="Display">
+                                    <ContentPresenter.LayoutTransform>
+                                        <RotateTransform Angle="90" />
+                                    </ContentPresenter.LayoutTransform>
+                                </ContentPresenter>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
             <TabItem Header="XML">
                 <!--<TextBox Grid.Row="0" Text="{Binding CommandText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap"/>-->
-                <avalonedit:TextEditor WordWrap="True" Background="#eee" FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True" SyntaxHighlighting="XML">
+                <avalonedit:TextEditor x:Name="XmlTextEditor" WordWrap="True" Background="#eee" FontFamily="Consolas" FontSize="10pt" ShowLineNumbers="True" SyntaxHighlighting="XML">
                     <i:Interaction.Behaviors>
-                        <ixpay:BindableAvalonEditTextBehavior Text="{Binding Message, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        <ixpay:BindableAvalonEditTextBehavior Text="{Binding Xml, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                     </i:Interaction.Behaviors>
                 </avalonedit:TextEditor>
             </TabItem>

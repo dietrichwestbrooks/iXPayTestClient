@@ -1,6 +1,6 @@
 ﻿using System;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
@@ -22,8 +22,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             ResponseMessage = message.GetResponseMessage();
             Time = DateTime.Now;
             SequenceNumber = message.GetResponseSequenceNumber();
-            Title = message.GetBaseResponse().GetType().Name;
-            Xml = message.Serialize();
+            Title = message.GetLastItem().GetType().Name;
+            message.TrySerialize(out _xml);
         }
 
         public string ResponseMessage

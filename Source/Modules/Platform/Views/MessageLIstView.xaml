@@ -17,7 +17,7 @@
         </Grid.Resources>
         <DockPanel LastChildFill="True">
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
-                <CheckBox IsChecked="True" Content="Clear on Run" />
+                <CheckBox IsChecked="{Binding ClearOnRun}" Content="Clear on Run" />
             </StackPanel>
             <ToolBarTray DockPanel.Dock="Top" Margin="0,10">
                 <ToolBar>
@@ -41,9 +41,23 @@
                       AutoGenerateColumns="False" 
                       HeadersVisibility="All" 
                       IsReadOnly="True" 
-                      ItemsSource="{Binding Messages}"
-                      PreviewMouseDown="DataGrid_OnPreviewMouseDown">
+                      ItemsSource="{Binding Messages}">
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button HorizontalAlignment="Center" Content="+" Click="RowExpanderClicked">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource MetroButton}" TargetType="Button">
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="FontSize" Value="14" />
+                                            <Setter Property="Background" Value="Transparent" />
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Sequence">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -82,17 +96,20 @@
                 </DataGrid.Columns>
                 <DataGrid.RowDetailsTemplate>
                     <DataTemplate>
-                        <avalonedit:TextEditor FontFamily="Consolas" 
-                                           FontSize="10pt" 
-                                           SyntaxHighlighting="XML" 
-                                               Background="#EEE"
-                                           IsReadOnly="True"
-                                           HorizontalScrollBarVisibility="Disabled" 
-                                           VerticalScrollBarVisibility="Disabled">
-                            <i:Interaction.Behaviors>
-                                <ixpay:BindableAvalonEditTextBehavior Text="{Binding Xml, Mode=OneTime}" />
-                            </i:Interaction.Behaviors>
-                        </avalonedit:TextEditor>
+                        <Border Height="150" 
+                                Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsPresenter}}, Path=ActualWidth}">
+                            <avalonedit:TextEditor FontFamily="Consolas" 
+                                                   FontSize="10pt" 
+                                                   SyntaxHighlighting="XML" 
+                                                   Background="#EEE"
+                                                   IsReadOnly="True"
+                                                   WordWrap="True"
+                                                   VerticalScrollBarVisibility="Auto">
+                                <i:Interaction.Behaviors>
+                                    <ixpay:BindableAvalonEditTextBehavior Text="{Binding Xml, Mode=OneTime}" />
+                                </i:Interaction.Behaviors>
+                            </avalonedit:TextEditor>
+                        </Border>
                     </DataTemplate>
                 </DataGrid.RowDetailsTemplate>
             </DataGrid>

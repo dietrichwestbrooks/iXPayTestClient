@@ -1,5 +1,6 @@
 ﻿using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events
@@ -9,6 +10,22 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events
     }
 
     public class CommandSelectedEvent : PubSubEvent<ITerminalDeviceCommand>
+    {
+    }
+
+    public class PropertySelectedEvent : PubSubEvent<ITerminalDeviceProperty>
+    {
+    }
+
+    public class MethodSelectedEvent : PubSubEvent<ITerminalDeviceMethod>
+    {
+    }
+
+    public class EventSelectedEvent : PubSubEvent<ITerminalDeviceEvent>
+    {
+    }
+
+    public class DeviceSelectedEvent : PubSubEvent<ITerminalDevice>
     {
     }
 
@@ -36,15 +53,23 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events
     {
     }
 
-    public class ScriptOutputEvent : PubSubEvent<string>
+    public class OutputTextEvent : PubSubEvent<OutputTextEventArgs>
     {
     }
 
-    public class PrepareScriptEvent : PubSubEvent<IScriptService>
+    public class SetupScriptEvent : PubSubEvent<IScriptService>
+    {
+    }
+
+    public class TeardownScriptEvent : PubSubEvent<IScriptService>
     {
     }
 
     public class DeviceRegisteredEvent : PubSubEvent<ITerminalDevice>
+    {
+    }
+
+    public class PreviewRunCommandsEvent : PubSubEvent
     {
     }
 }

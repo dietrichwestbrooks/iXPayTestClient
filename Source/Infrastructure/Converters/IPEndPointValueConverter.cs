@@ -10,7 +10,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count() != 2 || string.IsNullOrWhiteSpace(values[0]?.ToString()))
+            if (values.Length != 2 || string.IsNullOrWhiteSpace(values[0]?.ToString()))
                 return null;
 
             IPAddress address;
