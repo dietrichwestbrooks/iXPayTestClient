@@ -1,9 +1,6 @@
-﻿using System;
-using Microsoft.Practices.ServiceLocation;
+﻿using Microsoft.Practices.ServiceLocation;
 using Prism.Events;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 {
@@ -38,16 +35,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
         {
             if (condition)
                 WriteLine(message);
-        }
-
-        public void RegisterDevice(ITerminalDevice device)
-        {
-            var terminalService = ServiceLocator.Current.GetInstance<ITerminalClientService>();
-
-            if (terminalService == null)
-                throw new InvalidOperationException("Unable to locate terminal service");
-
-            terminalService.RegisterDevice(device);
         }
 
         private IEventAggregator EventAggregator { get; }

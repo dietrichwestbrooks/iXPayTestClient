@@ -20,35 +20,35 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new ChipCardStatusProperty(this),
-                    new ChipCardOpenedProperty(this),
-                    new ChipCardCardPositionProperty(this),
+                    new ChipCardReaderStatusProperty(this),
+                    new ChipCardReaderOpenedProperty(this),
+                    new ChipCardReaderCardPositionProperty(this),
                     new ChipCardReaderTypeProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new OpenChipCardMethod(this),
-                    new CloseChipCardMethod(this),
-                    new DeactivateChipCardMethod(this),
-                    new SoftResetMethod(this),
-                    new ProcessApduMethod(this),
+                    new ChipCardReaderOpenMethod(this),
+                    new ChipCardReaderCloseMethod(this),
+                    new ChipCardReaderDeactivateMethod(this),
+                    new ChipCardReaderSoftResetMethod(this),
+                    new ChipCardReaderProcessApduMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new ChipCardOpenChangedEvent(this),
-                    new ChipCardStatusChangedEvent(this),
-                    new ChipCardCardPositionChangedEvent(this),
-                    new ChipCardDataEvent(this),
-                    new ChipCardInvalidDataEvent(this),
+                    new ChipCardReaderOpenChangedEvent(this),
+                    new ChipCardReaderStatusChangedEvent(this),
+                    new ChipCardReaderCardPositionChangedEvent(this),
+                    new ChipCardReaderDataReadEvent(this),
+                    new ChipCardReaderInvalidDataReadEvent(this),
                     new ChipCardReaderTimedOutEvent(this),
                 });
         }
 
         public void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
@@ -56,10 +56,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     #region Properties
 
     [ValueProperty("State")]
-    public class ChipCardStatusProperty : TerminalDeviceProperty<Status,
+    public class ChipCardReaderStatusProperty : TerminalDeviceProperty<Status,
         GetStatusCommand, GetStatusResponse>
     {
-        public ChipCardStatusProperty(ITerminalDevice device)
+        public ChipCardReaderStatusProperty(ITerminalDevice device)
             : base(device, "Status")
         {
             GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
@@ -70,10 +70,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("Open")]
-    public class ChipCardOpenedProperty : TerminalDeviceProperty<bool,
+    public class ChipCardReaderOpenedProperty : TerminalDeviceProperty<bool,
         GetOpenedCommand, GetOpenedResponse>
     {
-        public ChipCardOpenedProperty(ITerminalDevice device)
+        public ChipCardReaderOpenedProperty(ITerminalDevice device)
             : base(device, "Opened")
         {
             GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
@@ -84,10 +84,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("CardPosition")]
-    public class ChipCardCardPositionProperty : TerminalDeviceProperty<CardPosition,
+    public class ChipCardReaderCardPositionProperty : TerminalDeviceProperty<CardPosition,
         GetCardPositionCommand, GetCardPositionResponse>
     {
-        public ChipCardCardPositionProperty(ITerminalDevice device)
+        public ChipCardReaderCardPositionProperty(ITerminalDevice device)
             : base(device, "CardPosition")
         {
             GetCommand = new TerminalDeviceCommand<GetCardPositionCommand, GetCardPositionResponse>(
@@ -115,29 +115,29 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class OpenChipCardMethod : TerminalDeviceMethod<OpenChipCardReaderCommand, OpenChipCardReaderResponse>
+    public class ChipCardReaderOpenMethod : TerminalDeviceMethod<OpenChipCardReaderCommand, OpenChipCardReaderResponse>
     {
-        public OpenChipCardMethod(ITerminalDevice device)
+        public ChipCardReaderOpenMethod(ITerminalDevice device)
             : base(device, "Open")
         {
             InvokeCommand = new TerminalDeviceCommand<OpenChipCardReaderCommand, OpenChipCardReaderResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new OpenChipCardReaderCommand
                     {
-                        {"allowMagStripeFallback", true},
-                        {"allowMagStripeFallbackSpecified", true},
-                        {"timeout", 0},
-                        {"timeoutSpecified", false},
+                        AllowMagStripeFallback = true,
+                        AllowMagStripeFallbackSpecified = true,
+                        Timeout = 0,
+                        TimeoutSpecified = false,
                     }
                 );
         }
     }
 
-    public class CloseChipCardMethod :
+    public class ChipCardReaderCloseMethod :
         TerminalDeviceMethod<CloseChipCardReaderCommand, CloseChipCardReaderResponse>
     {
-        public CloseChipCardMethod(ITerminalDevice device)
+        public ChipCardReaderCloseMethod(ITerminalDevice device)
             : base(device, "Close")
         {
             InvokeCommand = new TerminalDeviceCommand<CloseChipCardReaderCommand, CloseChipCardReaderResponse>(
@@ -147,25 +147,25 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class DeactivateChipCardMethod : TerminalDeviceMethod<DeactivateChipCardCommand, DeactivateChipCardResponse>
+    public class ChipCardReaderDeactivateMethod : TerminalDeviceMethod<DeactivateChipCardCommand, DeactivateChipCardResponse>
     {
-        public DeactivateChipCardMethod(ITerminalDevice device)
+        public ChipCardReaderDeactivateMethod(ITerminalDevice device)
             : base(device, "Deactivate")
         {
             InvokeCommand = new TerminalDeviceCommand<DeactivateChipCardCommand, DeactivateChipCardResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeactivateChipCardCommand
                     {
-                        {"releaseCard", true},
+                        ReleaseCard = true,
                     }
                 );
         }
     }
 
-    public class SoftResetMethod : TerminalDeviceMethod<SoftResetChipCardCommand, SoftResetChipCardResponse>
+    public class ChipCardReaderSoftResetMethod : TerminalDeviceMethod<SoftResetChipCardCommand, SoftResetChipCardResponse>
     {
-        public SoftResetMethod(ITerminalDevice device)
+        public ChipCardReaderSoftResetMethod(ITerminalDevice device)
             : base(device, "SoftReset")
         {
             InvokeCommand = new TerminalDeviceCommand<SoftResetChipCardCommand, SoftResetChipCardResponse>(
@@ -175,17 +175,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class ProcessApduMethod : TerminalDeviceMethod<ChipCardProcessAPDUCommand, ChipCardProcessAPDUResponse>
+    public class ChipCardReaderProcessApduMethod : TerminalDeviceMethod<ChipCardProcessAPDUCommand, ChipCardProcessAPDUResponse>
     {
-        public ProcessApduMethod(ITerminalDevice device)
+        public ChipCardReaderProcessApduMethod(ITerminalDevice device)
             : base(device, "ProcessAPDU")
         {
             InvokeCommand = new TerminalDeviceCommand<ChipCardProcessAPDUCommand, ChipCardProcessAPDUResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new ChipCardProcessAPDUCommand
                     {
-                        {"capdu", ConvertHelper.ToHexByteArray("00A4040007A0000000041010")},
+                        CAPDU = ConvertHelper.ToHexByteArray("00A4040007A0000000041010"),
                     }
                 );
         }
@@ -195,42 +195,42 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Events
 
-    public class ChipCardOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
+    public class ChipCardReaderOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
     {
-        public ChipCardOpenChangedEvent(ITerminalDevice device)
+        public ChipCardReaderOpenChangedEvent(ITerminalDevice device)
             : base(device, "OpenChanged")
         {
         }
     }
 
-    public class ChipCardStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
+    public class ChipCardReaderStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
     {
-        public ChipCardStatusChangedEvent(ITerminalDevice device)
+        public ChipCardReaderStatusChangedEvent(ITerminalDevice device)
             : base(device, "StatusChanged")
         {
         }
     }
 
-    public class ChipCardCardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
+    public class ChipCardReaderCardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
     {
-        public ChipCardCardPositionChangedEvent(ITerminalDevice device)
+        public ChipCardReaderCardPositionChangedEvent(ITerminalDevice device)
             : base(device, "CardPositionChanged")
         {
         }
     }
 
-    public class ChipCardDataEvent : TerminalDeviceEvent<ChipCardData>
+    public class ChipCardReaderDataReadEvent : TerminalDeviceEvent<ChipCardData>
     {
-        public ChipCardDataEvent(ITerminalDevice device)
-            : base(device, "Data")
+        public ChipCardReaderDataReadEvent(ITerminalDevice device)
+            : base(device, "DataRead")
         {
         }
     }
 
-    public class ChipCardInvalidDataEvent : TerminalDeviceEvent<ChipCardInvalidData>
+    public class ChipCardReaderInvalidDataReadEvent : TerminalDeviceEvent<ChipCardInvalidData>
     {
-        public ChipCardInvalidDataEvent(ITerminalDevice device)
-            : base(device, "InvalidData")
+        public ChipCardReaderInvalidDataReadEvent(ITerminalDevice device)
+            : base(device, "InvalidDataRead")
         {
         }
     }
@@ -238,7 +238,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     public class ChipCardReaderTimedOutEvent : TerminalDeviceEvent<ChipCardReaderTimedOut>
     {
         public ChipCardReaderTimedOutEvent(ITerminalDevice device)
-            : base(device, "ReaderTimedOut")
+            : base(device, "TimedOut")
         {
         }
     }

@@ -19,20 +19,23 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         private TcpClient _client;
         private Timer _pulseTimer;
 
-        private int _messageLoopSleepTime = 500;
         ProducerConsumerQueue _outboundMessageQueue;
+
+        ProducerConsumerQueue _inboundMessageQueue;
+        private Task _inboundLoopTask;
+        private int _inboundLoopSleepTime = 500;
 
         CancellationTokenSource _shutdownToken;
 
         private static int _sequenceNumber;
         private static object _sequenceLocker = new object();
-        private Task _inboundLoopTask;
 
         public TerminalClient()
         {
             _pulseTimer = new Timer(OnPulseTimerElapsed, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
             _outboundMessageQueue = new ProducerConsumerQueue(2);
+            _inboundMessageQueue = new ProducerConsumerQueue(2);
         }
 
         ~TerminalClient()
@@ -84,9 +87,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
                 EndPoint = endPoint;
 
-                //_outboundMessageLoop.Start(this);
-                //Task.Factory.StartNew(OutboundMessageLoop, _shutdownToken);
-                //_inboundMessageLoop.Start(this);
 #pragma warning disable 4014
                 _inboundLoopTask = Task.Factory.StartNew(InboundMessageLoop, _shutdownToken.Token);
 #pragma warning restore 4014
@@ -102,7 +102,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             }
             catch (Exception ex)
             {
-                FireClientError(Enums.ClientErrorType.ConnectionError, ex);
+                FireClientError(ClientErrorType.ConnectionError, ex);
 
                 // JIC we were able to connect but encontered another issue
                 //Disconnect();
@@ -139,7 +139,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             Connect(endPoint);
         }
 
-        public int SendMessage(TerminalMessage message, Enums.MessagePriorty priority = Enums.MessagePriorty.Normal)
+        public int SendMessage(TerminalMessage message, MessagePriorty priority = MessagePriorty.Normal)
         {
             if (_client == null || !_client.Connected)
                 throw new InvalidOperationException("No Connection");
@@ -148,7 +148,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
             message.SetCommandSequenceNumber(sequenceNumber);
 
-            //lock (_outboundMessageQueue) _outboundMessageQueue.Enqueue(message);
             _outboundMessageQueue.Enqueue(() => Send(message), _shutdownToken.Token);
 
             return sequenceNumber;
@@ -180,7 +179,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             {
                 try
                 {
-                    if (_shutdownToken.Token.WaitHandle.WaitOne(_messageLoopSleepTime))
+                    if (_shutdownToken.Token.WaitHandle.WaitOne(_inboundLoopSleepTime))
                         break;
 
                     var reader = _client.GetStream();
@@ -200,36 +199,42 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
                         length = IPAddress.NetworkToHostOrder(length);
 
-                        xmlMessage = ReadBuffer(length); 
+                        xmlMessage = ReadBuffer(length);
+
+                        _inboundMessageQueue.Enqueue(() => Receive(xmlMessage), _shutdownToken.Token);
                     }
 
-                    if (xmlMessage.Contains("Heartbeat"))
-                    {
-                        _pulseTimer.Change(TimeSpan.FromSeconds(15 * 2), TimeSpan.FromSeconds(15 * 2));
-                        FirePulse(true);
-                        continue;
-                    }
-
-                    var serializer = ServiceLocator.Current.GetInstance<ITerminalMessageSerializer>();
-                    var message = serializer.Deserialize(xmlMessage);
-
-                    var @event = message.Item as TerminalEvent;
-                    if (@event != null)
-                    {
-                        FireEventReceived(message);
-                        continue;
-                    }
-
-                    var response = message.Item as TerminalResponse;
-                    if (response != null)
-                        FireResponseReceived(message);
                 }
                 catch (Exception ex)
                 {
-                    FireClientError(Enums.ClientErrorType.DataReceiveError, ex);
+                    FireClientError(ClientErrorType.DataReceiveError, ex);
                     break;
                 }
             }
+        }
+
+        private void Receive(string xmlMessage)
+        {
+            if (xmlMessage.Contains("Heartbeat"))
+            {
+                _pulseTimer.Change(TimeSpan.FromSeconds(15 * 2), TimeSpan.FromSeconds(15 * 2));
+                FirePulse(true);
+                return;
+            }
+
+            var serializer = ServiceLocator.Current.GetInstance<ITerminalMessageSerializer>();
+            var message = serializer.Deserialize(xmlMessage);
+
+            var @event = message.Item as TerminalEvent;
+            if (@event != null)
+            {
+                FireEventReceived(message);
+                return;
+            }
+
+            var response = message.Item as TerminalResponse;
+            if (response != null)
+                FireResponseReceived(message);
         }
 
         private void Send(TerminalMessage message)
@@ -246,46 +251,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             }
             catch (Exception ex)
             {
-                FireClientError(Enums.ClientErrorType.DataSendError, ex);
+                FireClientError(ClientErrorType.DataSendError, ex);
             }
         }
-
-        //private void OutboundMessageLoop()
-        //{
-        //    while (true)
-        //    {
-        //        if (_shutdown.Wait(_messageLoopSleepTime))
-        //            break;
-
-        //        TerminalMessage message = null;
-
-        //        lock (_outboundMessageQueue)
-        //        {
-        //            if (_outboundMessageQueue.Count > 0)
-        //                message = _outboundMessageQueue.Dequeue();
-        //        }
-
-        //        if (message == null)
-        //            continue;
-
-        //        try
-        //        {
-        //            message.GetBaseCommand().SequenceNumber = SequenceNumber;
-
-        //            byte[] buffer = message.GetBytes();
-
-        //            var length = IPAddress.HostToNetworkOrder(buffer.Length);
-
-        //            _client.Client.Send(BitConverter.GetBytes(length).Concat(buffer).ToArray());
-
-        //            FireMessageSent(message);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            FireClientError(Enums.ClientErrorType.DataSendError, ex);
-        //        }
-        //    }
-        //}
 
         private static int IncSequenceNumber
         {
@@ -336,16 +304,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             Disconnected?.Invoke(this, EndPoint);
         }
 
-        //private static void InboundMessageLoopThread(object @this)
-        //{
-        //    ((TerminalClient)@this).InboundMessageLoop();
-        //}
-
-        //private static void OutboundMessageLoopThread(object @this)
-        //{
-        //    ((TerminalClient)@this).OutboundMessageLoop();
-        //}
-
         protected virtual void FireEventReceived(TerminalMessage message)
         {
             EventReceived?.Invoke(this, message);
@@ -356,7 +314,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             ResponseReceived?.Invoke(this, message);
         }
 
-        protected virtual void FireClientError(Enums.ClientErrorType type, Exception ex)
+        protected virtual void FireClientError(ClientErrorType type, Exception ex)
         {
             Error?.Invoke(this, new ClientErrorEventArg {Exception = ex, EndPoint = EndPoint, ErrorType = type, IsError = true});
         }

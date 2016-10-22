@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Threading;
+using System.Windows.Input;
+using Prism.Commands;
+using Prism.Regions;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -12,6 +16,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 {
     public class MessageSentViewModel : ViewModelBase, IViewModel
     {
+        private readonly TerminalMessage _message;
         private string _title;
         private string _xml;
         private int _sequenceNumber;
@@ -21,8 +26,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         public MessageSentViewModel(TerminalMessage message)
         {
+            _message = message;
             State = MessageSentState.Sent;
+
+            ResendMessageCommand = new DelegateCommand(OnResendMessage);
+
             _responseTimer = new Timer(WaitResponseElapsed, null, TimeSpan.FromSeconds(15), Timeout.InfiniteTimeSpan);
+
             EventAggregator.GetEvent<ResponseReceivedEvent>().Subscribe(OnResponseReceived);
 
             object command = message.GetLastItem();
@@ -31,6 +41,18 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             SequenceNumber = message.GetCommandSequenceNumber();
             Title = command.GetType().Name;
             message.TrySerialize(out _xml);
+        }
+        
+        public ICommand ResendMessageCommand { get; }
+
+        private void OnResendMessage()
+        {
+            var parameters = new NavigationParameters
+                {
+                    {"Message", _message},
+                };
+
+            RegionManager.RequestNavigate(RegionNames.DialogPopupRegion, "ResendMessagePopUpView", parameters);
         }
 
         public DateTime Time

@@ -10,7 +10,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop.Views
     /// <summary>
     /// Interaction logic for Shell.xaml
     /// </summary>
-    [Export]
+    [Export(typeof(IShellView))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class ShellView : IShellView, IPartImportsSatisfiedNotification
     {
         //[Import(AllowRecomposition = false)]

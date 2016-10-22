@@ -20,31 +20,31 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new BarcodeStatusProperty(this),
-                    new BarcodeOpenedProperty(this),
+                    new BarcodeReaderStatusProperty(this),
+                    new BarcodeReaderOpenedProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new OpenBarcodeMethod(this),
-                    new CloseBarcodeMethod(this),
-                    new FlashLightMethod(this),
-                    new TurnBarcodeLightOnMethod(this),
-                    new TurnBarcodeLightOffMethod(this),
+                    new BarcodeReaderOpenMethod(this),
+                    new BarcodeReaderCloseMethod(this),
+                    new BarcodeReaderFlashLightMethod(this),
+                    new BarcodeReaderTurnLightOnMethod(this),
+                    new BarcodeReaderTurnLightOffMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new BarcodeOpenChangedEvent(this),
-                    new BarcodeStatusChangedEvent(this),
-                    new BarcodeDataEvent(this),
-                    new BarcodeInvalidDataEvent(this),
+                    new BarcodeReaderOpenChangedEvent(this),
+                    new BarcodeReaderStatusChangedEvent(this),
+                    new BarcodeReaderDataReadEvent(this),
+                    new BarcodeReaderInvalidDataReadEvent(this),
                 });
         }
 
         public void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
@@ -52,10 +52,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     #region Properties
 
     [ValueProperty("State")]
-    public class BarcodeStatusProperty : TerminalDeviceProperty<Status,
+    public class BarcodeReaderStatusProperty : TerminalDeviceProperty<Status,
         GetStatusCommand, GetStatusResponse>
     {
-        public BarcodeStatusProperty(ITerminalDevice device)
+        public BarcodeReaderStatusProperty(ITerminalDevice device)
             : base(device, "Status")
         {
             GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
@@ -66,10 +66,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("Open")]
-    public class BarcodeOpenedProperty : TerminalDeviceProperty<bool,
+    public class BarcodeReaderOpenedProperty : TerminalDeviceProperty<bool,
         GetOpenedCommand, GetOpenedResponse>
     {
-        public BarcodeOpenedProperty(ITerminalDevice device)
+        public BarcodeReaderOpenedProperty(ITerminalDevice device)
             : base(device, "Opened")
         {
             GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
@@ -83,10 +83,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class OpenBarcodeMethod :
+    public class BarcodeReaderOpenMethod :
     TerminalDeviceMethod<OpenBarcodeReaderCommand, OpenBarcodeReaderResponse>
     {
-        public OpenBarcodeMethod(ITerminalDevice device)
+        public BarcodeReaderOpenMethod(ITerminalDevice device)
             : base(device, "Open")
         {
             InvokeCommand = new TerminalDeviceCommand<OpenBarcodeReaderCommand, OpenBarcodeReaderResponse>(
@@ -96,10 +96,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class CloseBarcodeMethod :
+    public class BarcodeReaderCloseMethod :
         TerminalDeviceMethod<CloseBarCodeReaderCommand, CloseBarCodeReaderResponse>
     {
-        public CloseBarcodeMethod(ITerminalDevice device)
+        public BarcodeReaderCloseMethod(ITerminalDevice device)
             : base(device, "Close")
         {
             InvokeCommand = new TerminalDeviceCommand<CloseBarCodeReaderCommand, CloseBarCodeReaderResponse>(
@@ -109,10 +109,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class TurnBarcodeLightOnMethod :
+    public class BarcodeReaderTurnLightOnMethod :
         TerminalDeviceMethod<TurnLightOnCommand, TurnLightOnResponse>
     {
-        public TurnBarcodeLightOnMethod(ITerminalDevice device)
+        public BarcodeReaderTurnLightOnMethod(ITerminalDevice device)
             : base(device, "TurnLightOn")
         {
             InvokeCommand = new TerminalDeviceCommand<TurnLightOnCommand, TurnLightOnResponse>(
@@ -122,28 +122,28 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class FlashLightMethod :
+    public class BarcodeReaderFlashLightMethod :
         TerminalDeviceMethod<FlashLightCommand, FlashLightResponse>
     {
-        public FlashLightMethod(ITerminalDevice device)
+        public BarcodeReaderFlashLightMethod(ITerminalDevice device)
             : base(device, "FlashLight")
         {
             InvokeCommand = new TerminalDeviceCommand<FlashLightCommand, FlashLightResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new FlashLightCommand
                     {
-                        {"onTime", 1000},
-                        {"offTime", 100},
+                        OnTime = 1000,
+                        OffTime = 100,
                     }
                 );
         }
     }
 
-    public class TurnBarcodeLightOffMethod :
+    public class BarcodeReaderTurnLightOffMethod :
         TerminalDeviceMethod<TurnLightOffCommand, TurnLightOffResponse>
     {
-        public TurnBarcodeLightOffMethod(ITerminalDevice device)
+        public BarcodeReaderTurnLightOffMethod(ITerminalDevice device)
             : base(device, "TurnLightOff")
         {
             InvokeCommand = new TerminalDeviceCommand<TurnLightOffCommand, TurnLightOffResponse>(
@@ -157,34 +157,34 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Events
 
-    public class BarcodeOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
+    public class BarcodeReaderOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
     {
-        public BarcodeOpenChangedEvent(ITerminalDevice device)
+        public BarcodeReaderOpenChangedEvent(ITerminalDevice device)
             : base(device, "OpenChanged")
         {
         }
     }
 
-    public class BarcodeStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
+    public class BarcodeReaderStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
     {
-        public BarcodeStatusChangedEvent(ITerminalDevice device)
+        public BarcodeReaderStatusChangedEvent(ITerminalDevice device)
             : base(device, "StatusChanged")
         {
         }
     }
 
-    public class BarcodeDataEvent : TerminalDeviceEvent<BarcodeData>
+    public class BarcodeReaderDataReadEvent : TerminalDeviceEvent<BarcodeData>
     {
-        public BarcodeDataEvent(ITerminalDevice device)
-            : base(device, "Data")
+        public BarcodeReaderDataReadEvent(ITerminalDevice device)
+            : base(device, "DataRead")
         {
         }
     }
 
-    public class BarcodeInvalidDataEvent : TerminalDeviceEvent<BarcodeInvalidData>
+    public class BarcodeReaderInvalidDataReadEvent : TerminalDeviceEvent<BarcodeInvalidData>
     {
-        public BarcodeInvalidDataEvent(ITerminalDevice device)
-            : base(device, "InvalidData")
+        public BarcodeReaderInvalidDataReadEvent(ITerminalDevice device)
+            : base(device, "InvalidDataRead")
         {
         }
     }

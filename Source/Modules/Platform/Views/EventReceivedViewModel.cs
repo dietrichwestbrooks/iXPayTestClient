@@ -19,7 +19,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         public EventReceivedViewModel(TerminalMessage message)
         {
-            TerminalClientService = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            TerminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
 
             Time = DateTime.Now;
             Title = message.GetLastItem().GetType().Name;
@@ -31,7 +31,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             {
                 Type eventType = eventObject.GetType();
 
-                ITerminalDevice device = TerminalClientService.Devices.FirstOrDefault(d => d.EventType == eventType);
+                ITerminalDevice device = TerminalService.Devices.FirstOrDefault(d => d.EventType == eventType);
 
                 DeviceName = device?.Name ?? string.Empty;
             }
@@ -61,6 +61,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             set { SetProperty(ref _xml, value); }
         }
 
-        private ITerminalClientService TerminalClientService { get; }
+        private ITerminalService TerminalService { get; }
     }
 }

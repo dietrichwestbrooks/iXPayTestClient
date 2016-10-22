@@ -4,7 +4,7 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces
 {
-    public interface ITerminalClientService
+    public interface ITerminalService
     {
         TerminalDeviceCollection Devices { get; }
         bool IsConnected { get; }

@@ -24,7 +24,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         public ConnectViewModel()
         {
-            Terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            Terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Configuration = ServiceLocator.Current.GetInstance<IConfigurationService>();
 
             HostAddress = Configuration.HostAddress;
@@ -85,7 +85,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         private IConfigurationService Configuration { get; }
 
-        private ITerminalClientService Terminal { get; }
+        private ITerminalService Terminal { get; }
 
         private bool CanConnect(IPEndPoint endPoint)
         {

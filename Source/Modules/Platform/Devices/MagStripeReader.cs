@@ -20,32 +20,32 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new MagStripeStatusProperty(this),
-                    new MagStripeOpenedProperty(this),
-                    new MagStripeCardPositionProperty(this),
+                    new MagStripeReaderStatusProperty(this),
+                    new MagStripeReaderOpenedProperty(this),
+                    new MagStripeReaderCardPositionProperty(this),
                     new MagStripeReaderTypeProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new OpenMagStripeMethod(this),
-                    new CloseMagStripeMethod(this),
+                    new MagStripeReaderOpenMethod(this),
+                    new MagStripeReaderCloseMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new MagStripeOpenChangedEvent(this),
-                    new MagStripeStatusChangedEvent(this),
-                    new MagStripeCardPositionChangedEvent(this),
-                    new MagStripeDataEvent(this),
-                    new MagStripeInvalidDataEvent(this),
+                    new MagStripeReaderOpenChangedEvent(this),
+                    new MagStripeReaderStatusChangedEvent(this),
+                    new MagStripeReaderCardPositionChangedEvent(this),
+                    new MagStripeReaderDataReadEvent(this),
+                    new MagStripeReaderInvalidDataReadEvent(this),
                     new MagStripeReaderTimedOutEvent(this),
                 });
         }
 
         public void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
@@ -53,10 +53,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     #region Properties
 
     [ValueProperty("State")]
-    public class MagStripeStatusProperty : TerminalDeviceProperty<Status,
+    public class MagStripeReaderStatusProperty : TerminalDeviceProperty<Status,
         GetStatusCommand, GetStatusResponse>
     {
-        public MagStripeStatusProperty(ITerminalDevice device)
+        public MagStripeReaderStatusProperty(ITerminalDevice device)
             : base(device, "Status")
         {
             GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
@@ -67,10 +67,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("Open")]
-    public class MagStripeOpenedProperty : TerminalDeviceProperty<bool,
+    public class MagStripeReaderOpenedProperty : TerminalDeviceProperty<bool,
         GetOpenedCommand, GetOpenedResponse>
     {
-        public MagStripeOpenedProperty(ITerminalDevice device)
+        public MagStripeReaderOpenedProperty(ITerminalDevice device)
             : base(device, "Opened")
         {
             GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
@@ -81,10 +81,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("CardPosition")]
-    public class MagStripeCardPositionProperty : TerminalDeviceProperty<CardPosition,
+    public class MagStripeReaderCardPositionProperty : TerminalDeviceProperty<CardPosition,
         GetCardPositionCommand, GetCardPositionResponse>
     {
-        public MagStripeCardPositionProperty(ITerminalDevice device)
+        public MagStripeReaderCardPositionProperty(ITerminalDevice device)
             : base(device, "CardPosition")
         {
             GetCommand = new TerminalDeviceCommand<GetCardPositionCommand, GetCardPositionResponse>(
@@ -112,28 +112,28 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class OpenMagStripeMethod :
+    public class MagStripeReaderOpenMethod :
     TerminalDeviceMethod<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>
     {
-        public OpenMagStripeMethod(ITerminalDevice device)
+        public MagStripeReaderOpenMethod(ITerminalDevice device)
             : base(device, "Open")
         {
             InvokeCommand = new TerminalDeviceCommand<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new OpenMagStripeReaderCommand
                     {
-                        {"timeout", 0},
-                        {"timeoutSpecified", false},
+                        Timeout = 0,
+                        TimeoutSpecified = false,
                     }
                 );
         }
     }
 
-    public class CloseMagStripeMethod :
+    public class MagStripeReaderCloseMethod :
         TerminalDeviceMethod<CloseMagStripeReaderCommand, CloseMagStripeReaderResponse>
     {
-        public CloseMagStripeMethod(ITerminalDevice device)
+        public MagStripeReaderCloseMethod(ITerminalDevice device)
             : base(device, "Close")
         {
             InvokeCommand = new TerminalDeviceCommand<CloseMagStripeReaderCommand, CloseMagStripeReaderResponse>(
@@ -147,42 +147,42 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Events
 
-    public class MagStripeOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
+    public class MagStripeReaderOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
     {
-        public MagStripeOpenChangedEvent(ITerminalDevice device)
+        public MagStripeReaderOpenChangedEvent(ITerminalDevice device)
             : base(device, "OpenChanged")
         {
         }
     }
 
-    public class MagStripeStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
+    public class MagStripeReaderStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
     {
-        public MagStripeStatusChangedEvent(ITerminalDevice device)
+        public MagStripeReaderStatusChangedEvent(ITerminalDevice device)
             : base(device, "StatusChanged")
         {
         }
     }
 
-    public class MagStripeCardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
+    public class MagStripeReaderCardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
     {
-        public MagStripeCardPositionChangedEvent(ITerminalDevice device)
+        public MagStripeReaderCardPositionChangedEvent(ITerminalDevice device)
             : base(device, "CardPositionChanged")
         {
         }
     }
 
-    public class MagStripeDataEvent : TerminalDeviceEvent<MagStripeData>
+    public class MagStripeReaderDataReadEvent : TerminalDeviceEvent<MagStripeData>
     {
-        public MagStripeDataEvent(ITerminalDevice device)
-            : base(device, "Data")
+        public MagStripeReaderDataReadEvent(ITerminalDevice device)
+            : base(device, "DataRead")
         {
         }
     }
 
-    public class MagStripeInvalidDataEvent : TerminalDeviceEvent<MagStripeInvalidData>
+    public class MagStripeReaderInvalidDataReadEvent : TerminalDeviceEvent<MagStripeInvalidData>
     {
-        public MagStripeInvalidDataEvent(ITerminalDevice device)
-            : base(device, "InvalidData")
+        public MagStripeReaderInvalidDataReadEvent(ITerminalDevice device)
+            : base(device, "InvalidDataRead")
         {
         }
     }
@@ -190,7 +190,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     public class MagStripeReaderTimedOutEvent : TerminalDeviceEvent<MagStripeReaderTimedOut>
     {
         public MagStripeReaderTimedOutEvent(ITerminalDevice device)
-            : base(device, "ReaderTimedOut")
+            : base(device, "TimedOut")
         {
         }
     }

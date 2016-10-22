@@ -73,10 +73,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             return (TValue)valueProperty?.GetValue(response);
         }
 
-        public virtual bool TrySet(CommandParameters parameters)
+        public bool TrySet(CommandParameters parameters)
+        {
+            object response;
+            TrySet(parameters, out response);
+            return true;
+        }
+
+        protected virtual bool TrySet(CommandParameters parameters, out object result)
         {
             SetValue(parameters);
-            SetCommand.Execute(parameters);
+            result = SetCommand.Execute(parameters);
             return true;
         }
 
@@ -137,7 +144,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
                         break;
 
                     case PropertyInvoke.Set:
-                        success = TrySet(new CommandParameters(binder.CallInfo.ArgumentNames, args));
+                        success = TrySet(new CommandParameters(binder.CallInfo.ArgumentNames, args), out result);
                         break;
                 }
             }

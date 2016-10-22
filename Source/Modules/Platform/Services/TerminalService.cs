@@ -5,17 +5,16 @@ using Microsoft.Practices.ServiceLocation;
 using Prism.Logging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Services;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
 {
-    [Export(typeof(ITerminalClientService))]
-    public class TerminalClientService : ServiceBase, ITerminalClientService
+    [Export(typeof(ITerminalService))]
+    public class TerminalService : ServiceBase, ITerminalService
     {
-        public TerminalClientService()
+        public TerminalService()
         {
             ScriptService = ServiceLocator.Current.GetInstance<IScriptService>();
             Client = ServiceLocator.Current.GetInstance<ITerminalClient>();
@@ -110,12 +109,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
             Configuration.HostPort = endPoint.Port;
             Configuration.Save();
 
-            ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter
-                {
-                    Type = NotificationType.Succeeded,
-                    Message = $"Connected to {endPoint}"
-                });
-
             EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
             {
                 Type = ConnectionEventType.Connected,
@@ -143,13 +136,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
         {
             switch (args.ErrorType)
             {
-                case Enums.ClientErrorType.ConnectionError:
-                    ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter()
-                    {
-                        Type = NotificationType.Failed,
-                        Message = args.Exception.Message
-                    });
-
+                case ClientErrorType.ConnectionError:
                     EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
                     {
                         Type = ConnectionEventType.Failed,

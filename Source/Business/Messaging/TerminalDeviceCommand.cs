@@ -11,21 +11,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         where TCommand : class, new()
         where TResponse : class
     {
-        private IEnumerable<KeyValuePair<string, object>> _defaultParameters;
+        private readonly Func<TCommand> _getDefaultCommand;
 
-        public TerminalDeviceCommand(ITerminalDeviceMember member, string name)
+        public TerminalDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> getDefaultCommand = null)
         {
             Member = member;
             Name = name;
-            _defaultParameters = new SortedList<string, object>();
-        }
-
-        public TerminalDeviceCommand(ITerminalDeviceMember member, string name,
-            IEnumerable<KeyValuePair<string, object>> defaultParameters)
-        {
-            Member = member;
-            Name = name;
-            _defaultParameters = defaultParameters ?? new SortedList<string, object>();
+            _getDefaultCommand = getDefaultCommand ?? (() => new TCommand());
         }
 
         public ITerminalDeviceMember Member { get; }
@@ -40,21 +32,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
         public string ResultMessage { get; private set; }
 
-        public TerminalMessage GetMessage()
+        public TerminalMessage GetMessage(CommandParameters parameters = null)
         {
-            var parameters = new CommandParameters();
-
-            foreach (var p in _defaultParameters)
-            {
-                parameters.Add(p.Key, p.Value);
-            }
-
-            return GetMessage(parameters);
-        }
-
-        public TerminalMessage GetMessage(CommandParameters parameters)
-        {
-            TCommand command = (TCommand)CreateCommand(parameters);
+            TCommand command = (parameters == null ? _getDefaultCommand() : (TCommand)CreateCommand(parameters));
 
             return new TerminalMessage { Item = BuildCommand(command, Member.Device) };
         }

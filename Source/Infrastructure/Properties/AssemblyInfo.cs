@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Markup;
 
@@ -42,3 +41,4 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("http://schemas.wayne.com/xaml/ixpay", "Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Behaviors")]
 [assembly: XmlnsDefinition("http://schemas.wayne.com/xaml/ixpay", "Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Commands")]
 [assembly: XmlnsDefinition("http://schemas.wayne.com/xaml/ixpay", "Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Actions")]
+[assembly: XmlnsDefinition("http://schemas.wayne.com/xaml/ixpay", "Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Extensions")]

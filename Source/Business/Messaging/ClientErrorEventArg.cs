@@ -9,7 +9,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
         public IPEndPoint EndPoint { get; set; }
 
-        public Enums.ClientErrorType ErrorType { get; set; }
+        public ClientErrorType ErrorType { get; set; }
 
         public Exception Exception { get; set; }
     }

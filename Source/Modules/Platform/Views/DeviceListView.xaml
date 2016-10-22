@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views.DeviceListView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,21 +8,31 @@
              xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views"
-             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:cm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.Resources>
             <CollectionViewSource x:Key="Devices" Source="{Binding Path=Devices}" >
                 <CollectionViewSource.SortDescriptions>
-                    <componentModel:SortDescription PropertyName="Name" />
+                    <cm:SortDescription PropertyName="Name" />
                 </CollectionViewSource.SortDescriptions>
             </CollectionViewSource>
         </Grid.Resources>
         <DockPanel LastChildFill="True">
             <ToolBarTray DockPanel.Dock="Top">
                 <ToolBar Padding="5,0">
-                    <CheckBox x:Name="_showEvents" Content="Show Events" IsChecked="True" />
+                    <metro:SplitButton Margin="5,0,0,0" 
+                                       ItemsSource="{Binding Source={ixpay:Enumeration {x:Type local:FilterOption}}}"   
+                                       SelectedValuePath="Value"
+                                       SelectedValue="{Binding FilterOption}"
+                                       DisplayMemberPath="Description"
+                                       HorizontalAlignment="Center"
+                                       HorizontalContentAlignment="Left"
+                                       VerticalContentAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       SelectedIndex="1" 
+                                       Orientation="Horizontal" />
                 </ToolBar>
             </ToolBarTray>
             <TreeView x:Name="_devices" ItemsSource="{Binding Source={StaticResource Devices}}">
@@ -43,7 +53,7 @@
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type local:DeviceEventViewModel}">
-                        <StackPanel Orientation="Horizontal" Visibility="{Binding ElementName=_showEvents, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
                             <Image Height="10" Source="{DynamicResource lightningIconImageSource}" />
                             <TextBlock Margin="5 0 0 0" Text="{Binding Title}" />
                         </StackPanel>
@@ -71,6 +81,47 @@
                         </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>
+                <TreeView.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource MetroTreeViewItem}" TargetType="{x:Type TreeViewItem}">
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:DevicePropertyViewModel}" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}, Path=DataContext.FilterOption}" Value="{x:Static local:FilterOption.OnlyMethods}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:DeviceMethodViewModel}" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}, Path=DataContext.FilterOption}" Value="{x:Static local:FilterOption.OnlyProperties}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:DeviceEventViewModel}"  />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}, Path=DataContext.FilterOption}" Value="{x:Static local:FilterOption.OnlyProperties}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:DeviceEventViewModel}"  />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}, Path=DataContext.FilterOption}" Value="{x:Static local:FilterOption.OnlyMethods}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Converter={StaticResource ObjectToTypeConverter}}" Value="{x:Type local:DeviceEventViewModel}"  />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}, Path=DataContext.FilterOption}" Value="{x:Static local:FilterOption.HideEvents}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.ItemContainerStyle>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding SelectedObjectChangedCommand}" CommandParameter="{Binding ElementName=_devices, Path=SelectedItem}" />

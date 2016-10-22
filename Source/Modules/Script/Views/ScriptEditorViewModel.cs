@@ -295,7 +295,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             string deviceName = @event.Device.Name;
             string eventName = @event.Name;
 
-            builder.AppendLine($"\ndef On{eventName}(object sender, EventArgs e):");
+            builder.AppendLine($"\ndef On{eventName}(sender, e):");
 
             var properties = @event.EventType.GetProperties();
 
@@ -319,15 +319,18 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
             //var commandItem = command.GetMessage().GetLastItem();
 
+            string valueProperty = GetValueProperty(command);
+
             var props = command.CommandType.GetProperties().Where(p => p.Name != "SequenceNumber").ToList();
 
             builder.Append($"\nresponse = {deviceName}.{methodName}(");
 
             foreach (var p in props)
             {
+                var valuePropertyChar = valueProperty == p.Name ? "*" : string.Empty;
                 //string value = GetScriptValue(p, commandItem);
                 //builder.Append($"{p.Name.ToLower()}={value},");
-                builder.Append($"{p.Name.ToLower()}={{{p.GetGetMethod().ReturnType.Name}}},");
+                builder.Append($"{p.Name}{valuePropertyChar}={{{p.GetGetMethod().ReturnType.Name}}},");
             }
 
             if (props.Any())
@@ -341,8 +344,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
             foreach (var p in props)
             {
-                builder.AppendLine($"{p.Name.ToLower()} = response.{p.Name}");
+                var valuePropertyChar = valueProperty == p.Name ? "*" : string.Empty;
+                builder.AppendLine($"{p.Name.ToLower()} = response.{p.Name}{valuePropertyChar}");
             }
+        }
+
+        private string GetValueProperty(ITerminalDeviceCommand command)
+        {
+            var attribute = command.Member.GetType().GetCustomAttributes(typeof (ValuePropertyAttribute), false)
+                .FirstOrDefault() as ValuePropertyAttribute;
+
+            return attribute == null ? string.Empty : attribute.PropertyName;
         }
 
         //private string GetScriptValue(PropertyInfo prop, object instance)

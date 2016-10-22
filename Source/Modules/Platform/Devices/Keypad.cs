@@ -26,26 +26,26 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new DisableKeypadMethod(this),
-                    new EnableKeypadFunctionKeysMethod(this),
-                    new ValidatePinBlockMethod(this),
+                    new KeypadDisableMethod(this),
+                    new KeypadEnableFunctionKeysMethod(this),
+                    new KeypadValidatePinBlockMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
                     new KeyPadOpenChangedEvent(this),
                     new KeyPadStatusChangedEvent(this),
-                    new KeyPressedEvent(this),
+                    new KeypadKeyPressedEvent(this),
                     new KeyPadFunctionKeyPressedEvent(this),
-                    new EntryCompleteEvent(this),
-                    new PinEntryCompleteEvent(this),
+                    new KeypadEntryCompleteEvent(this),
+                    new KeypadPinEntryCompleteEvent(this),
                     new KeypadEntryTimedOutEvent(this),
                 });
         }
 
         public void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
 
@@ -88,11 +88,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class DisableKeypadMethod :
+    public class KeypadDisableMethod :
     TerminalDeviceMethod<DisableKeypadCommand, DisableKeypadResponse>
     {
-        public DisableKeypadMethod(ITerminalDevice device)
-            : base(device, "DisableKeypad")
+        public KeypadDisableMethod(ITerminalDevice device)
+            : base(device, "Disable")
         {
             InvokeCommand = new TerminalDeviceCommand<DisableKeypadCommand, DisableKeypadResponse>(
                 this,
@@ -101,20 +101,19 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class EnableKeypadFunctionKeysMethod :
+    public class KeypadEnableFunctionKeysMethod :
     TerminalDeviceMethod<EnableKeypadFunctionKeysCommand, EnableKeypadFunctionKeysResponse>
     {
-        public EnableKeypadFunctionKeysMethod(ITerminalDevice device)
-            : base(device, "EnableKeypadFunctionKeys")
+        public KeypadEnableFunctionKeysMethod(ITerminalDevice device)
+            : base(device, "EnableFunctionKeys")
         {
             InvokeCommand = new TerminalDeviceCommand<EnableKeypadFunctionKeysCommand, EnableKeypadFunctionKeysResponse>
                 (
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new EnableKeypadFunctionKeysCommand
                     {
-                        {
-                            "keypadFunctionKey", new[]
+                        KeypadFunctionKey = new[]
                                 {
                                     new KeypadFunctionKey {Function = KeypadFunctionKeyEnum.FuncL1, ReturnValue = 1},
                                     new KeypadFunctionKey {Function = KeypadFunctionKeyEnum.FuncL2, ReturnValue = 2},
@@ -123,24 +122,23 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
                                     new KeypadFunctionKey {Function = KeypadFunctionKeyEnum.Num1, ReturnValue = 5},
                                     new KeypadFunctionKey {Function = KeypadFunctionKeyEnum.Num2, ReturnValue = 6},
                                 }
-                        }
                     }
                 );
         }
     }
 
-    public class ValidatePinBlockMethod :
+    public class KeypadValidatePinBlockMethod :
     TerminalDeviceMethod<ValidatePINBlockCommand, ValidatePINBlockResponse>
     {
-        public ValidatePinBlockMethod(ITerminalDevice device)
+        public KeypadValidatePinBlockMethod(ITerminalDevice device)
             : base(device, "ValidatePinBlock")
         {
             InvokeCommand = new TerminalDeviceCommand<ValidatePINBlockCommand, ValidatePINBlockResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new ValidatePINBlockCommand
                     {
-                    { "pinBlock", ConvertHelper.ToHexByteArray("01020304CDFE4F") }
+                        PINBlock = ConvertHelper.ToHexByteArray("01020304CDFE4F")
                     }
                 );
         }
@@ -166,9 +164,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class KeyPressedEvent : TerminalDeviceEvent<KeyPressed>
+    public class KeypadKeyPressedEvent : TerminalDeviceEvent<KeyPressed>
     {
-        public KeyPressedEvent(ITerminalDevice device)
+        public KeypadKeyPressedEvent(ITerminalDevice device)
             : base(device, "KeyPressed")
         {
         }
@@ -182,18 +180,18 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class EntryCompleteEvent : TerminalDeviceEvent<EntryComplete>
+    public class KeypadEntryCompleteEvent : TerminalDeviceEvent<EntryComplete>
     {
-        public EntryCompleteEvent(ITerminalDevice device)
+        public KeypadEntryCompleteEvent(ITerminalDevice device)
             : base(device, "EntryComplete")
         {
         }
     }
 
-    public class PinEntryCompleteEvent : TerminalDeviceEvent<PINEntryComplete>
+    public class KeypadPinEntryCompleteEvent : TerminalDeviceEvent<PINEntryComplete>
     {
-        public PinEntryCompleteEvent(ITerminalDevice device)
-            : base(device, "PINEntryComplete")
+        public KeypadPinEntryCompleteEvent(ITerminalDevice device)
+            : base(device, "PinEntryComplete")
         {
         }
     }
@@ -201,7 +199,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     public class KeypadEntryTimedOutEvent : TerminalDeviceEvent<KeypadEntryTimedOut>
     {
         public KeypadEntryTimedOutEvent(ITerminalDevice device)
-            : base(device, "KeypadEntryTimedOut")
+            : base(device, "EntryTimedOut")
         {
         }
     }

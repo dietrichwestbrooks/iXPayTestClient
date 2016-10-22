@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using Microsoft.Practices.ServiceLocation;
 using Prism.Events;
 using Prism.Logging;
 using Prism.Mef;
@@ -37,7 +38,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
 
         protected override DependencyObject CreateShell()
         {
-            return Container.GetExportedValue<ShellView>();
+            return Container.GetExportedValue<IShellView>() as Window;
         }
 
         protected override void InitializeShell()

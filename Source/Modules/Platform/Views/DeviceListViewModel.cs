@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Input;
+using Microsoft.Practices.ServiceLocation;
 using Prism.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -15,12 +17,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         private ObservableCollection<DeviceViewModel> _devices;
 
         private string _title;
+        private FilterOption _filterOption;
 
         public DeviceListViewModel()
         {
             Title = "Devices";
 
             SelectedObjectChangedCommand = new DelegateCommand<object>(OnSelectedObjectChanged);
+
+            TerminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
+
+            FilterOption = FilterOption.ShowAll;
         }
 
         public ICommand SelectedObjectChangedCommand { get; }
@@ -31,6 +38,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             set { SetProperty(ref _title, value); }
         }
 
+        public FilterOption FilterOption
+        {
+            get { return _filterOption; }
+            set { SetProperty(ref _filterOption, value); }
+        }
+
         public ObservableCollection<DeviceViewModel> Devices
         {
             get
@@ -39,17 +52,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
                 {
                     _devices =
                         new ObservableCollection<DeviceViewModel>(
-                            TerminalClientService.Devices.Select(d => new DeviceViewModel(d)));
+                            TerminalService.Devices.Select(d => new DeviceViewModel(d)));
 
-                    TerminalClientService.Devices.DeviceAdded += (sender, d) => _devices.Add(new DeviceViewModel(d));
+                    TerminalService.Devices.DeviceAdded += (sender, d) => _devices.Add(new DeviceViewModel(d));
                 }
 
                 return _devices;
             }
         }
 
-        [Import]
-        private ITerminalClientService TerminalClientService { get; set; }
+        private ITerminalService TerminalService { get; }
 
         private void OnSelectedObjectChanged(object item)
         {
@@ -91,5 +103,20 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
                 EventAggregator.GetEvent<DeviceSelectedEvent>().Publish(device.Object);
             }
         }
+    }
+
+    public enum FilterOption
+    {
+        [Description("Show All")]
+        ShowAll,
+
+        [Description("Only Properties")]
+        OnlyProperties,
+
+        [Description("Only Methods")]
+        OnlyMethods,
+
+        [Description("Hide Events")]
+        HideEvents
     }
 }

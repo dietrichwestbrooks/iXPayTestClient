@@ -92,6 +92,7 @@
     <Compile Include="Devices\BarcodeReader.cs" />
     <Compile Include="Devices\Beeper.cs" />
     <Compile Include="Devices\ChipCardReader.cs" />
+    <Compile Include="Devices\ContactlessReader.cs" />
     <Compile Include="Devices\Display.cs" />
     <Compile Include="Devices\Keypad.cs" />
     <Compile Include="Devices\MagStripeReader.cs" />
@@ -112,7 +113,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Services\TerminalClientService.cs" />
+    <Compile Include="Services\TerminalService.cs" />
     <Compile Include="Views\CommandEditorView.xaml.cs">
       <DependentUpon>CommandEditorView.xaml</DependentUpon>
     </Compile>
@@ -154,6 +155,8 @@
     <Compile Include="Views\IMessageEditorViewModel.cs" />
     <Compile Include="Views\IMessageListView.cs" />
     <Compile Include="Views\IMessageListViewModel.cs" />
+    <Compile Include="Views\IResendMessagePopUpView.cs" />
+    <Compile Include="Views\IResendMessagePopUpViewModel.cs" />
     <Compile Include="Views\IResponseListView.cs" />
     <Compile Include="Views\IResponseListViewModel.cs" />
     <Compile Include="Views\MessageEditorView.xaml.cs">
@@ -165,6 +168,10 @@
       <DependentUpon>MessageLIstView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MessageListViewModel.cs" />
+    <Compile Include="Views\ResendMessagePopUpView.xaml.cs">
+      <DependentUpon>ResendMessagePopUpView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ResendMessagePopUpViewModel.cs" />
     <Compile Include="Views\ResponseListView.xaml.cs">
       <DependentUpon>ResponseListView.xaml</DependentUpon>
     </Compile>
@@ -224,6 +231,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MessageLIstView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ResendMessagePopUpView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Windows.Input;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Commands;
@@ -26,14 +25,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             EventAggregator.GetEvent<CommandEditedEvent>().Subscribe(OnCommandEdited);
 
             MessageSerializer = ServiceLocator.Current.GetInstance<ITerminalMessageSerializer>();
-
-            if (MessageSerializer == null)
-                throw new InvalidOperationException("Unable to locate Terminal Message Serializer");
-
-            Terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
-
-            if (Terminal == null)
-                throw new InvalidOperationException("Unable to locate Terminal Client Service");
+            TerminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
 
             ExecuteCommand = new DelegateCommand<string>(OnExecute, CanExecute);
         }
@@ -65,7 +57,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
                 EventAggregator.GetEvent<MessageEditedEvent>().Publish(message);
         }
 
-        private ITerminalClientService Terminal { get; }
+        private ITerminalService TerminalService { get; }
 
         private ITerminalMessageSerializer MessageSerializer { get; set; }
 
@@ -105,7 +97,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
             TerminalMessage message = MessageSerializer.Deserialize(xml);
 
-            Terminal.SendMessage(message);
+            TerminalService.SendMessage(message);
         }
     }
 }

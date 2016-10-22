@@ -21,19 +21,19 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
                     new PrinterStatusProperty(this),
-                    new PaperStatusProperty(this),
+                    new PrinterPaperStatusProperty(this),
                     new PrinterCapabilitiesProperty(this),
                     new PrinterWidthProperty(this),
-                    new TypeFacesProperty(this),
+                    new PrinterTypeFacesProperty(this),
                     new PrinterFontsProperty(this),
-                    new SupportedImageTypesProperty(this),
-                    new SupportedBarCodeSymbologiesProperty(this),
+                    new PrinterSupportedImageTypesProperty(this),
+                    new PrinterSupportedBarCodeSymbologiesProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new PrintMethod(this),
-                    new SetMemoryImageMethod(this),
+                    new PrinterPrintMethod(this),
+                    new PrinterSetMemoryImageMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
@@ -45,7 +45,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
         public void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
@@ -67,10 +67,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("PrinterPaperStatus")]
-    public class PaperStatusProperty : TerminalDeviceProperty<PrinterPaperStatus,
+    public class PrinterPaperStatusProperty : TerminalDeviceProperty<PrinterPaperStatus,
         GetPaperStatusCommand, GetPaperStatusResponse>
     {
-        public PaperStatusProperty(ITerminalDevice device)
+        public PrinterPaperStatusProperty(ITerminalDevice device)
             : base(device, "PaperStatus")
         {
             GetCommand = new TerminalDeviceCommand<GetPaperStatusCommand, GetPaperStatusResponse>(
@@ -121,9 +121,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("TypeFaces")]
-    public class TypeFacesProperty : TerminalDeviceProperty<int, GetTypeFacesCommand, GetTypeFacesResponse>
+    public class PrinterTypeFacesProperty : TerminalDeviceProperty<int, GetTypeFacesCommand, GetTypeFacesResponse>
     {
-        public TypeFacesProperty(ITerminalDevice device)
+        public PrinterTypeFacesProperty(ITerminalDevice device)
             : base(device, "TypeFaces")
         {
             GetCommand = new TerminalDeviceCommand<GetTypeFacesCommand, GetTypeFacesResponse>(
@@ -134,9 +134,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("ImageType")]
-    public class SupportedImageTypesProperty : TerminalDeviceProperty<int, GetSupportedImagesCommand, GetSupportedImagesResponse>
+    public class PrinterSupportedImageTypesProperty : TerminalDeviceProperty<int, GetSupportedImagesCommand, GetSupportedImagesResponse>
     {
-        public SupportedImageTypesProperty(ITerminalDevice device)
+        public PrinterSupportedImageTypesProperty(ITerminalDevice device)
             : base(device, "SupportedImageTypes")
         {
             GetCommand = new TerminalDeviceCommand<GetSupportedImagesCommand, GetSupportedImagesResponse>(
@@ -147,10 +147,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("Symbology")]
-    public class SupportedBarCodeSymbologiesProperty : 
+    public class PrinterSupportedBarCodeSymbologiesProperty : 
         TerminalDeviceProperty<int, GetSupportedBarCodeSymbologiesCommand, GetSupportedBarCodeSymbologiesResponse>
     {
-        public SupportedBarCodeSymbologiesProperty(ITerminalDevice device)
+        public PrinterSupportedBarCodeSymbologiesProperty(ITerminalDevice device)
             : base(device, "SupportedBarCodeSymbologies")
         {
             GetCommand = new TerminalDeviceCommand<GetSupportedBarCodeSymbologiesCommand, GetSupportedBarCodeSymbologiesResponse>(
@@ -164,96 +164,95 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class PrintMethod : TerminalDeviceMethod<PrintCommand, PrintResponse>
+    public class PrinterPrintMethod : TerminalDeviceMethod<PrintCommand, PrintResponse>
     {
-        public PrintMethod(ITerminalDevice device)
+        public PrinterPrintMethod(ITerminalDevice device)
             : base(device, "Print")
         {
             InvokeCommand = new TerminalDeviceCommand<PrintCommand, PrintResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new PrintCommand
                     {
-                        { "Items", new object[]
-                                {
-                                    new PrintCommandSetTypeFace
-                                        {
-                                            TypeFace = new[]
-                                                {
-                                                    new PrintCommandSetTypeFaceTypeFace
-                                                        {
-                                                            Id = TypeFaceEnum.Bold,
-                                                            Value = true
-                                                        },
-                                                    new PrintCommandSetTypeFaceTypeFace
-                                                        {
-                                                            Id = TypeFaceEnum.Underline,
-                                                            Value = false
-                                                        },
-                                                }
-                                        },
-                                    new PrintCommandSetFont
-                                        {
-                                            Font = new PrintCommandSetFontFont {FontName = "Courier"}
-                                        },
-                                    new PrintCommandPrintText
-                                        {
-                                            Justification = HorizontalJustificationsEnum.Left,
-                                            LineFeed = true,
-                                            Text = new PrintCommandPrintTextText
-                                                {
-                                                    Text = new[] {"Document text goes here"}
-                                                }
-                                        },
-                                    new PrintCommandPrintBarCode
-                                        {
-                                            Characters = "045235401239",
-                                            Symbology = BarCodeSymbologiesEnum.UPC_A,
-                                            Justification = HorizontalJustificationsEnum.Center,
-                                            JustificationSpecified = true,
-                                            TextPosition = PrintCommandPrintBarCodeTextPosition.NoText,
-                                            TextPositionSpecified = true,
-                                            Width = 300,
-                                            WidthSpecified = true,
-                                            Height = 40,
-                                            HeightSpecified = true,
-                                        },
-                                    new PrintCommandPrintDownloadedImage
-                                        {
-                                            Id = 1,
-                                            Justification = HorizontalJustificationsEnum.Center,
-                                        },
-                                    new PrintCommandPrintImage
-                                        {
-                                            FileName = "..\\ImageLogo.bmp",
-                                            Justification = HorizontalJustificationsEnum.Center,
-                                        },
-                                    new PrintCommandCutPaper
-                                        {
-                                            FullCut = true,
-                                            FullCutSpecified = true,
-                                            Eject = false,
-                                            EjectSpecified = true,
-                                        }
-                                }
-                        }
+                        Items = new object[]
+                            {
+                                new PrintCommandSetTypeFace
+                                    {
+                                        TypeFace = new[]
+                                            {
+                                                new PrintCommandSetTypeFaceTypeFace
+                                                    {
+                                                        Id = TypeFaceEnum.Bold,
+                                                        Value = true
+                                                    },
+                                                new PrintCommandSetTypeFaceTypeFace
+                                                    {
+                                                        Id = TypeFaceEnum.Underline,
+                                                        Value = false
+                                                    },
+                                            }
+                                    },
+                                new PrintCommandSetFont
+                                    {
+                                        Font = new PrintCommandSetFontFont {FontName = "Courier"}
+                                    },
+                                new PrintCommandPrintText
+                                    {
+                                        Justification = HorizontalJustificationsEnum.Left,
+                                        LineFeed = true,
+                                        Text = new PrintCommandPrintTextText
+                                            {
+                                                Text = new[] {"Document text goes here"}
+                                            }
+                                    },
+                                new PrintCommandPrintBarCode
+                                    {
+                                        Characters = "045235401239",
+                                        Symbology = BarCodeSymbologiesEnum.UPC_A,
+                                        Justification = HorizontalJustificationsEnum.Center,
+                                        JustificationSpecified = true,
+                                        TextPosition = PrintCommandPrintBarCodeTextPosition.NoText,
+                                        TextPositionSpecified = true,
+                                        Width = 300,
+                                        WidthSpecified = true,
+                                        Height = 40,
+                                        HeightSpecified = true,
+                                    },
+                                new PrintCommandPrintDownloadedImage
+                                    {
+                                        Id = 1,
+                                        Justification = HorizontalJustificationsEnum.Center,
+                                    },
+                                new PrintCommandPrintImage
+                                    {
+                                        FileName = "..\\ImageLogo.bmp",
+                                        Justification = HorizontalJustificationsEnum.Center,
+                                    },
+                                new PrintCommandCutPaper
+                                    {
+                                        FullCut = true,
+                                        FullCutSpecified = true,
+                                        Eject = false,
+                                        EjectSpecified = true,
+                                    }
+                            }
                     }
                 );
         }
     }
 
-    public class SetMemoryImageMethod : TerminalDeviceMethod<SetMemoryImageCommand, SetMemoryImageResponse>
+    public class PrinterSetMemoryImageMethod : TerminalDeviceMethod<SetMemoryImageCommand, SetMemoryImageResponse>
     {
-        public SetMemoryImageMethod(ITerminalDevice device)
+        public PrinterSetMemoryImageMethod(ITerminalDevice device)
             : base(device, "SetMemoryImage")
         {
             InvokeCommand = new TerminalDeviceCommand<SetMemoryImageCommand, SetMemoryImageResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new SetMemoryImageCommand
                     {
-                        {"Id", 1},
-                        {"Filename", "..\\Image\\Logo.bmp"},
+                        Id = 1,
+                        FileName = "..\\Image\\Logo.bmp",
                     }
                 );
         }
@@ -274,7 +273,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     public class PrinterPaperStatusChangedEvent : TerminalDeviceEvent<PrinterPaperStatusChanged>
     {
         public PrinterPaperStatusChangedEvent(ITerminalDevice device)
-            : base(device, "PrinterPaperStatusChanged")
+            : base(device, "PaperStatusChanged")
         {
         }
     }

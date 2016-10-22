@@ -43,7 +43,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
 
         private void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
@@ -71,17 +71,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
             SetCommand = new FakeDeviceCommand<SetIterationsCommand, SetIterationsResponse>(
                 this,
                 $"set_{Name}",
-                new SortedList<string, object>
+                () => new SetIterationsCommand
                     {
-                        {"iterations", 1},
-                        {"multiplier", 1}
+                        Iterations = 1,
+                        Multiplier = 1,
                     }
                 );
         }
 
-        public override bool TrySet(CommandParameters parameters)
+        protected override bool TrySet(CommandParameters parameters, out object response)
         {
-            bool retVal = base.TrySet(parameters);
+            bool retVal = base.TrySet(parameters, out response);
 
             if (parameters.Has("Iterations"))
                 FakeDevicePropertyValues.Iterations = parameters.GetValue<int>("Iterations", 0);
@@ -130,6 +130,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
         {
             result = null;
 
+            var eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
+
             int iterations = FakeDevicePropertyValues.Multiplier*FakeDevicePropertyValues.Iterations;
 
             for (int i = 0; i < iterations; i++)
@@ -139,6 +141,21 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
                 new Thread(o =>
                 {
                     Thread.Sleep(500);
+
+                    eventAggregator.GetEvent<EventReceivedEvent>().Publish(new TerminalMessage
+                    {
+                        Item = new TerminalEvent
+                        {
+                            Item = new FakeDeviceEvent
+                            {
+                                Item = new SimulateCompleted
+                                {
+                                    Iteration = (int)o,
+                                }
+                            }
+                        }
+                    });
+
                     Device.Events.Single(e => e.Name == "SimulateCompleted").TryInvoke(new SimulateCompleted
                     {
                         Iteration = (int)o,

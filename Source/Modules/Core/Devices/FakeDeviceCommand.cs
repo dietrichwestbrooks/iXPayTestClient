@@ -23,8 +23,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
             _delay = new Random().Next(1000, 5000);
         }
 
-        public FakeDeviceCommand(ITerminalDeviceMember member, string name, IEnumerable<KeyValuePair<string, object>> defaultParameters) 
-            : base(member, name, defaultParameters)
+        public FakeDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> getDefaultCommand = null) 
+            : base(member, name, getDefaultCommand)
         {
             _delay = new Random().Next(1000, 5000);
         }
@@ -80,7 +80,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
             get { lock (_instLock) return _instance ?? (_instance = new FakeSequenceNumberGenerator()); }
         }
 
-        private int _sequenceNumber = 1;
+        private int _sequenceNumber = 101;
 
         public int Increment()
         {

@@ -8,8 +8,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         string Name { get; }
         Type CommandType { get; }
         Type ResponseType { get; }
-        TerminalMessage GetMessage(CommandParameters parameters);
-        TerminalMessage GetMessage();
+        TerminalMessage GetMessage(CommandParameters parameters = null);
         object Execute(CommandParameters parameters);
         bool Result { get; }
         string ResultMessage { get; }

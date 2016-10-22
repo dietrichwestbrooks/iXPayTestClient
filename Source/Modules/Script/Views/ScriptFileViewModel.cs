@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Practices.ServiceLocation;
 using Prism;
+using Prism.Logging;
 using Prism.Regions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
@@ -239,28 +240,38 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
         private bool IsSelectedTarget { get; set; }
 
-        private void SaveTempFile()
+        private string GetTempFilePath()
         {
             string filePath = Path.GetDirectoryName(FilePath);
             Debug.Assert(filePath != null);
 
             string fileName = Path.GetFileName(FilePath);
 
-            string tempFilePath = Path.Combine(filePath, $"~{fileName}");
+            return Path.Combine(filePath, $"~{fileName}");
+        }
 
-            FileService.SaveTextFile(tempFilePath, Code);
+        private void SaveTempFile()
+        {
+            try
+            {
+                FileService.SaveTextFile(GetTempFilePath(), Code);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, Category.Exception, Priority.Low);
+            }
         }
 
         private void DeleteTempFile()
         {
-            string filePath = Path.GetDirectoryName(FilePath);
-            Debug.Assert(filePath != null);
-
-            string fileName = Path.GetFileName(FilePath);
-
-            string tempFilePath = Path.Combine(filePath, $"~{fileName}");
-
-            FileService.DeleteFile(tempFilePath);
+            try
+            {
+                FileService.DeleteFile(GetTempFilePath());
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.Message, Category.Exception, Priority.Low);
+            }
         }
 
         private void OpenFile()

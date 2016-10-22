@@ -20,40 +20,40 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new HierarchyInUseProperty(this),
-                    new SupportedKeyHierarchiesProperty(this),
-                    new SupportedWorkingKeysProperty(this),
-                    new SerialNumberProperty(this),
-                    new BankSerialNumberProperty(this),
+                    new SecurityModuleHierarchyInUseProperty(this),
+                    new SecurityModuleSupportedKeyHierarchiesProperty(this),
+                    new SecurityModuleSupportedWorkingKeysProperty(this),
+                    new SecurityModuleSerialNumberProperty(this),
+                    new SecurityModuleBankSerialNumberProperty(this),
                     new SecurityModuleCapabilitiesProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new SwitchKeyHierarchyMethod(this),
-                    new CalculateMacMethod(this),
-                    new VerifyMacMethod(this),
-                    new EncryptMessageMethod(this),
-                    new SetWorkingKeyMethod(this),
-                    new GetWorkingKeyStatisticsMethod(this),
-                    new IncrementKsnMethod(this),
+                    new SecurityModuleSwitchKeyHierarchyMethod(this),
+                    new SecurityModuleCalculateMacMethod(this),
+                    new SecurityModuleVerifyMacMethod(this),
+                    new SecurityModuleEncryptMessageMethod(this),
+                    new SecurityModuleSetWorkingKeyMethod(this),
+                    new SecurityModuleGetWorkingKeyStatisticsMethod(this),
+                    new SecurityModuleIncrementKsnMethod(this),
                 });
         }
 
         public void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
 
     #region Properties
 
-    public class HierarchyInUseProperty : TerminalDeviceProperty<int,
+    public class SecurityModuleHierarchyInUseProperty : TerminalDeviceProperty<int,
     GetHierarchyInUseCommand, GetHierarchyInUseResponse,
     SetHierarchyInUseCommand, SetHierarchyInUseResponse>
     {
-        public HierarchyInUseProperty(ITerminalDevice device)
+        public SecurityModuleHierarchyInUseProperty(ITerminalDevice device)
             : base(device, "HierarchyInUse")
         {
             GetCommand = new TerminalDeviceCommand<GetHierarchyInUseCommand, GetHierarchyInUseResponse>(
@@ -64,18 +64,18 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             SetCommand = new TerminalDeviceCommand<SetHierarchyInUseCommand, SetHierarchyInUseResponse>(
                 this,
                 $"set_{Name}",
-                new SortedList<string, object>
+                () => new SetHierarchyInUseCommand
                     {
-                        {"value", 1},
+                        Id = 1,
                     }
                 );
         }
     }
 
-    public class SupportedKeyHierarchiesProperty : TerminalDeviceProperty<SupportedKeyHierarchy[],
+    public class SecurityModuleSupportedKeyHierarchiesProperty : TerminalDeviceProperty<SupportedKeyHierarchy[],
         GetSupportedKeyHierarchiesCommand, GetSupportedKeyHierarchiesResponse>
     {
-        public SupportedKeyHierarchiesProperty(ITerminalDevice device)
+        public SecurityModuleSupportedKeyHierarchiesProperty(ITerminalDevice device)
             : base(device, "SupportedKeyHierarchies")
         {
             GetCommand = new TerminalDeviceCommand
@@ -86,10 +86,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class SupportedWorkingKeysProperty : TerminalDeviceProperty<WorkingKey[],
+    public class SecurityModuleSupportedWorkingKeysProperty : TerminalDeviceProperty<WorkingKey[],
         GetSupportedWorkingKeysCommand, GetSupportedWorkingKeysResponse>
     {
-        public SupportedWorkingKeysProperty(ITerminalDevice device)
+        public SecurityModuleSupportedWorkingKeysProperty(ITerminalDevice device)
             : base(device, "SupportedWorkingKeys")
         {
             GetCommand = new TerminalDeviceCommand<GetSupportedWorkingKeysCommand, GetSupportedWorkingKeysResponse>(
@@ -99,10 +99,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class SerialNumberProperty : TerminalDeviceProperty<byte[],
+    public class SecurityModuleSerialNumberProperty : TerminalDeviceProperty<byte[],
         GetSerialNumberCommand, GetSerialNumberResponse>
     {
-        public SerialNumberProperty(ITerminalDevice device)
+        public SecurityModuleSerialNumberProperty(ITerminalDevice device)
             : base(device, "SerialNumber")
         {
             GetCommand = new TerminalDeviceCommand<GetSerialNumberCommand, GetSerialNumberResponse>(
@@ -112,10 +112,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class BankSerialNumberProperty : TerminalDeviceProperty<byte[],
+    public class SecurityModuleBankSerialNumberProperty : TerminalDeviceProperty<byte[],
         GetBankSerialNumberCommand, GetBankSerialNumberResponse>
     {
-        public BankSerialNumberProperty(ITerminalDevice device)
+        public SecurityModuleBankSerialNumberProperty(ITerminalDevice device)
             : base(device, "BankSerialNumber")
         {
             GetCommand = new TerminalDeviceCommand<GetBankSerialNumberCommand, GetBankSerialNumberResponse>(
@@ -143,9 +143,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class SwitchKeyHierarchyMethod : TerminalDeviceMethod<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>
+    public class SecurityModuleSwitchKeyHierarchyMethod : TerminalDeviceMethod<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>
     {
-        public SwitchKeyHierarchyMethod(ITerminalDevice device)
+        public SecurityModuleSwitchKeyHierarchyMethod(ITerminalDevice device)
             : base(device, "SwitchKeyHierarchy")
         {
             InvokeCommand = new TerminalDeviceCommand<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>(
@@ -155,93 +155,93 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class CalculateMacMethod : TerminalDeviceMethod<CalculateMACCommand, CalculateMACResponse>
+    public class SecurityModuleCalculateMacMethod : TerminalDeviceMethod<CalculateMACCommand, CalculateMACResponse>
     {
-        public CalculateMacMethod(ITerminalDevice device)
-            : base(device, "CalculateMAC")
+        public SecurityModuleCalculateMacMethod(ITerminalDevice device)
+            : base(device, "CalculateMac")
         {
             InvokeCommand = new TerminalDeviceCommand<CalculateMACCommand, CalculateMACResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new CalculateMACCommand
                     {
-                        {"value", ConvertHelper.ToHexByteArray("454C67755663873A")},
+                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
                     }
                 );
         }
     }
 
-    public class VerifyMacMethod : TerminalDeviceMethod<VerifyMACCommand, VerifyMACResponse>
+    public class SecurityModuleVerifyMacMethod : TerminalDeviceMethod<VerifyMACCommand, VerifyMACResponse>
     {
-        public VerifyMacMethod(ITerminalDevice device)
-            : base(device, "VerifyMAC")
+        public SecurityModuleVerifyMacMethod(ITerminalDevice device)
+            : base(device, "VerifyMac")
         {
             InvokeCommand = new TerminalDeviceCommand<VerifyMACCommand, VerifyMACResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new VerifyMACCommand
                     {
-                        {"value", ConvertHelper.ToHexByteArray("454C67755663873A")},
-                        {"macValue", ConvertHelper.ToHexByteArray("34426831")},
-                        {"ksn", ConvertHelper.ToHexByteArray("0000000001")},
+                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
+                        MACValue = ConvertHelper.ToHexByteArray("34426831"),
+                        KSN = ConvertHelper.ToHexByteArray("0000000001"),
                     }
                 );
         }
     }
 
-    public class EncryptMessageMethod : TerminalDeviceMethod<EncryptMessageCommand, EncryptMessageResponse>
+    public class SecurityModuleEncryptMessageMethod : TerminalDeviceMethod<EncryptMessageCommand, EncryptMessageResponse>
     {
-        public EncryptMessageMethod(ITerminalDevice device)
+        public SecurityModuleEncryptMessageMethod(ITerminalDevice device)
             : base(device, "EncryptMessage")
         {
             InvokeCommand = new TerminalDeviceCommand<EncryptMessageCommand, EncryptMessageResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new EncryptMessageCommand
                     {
-                        {"value", ConvertHelper.ToHexByteArray("454C67755663873A")},
+                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
                     }
                 );
         }
     }
 
-    public class SetWorkingKeyMethod : TerminalDeviceMethod<SetWorkingKeyCommand, SetWorkingKeyResponse>
+    public class SecurityModuleSetWorkingKeyMethod : TerminalDeviceMethod<SetWorkingKeyCommand, SetWorkingKeyResponse>
     {
-        public SetWorkingKeyMethod(ITerminalDevice device)
+        public SecurityModuleSetWorkingKeyMethod(ITerminalDevice device)
             : base(device, "SetWorkingKey")
         {
             InvokeCommand = new TerminalDeviceCommand<SetWorkingKeyCommand, SetWorkingKeyResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new SetWorkingKeyCommand
                     {
-                        {"value", ConvertHelper.ToHexByteArray("454C67755663873A")},
-                        {"keyType", WorkingKeyType.PIN},
+                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
+                        KeyType = WorkingKeyType.PIN,
                     }
                 );
         }
     }
 
-    public class GetWorkingKeyStatisticsMethod : TerminalDeviceMethod<GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>
+    public class SecurityModuleGetWorkingKeyStatisticsMethod : TerminalDeviceMethod<GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>
     {
-        public GetWorkingKeyStatisticsMethod(ITerminalDevice device)
+        public SecurityModuleGetWorkingKeyStatisticsMethod(ITerminalDevice device)
             : base(device, "GetWorkingKeyStatistics")
         {
             InvokeCommand = new TerminalDeviceCommand<GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new GetWorkingKeyStatisticsCommand
                     {
-                        {"keyType", WorkingKeyType.PIN},
+                        KeyType = WorkingKeyType.PIN,
                     }
                 );
         }
     }
 
-    public class IncrementKsnMethod : TerminalDeviceMethod<IncrementKSNCommand, IncrementKSNResponse>
+    public class SecurityModuleIncrementKsnMethod : TerminalDeviceMethod<IncrementKSNCommand, IncrementKSNResponse>
     {
-        public IncrementKsnMethod(ITerminalDevice device)
-            : base(device, "IncrementKSN")
+        public SecurityModuleIncrementKsnMethod(ITerminalDevice device)
+            : base(device, "IncrementKsn")
         {
             InvokeCommand = new TerminalDeviceCommand<IncrementKSNCommand, IncrementKSNResponse>(
                 this,

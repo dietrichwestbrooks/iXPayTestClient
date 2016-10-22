@@ -1,35 +1,46 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using Microsoft.Practices.ServiceLocation;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    public class Beeper : TerminalDevice<BeepCommand, BeeperResponse>
+    [TerminalRequestHandler]
+    [TerminalDevice]
+    public class Beeper : TerminalDevice<BeeperCommand, BeeperResponse>, IPartImportsSatisfiedNotification
     {
         public Beeper() 
             : base("Beeper")
         {
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new BeepMethod(this),
+                    new BeeperBeepMethod(this),
                 });
+        }
+
+        public void OnImportsSatisfied()
+        {
+            var terminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
+            Successor = terminalService.Devices["Terminal"];
         }
     }
 
-    public class BeepMethod : TerminalDeviceMethod<BeepCommand, BeeperResponse>
+    public class BeeperBeepMethod : TerminalDeviceMethod<BeepCommand, BeeperResponse>
     {
-        public BeepMethod(ITerminalDevice device) 
+        public BeeperBeepMethod(ITerminalDevice device) 
             : base(device, "Beep")
         {
             InvokeCommand = new TerminalDeviceCommand<BeepCommand, BeeperResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new BeepCommand
                     {
-                        {"onTime", 1000},
-                        {"onTimeSpecified", true},
-                        {"offTime", 100},
-                        {"offTimeSpecified", true},
+                        OnTime = 1000,
+                        OnTimeSpecified = true,
+                        OffTime = 100,
+                        OffTimeSpecified = true,
                     }
                 );
         }

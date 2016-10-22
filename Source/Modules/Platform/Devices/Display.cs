@@ -20,46 +20,46 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new CurrentLanguageProperty(this),
-                    new MessageWindowPropertiesProperty(this),
-                    new SoftKeyPropertiesProperty(this),
-                    new DataEntryWindowPropertiesProperty(this),
-                    new ImageDetailsProperty(this),
-                    new ImageListProperty(this),
-                    new AnimationDetailsProperty(this),
-                    new AnimationListProperty(this),
-                    new PromptDetailsProperty(this),
-                    new PromptListProperty(this),
-                    new FontsProperty(this),
+                    new DisplayCurrentLanguageProperty(this),
+                    new DisplayMessageWindowPropertiesProperty(this),
+                    new DisplaySoftKeyPropertiesProperty(this),
+                    new DisplayDataEntryWindowPropertiesProperty(this),
+                    new DisplayImageDetailsProperty(this),
+                    new DisplayImageListProperty(this),
+                    new DisplayAnimationDetailsProperty(this),
+                    new DisplayAnimationListProperty(this),
+                    new DisplayPromptDetailsProperty(this),
+                    new DisplayPromptListProperty(this),
+                    new DisplayFontsProperty(this),
                     new DisplayStatusProperty(this),
                     new DisplayTypeProperty(this),
-                    new SupportedLanguagesProperty(this),
+                    new DisplaySupportedLanguagesProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
                     new DisplayPromptMethod(this),
                     new DeletePromptMethod(this),
-                    new DeleteAllPromptsMethod(this),
-                    new DeleteImageMethod(this),
-                    new DeleteAllImagesMethod(this),
-                    new DeleteAnimationMethod(this),
-                    new DeleteAllAnimationsMethod(this),
-                    new DeleteAllMethod(this),
-                    new RestoreDefaultMethod(this),
-                    new SetVideoWindowMethod(this),
+                    new DisplayDeleteAllPromptsMethod(this),
+                    new DisplayDeleteImageMethod(this),
+                    new DisplayDeleteAllImagesMethod(this),
+                    new DisplayDeleteAnimationMethod(this),
+                    new DisplayDeleteAllAnimationsMethod(this),
+                    new DisplayDeleteAllMethod(this),
+                    new DisplayRestoreDefaultMethod(this),
+                    new DisplaySetVideoWindowMethod(this),
                     new DisplayStringMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new CurrentLanguageChangedEvent(this),
+                    new DisplayCurrentLanguageChangedEvent(this),
                 });
         }
 
         private void OnModulesInitialized()
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalClientService>();
+            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
             Successor = terminal.Devices["Terminal"];
         }
     }
@@ -67,11 +67,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     #region Properties
 
     [ValueProperty("Language")]
-    public class CurrentLanguageProperty : TerminalDeviceProperty<string,
+    public class DisplayCurrentLanguageProperty : TerminalDeviceProperty<string,
         GetCurrentLanguageCommand, GetCurrentLanguageResponse,
         SetCurrentLanguageCommand, SetCurrentLanguageResponse>
     {
-        public CurrentLanguageProperty(ITerminalDevice device)
+        public DisplayCurrentLanguageProperty(ITerminalDevice device)
             : base(device, "CurrentLanguage")
         {
             GetCommand = new TerminalDeviceCommand<GetCurrentLanguageCommand, GetCurrentLanguageResponse>(
@@ -82,20 +82,20 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             SetCommand = new TerminalDeviceCommand<SetCurrentLanguageCommand, SetCurrentLanguageResponse>(
                 this,
                 $"set_{Name}",
-                new SortedList<string, object>
+                () => new SetCurrentLanguageCommand
                     {
-                        {"value", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
     [ValueProperty("MessageWindowProperties")]
-    public class MessageWindowPropertiesProperty : TerminalDeviceProperty<MessageWindowProperties,
+    public class DisplayMessageWindowPropertiesProperty : TerminalDeviceProperty<MessageWindowProperties,
         GetMessageWindowPropertiesCommand, GetMessageWindowPropertiesResponse,
         SetMessageWindowPropertiesCommand, SetMessageWindowPropertiesResponse>
     {
-        public MessageWindowPropertiesProperty(ITerminalDevice device)
+        public DisplayMessageWindowPropertiesProperty(ITerminalDevice device)
             : base(device, "MessageWindowProperties")
         {
             GetCommand = new TerminalDeviceCommand<GetMessageWindowPropertiesCommand, GetMessageWindowPropertiesResponse>(
@@ -111,11 +111,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("SoftKeyProperties")]
-    public class SoftKeyPropertiesProperty : TerminalDeviceProperty<SoftKeyProperties,
+    public class DisplaySoftKeyPropertiesProperty : TerminalDeviceProperty<SoftKeyProperties,
         GetSoftKeyPropertiesCommand, GetSoftKeyPropertiesResponse,
         SetSoftKeyPropertiesCommand, SetSoftKeyPropertiesResponse>
     {
-        public SoftKeyPropertiesProperty(ITerminalDevice device)
+        public DisplaySoftKeyPropertiesProperty(ITerminalDevice device)
             : base(device, "SoftKeyProperties")
         {
             GetCommand = new TerminalDeviceCommand<GetSoftKeyPropertiesCommand, GetSoftKeyPropertiesResponse>(
@@ -131,11 +131,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("DataEntryWindowProperties")]
-    public class DataEntryWindowPropertiesProperty : TerminalDeviceProperty<DataEntryWindowProperties,
+    public class DisplayDataEntryWindowPropertiesProperty : TerminalDeviceProperty<DataEntryWindowProperties,
         GetDataEntryWindowPropertiesCommand, GetDataEntryWindowPropertiesResponse,
         SetDataEntryWindowPropertiesCommand, SetDataEntryWindowPropertiesResponse>
     {
-        public DataEntryWindowPropertiesProperty(ITerminalDevice device)
+        public DisplayDataEntryWindowPropertiesProperty(ITerminalDevice device)
             : base(device, "DataEntryWindowProperties")
         {
             GetCommand = new TerminalDeviceCommand<GetDataEntryWindowPropertiesCommand, GetDataEntryWindowPropertiesResponse>(
@@ -151,153 +151,153 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("PromptDetails")]
-    public class PromptDetailsProperty : TerminalDeviceProperty<PromptDetails,
+    public class DisplayPromptDetailsProperty : TerminalDeviceProperty<PromptDetails,
         GetPromptDetailsCommand, GetPromptDetailsResponse,
         SetPromptDetailsCommand, SetPromptDetailsResponse>
     {
-        public PromptDetailsProperty(ITerminalDevice device)
+        public DisplayPromptDetailsProperty(ITerminalDevice device)
             : base(device, "PromptDetails")
         {
             GetCommand = new TerminalDeviceCommand<GetPromptDetailsCommand, GetPromptDetailsResponse>(
                 this,
                 $"get_{Name}",
-                new SortedList<string, object>
+                () => new GetPromptDetailsCommand
                     {
-                        {"promptId", 1},
-                        {"language", "en"},
+                        PromptId = 1,
+                        Language = "en",
                     }
                 );
 
             SetCommand = new TerminalDeviceCommand<SetPromptDetailsCommand, SetPromptDetailsResponse>(
                 this,
                 $"set_{Name}",
-                new SortedList<string, object>
+                () => new SetPromptDetailsCommand
                     {
-                        {"language", "en"},
-                        {"value", new PromptDetails()},
+                        Language = "en",
+                        PromptDetails = new PromptDetails(),
                     }
                 );
         }
     }
 
     [ValueProperty("PromptSummary")]
-    public class PromptListProperty : TerminalDeviceProperty<PromptSummary[],
+    public class DisplayPromptListProperty : TerminalDeviceProperty<PromptSummary[],
         GetPromptListCommand, GetPromptListResponse>
     {
-        public PromptListProperty(ITerminalDevice device)
+        public DisplayPromptListProperty(ITerminalDevice device)
             : base(device, "PromptList")
         {
             GetCommand = new TerminalDeviceCommand<GetPromptListCommand, GetPromptListResponse>(
                 this,
                 $"get_{Name}",
-                new SortedList<string, object>
+                () => new GetPromptListCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
     [ValueProperty("Value")]
-    public class ImageDetailsProperty : TerminalDeviceProperty<byte[],
+    public class DisplayImageDetailsProperty : TerminalDeviceProperty<byte[],
         GetImageDetailsCommand, GetImageDetailsResponse,
         SetImageDetailsCommand, SetImageDetailsResponse>
     {
-        public ImageDetailsProperty(ITerminalDevice device)
+        public DisplayImageDetailsProperty(ITerminalDevice device)
             : base(device, "ImageDetails")
         {
             GetCommand = new TerminalDeviceCommand<GetImageDetailsCommand, GetImageDetailsResponse>(
                 this,
                 $"get_{Name}",
-                new SortedList<string, object>
+                () => new GetImageDetailsCommand
                     {
-                        {"imageId", 1},
-                        {"language", "en"},
+                        ImageId = 1,
+                        Language = "en",
                     }
                 );
 
             SetCommand = new TerminalDeviceCommand<SetImageDetailsCommand, SetImageDetailsResponse>(
                 this,
                 $"set_{Name}",
-                new SortedList<string, object>
+                () => new SetImageDetailsCommand
                     {
-                        {"imageId", 1},
-                        {"filename", "bac1re1.bmp"},
-                        {"language", "en"},
+                        ImageId = 1,
+                        Filename = "bac1re1.bmp",
+                        Language = "en",
                     }
                 );
         }
     }
 
     [ValueProperty("ImageSummary")]
-    public class ImageListProperty : TerminalDeviceProperty<ImageSummary[],
+    public class DisplayImageListProperty : TerminalDeviceProperty<ImageSummary[],
         GetImageListCommand, GetImageListResponse>
     {
-        public ImageListProperty(ITerminalDevice device)
+        public DisplayImageListProperty(ITerminalDevice device)
             : base(device, "ImageList")
         {
             GetCommand = new TerminalDeviceCommand<GetImageListCommand, GetImageListResponse>(
                 this,
                 $"get_{Name}",
-                new SortedList<string, object>
+                () => new GetImageListCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
     [ValueProperty("AnimationDetails")]
-    public class AnimationDetailsProperty : TerminalDeviceProperty<AnimationDetails,
+    public class DisplayAnimationDetailsProperty : TerminalDeviceProperty<AnimationDetails,
         GetAnimationDetailsCommand, GetAnimationDetailsResponse,
         SetAnimationDetailsCommand, SetAnimationDetailsResponse>
     {
-        public AnimationDetailsProperty(ITerminalDevice device)
+        public DisplayAnimationDetailsProperty(ITerminalDevice device)
             : base(device, "AnimationDetails")
         {
             GetCommand = new TerminalDeviceCommand<GetAnimationDetailsCommand, GetAnimationDetailsResponse>(
                 this,
                 $"get_{Name}",
-                new SortedList<string, object>
+                () => new GetAnimationDetailsCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
 
             SetCommand = new TerminalDeviceCommand<SetAnimationDetailsCommand, SetAnimationDetailsResponse>(
                 this,
                 $"set_{Name}",
-                new SortedList<string, object>
+                () => new SetAnimationDetailsCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
     [ValueProperty("AnimationSummary")]
-    public class AnimationListProperty : TerminalDeviceProperty<AnimationSummary[],
+    public class DisplayAnimationListProperty : TerminalDeviceProperty<AnimationSummary[],
         GetAnimationListCommand, GetAnimationListResponse>
     {
-        public AnimationListProperty(ITerminalDevice device)
+        public DisplayAnimationListProperty(ITerminalDevice device)
             : base(device, "AnimationList")
         {
             GetCommand = new TerminalDeviceCommand<GetAnimationListCommand, GetAnimationListResponse>(
                 this,
                 $"get_{Name}",
-                new SortedList<string, object>
+                () => new GetAnimationListCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
     [ValueProperty("Font")]
-    public class FontsProperty : TerminalDeviceProperty<PrinterFont[],
+    public class DisplayFontsProperty : TerminalDeviceProperty<PrinterFont[],
         GetFontsCommand, GetFontsResponse>
     {
-        public FontsProperty(ITerminalDevice device)
+        public DisplayFontsProperty(ITerminalDevice device)
             : base(device, "Fonts")
         {
             GetCommand = new TerminalDeviceCommand<GetFontsCommand, GetFontsResponse>(
@@ -322,10 +322,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("SupportedLanguage")]
-    public class SupportedLanguagesProperty : TerminalDeviceProperty<SupportedLanguage[],
+    public class DisplaySupportedLanguagesProperty : TerminalDeviceProperty<SupportedLanguage[],
         GetSupportedLanguagesCommand, GetSupportedLanguagesResponse>
     {
-        public SupportedLanguagesProperty(ITerminalDevice device)
+        public DisplaySupportedLanguagesProperty(ITerminalDevice device)
             : base(device, "SupportedLanguages")
         {
             GetCommand = new TerminalDeviceCommand<GetSupportedLanguagesCommand, GetSupportedLanguagesResponse>(
@@ -361,16 +361,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             InvokeCommand = new TerminalDeviceCommand<DisplayPromptCommand, DisplayPromptResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DisplayPromptCommand
                     {
-                        {"id", 1},
-                        {"language", "en"},
-                        {"ignoreSoftKeySet", false},
-                        {"ignoreSoftKeySetSpecified", true},
-                        {"SubstituteParameter", new[]
+                        Id = 1,
+                        Language = "en",
+                        IgnoreSoftKeySet = false,
+                        IgnoreSoftKeySetSpecified = true,
+                        SubstituteParameter = new[]
                             {
                                 new SubstituteParameter {Text = "A Text"}
-                            }},
+                            },
                     }
                 );
         }
@@ -384,117 +384,116 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             InvokeCommand = new TerminalDeviceCommand<DeletePromptCommand, DeletePromptResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeletePromptCommand
                     {
-                        {"id", 1},
-                        {"language", "en"},
+                        Id = 1,
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class DeleteAllPromptsMethod : TerminalDeviceMethod<DeleteAllPromptsCommand, DeleteAllPromptsResponse>
+    public class DisplayDeleteAllPromptsMethod : TerminalDeviceMethod<DeleteAllPromptsCommand, DeleteAllPromptsResponse>
     {
-        public DeleteAllPromptsMethod(ITerminalDevice device)
+        public DisplayDeleteAllPromptsMethod(ITerminalDevice device)
             : base(device, "DeleteAllPrompts")
         {
             InvokeCommand = new TerminalDeviceCommand<DeleteAllPromptsCommand, DeleteAllPromptsResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeleteAllPromptsCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class DeleteImageMethod : TerminalDeviceMethod<DeleteImageCommand, DeleteImageResponse>
+    public class DisplayDeleteImageMethod : TerminalDeviceMethod<DeleteImageCommand, DeleteImageResponse>
     {
-        public DeleteImageMethod(ITerminalDevice device)
+        public DisplayDeleteImageMethod(ITerminalDevice device)
             : base(device, "DeleteImage")
         {
             InvokeCommand = new TerminalDeviceCommand<DeleteImageCommand, DeleteImageResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeleteImageCommand
                     {
-                        {"id", 1},
-                        {"language", "en"},
+                        Id = 1,
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class DeleteAllImagesMethod : TerminalDeviceMethod<DeleteAllImagesCommand, DeleteAllImagesResponse>
+    public class DisplayDeleteAllImagesMethod : TerminalDeviceMethod<DeleteAllImagesCommand, DeleteAllImagesResponse>
     {
-        public DeleteAllImagesMethod(ITerminalDevice device)
+        public DisplayDeleteAllImagesMethod(ITerminalDevice device)
             : base(device, "DeleteAllImages")
         {
             InvokeCommand = new TerminalDeviceCommand<DeleteAllImagesCommand, DeleteAllImagesResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeleteAllImagesCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class DeleteAnimationMethod : TerminalDeviceMethod<DeleteAnimationCommand, DeleteAnimationResponse>
+    public class DisplayDeleteAnimationMethod : TerminalDeviceMethod<DeleteAnimationCommand, DeleteAnimationResponse>
     {
-        public DeleteAnimationMethod(ITerminalDevice device)
+        public DisplayDeleteAnimationMethod(ITerminalDevice device)
             : base(device, "DeleteAnimation")
         {
             InvokeCommand = new TerminalDeviceCommand<DeleteAnimationCommand, DeleteAnimationResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeleteAnimationCommand
                     {
-                        {"id", 1},
-                        {"language", "en"},
+                        Id = 1,
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class DeleteAllAnimationsMethod : TerminalDeviceMethod<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>
+    public class DisplayDeleteAllAnimationsMethod : TerminalDeviceMethod<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>
     {
-        public DeleteAllAnimationsMethod(ITerminalDevice device)
+        public DisplayDeleteAllAnimationsMethod(ITerminalDevice device)
             : base(device, "DeleteAllAnimations")
         {
             InvokeCommand = new TerminalDeviceCommand<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeleteAllAnimationsCommand
                     {
-                        {"id", 1},
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class DeleteAllMethod : TerminalDeviceMethod<DeleteAllCommand, DeleteAllResponse>
+    public class DisplayDeleteAllMethod : TerminalDeviceMethod<DeleteAllCommand, DeleteAllResponse>
     {
-        public DeleteAllMethod(ITerminalDevice device)
+        public DisplayDeleteAllMethod(ITerminalDevice device)
             : base(device, "DeleteAll")
         {
             InvokeCommand = new TerminalDeviceCommand<DeleteAllCommand, DeleteAllResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DeleteAllCommand
                     {
-                        {"language", "en"},
+                        Language = "en",
                     }
                 );
         }
     }
 
-    public class RestoreDefaultMethod : TerminalDeviceMethod<RestoreDefaultCommand, RestoreDefaultResponse>
+    public class DisplayRestoreDefaultMethod : TerminalDeviceMethod<RestoreDefaultCommand, RestoreDefaultResponse>
     {
-        public RestoreDefaultMethod(ITerminalDevice device)
+        public DisplayRestoreDefaultMethod(ITerminalDevice device)
             : base(device, "RestoreDefault")
         {
             InvokeCommand = new TerminalDeviceCommand<RestoreDefaultCommand, RestoreDefaultResponse>(
@@ -504,17 +503,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class SetVideoWindowMethod : TerminalDeviceMethod<SetVideoWindowCommand, SetVideoWindowResponse>
+    public class DisplaySetVideoWindowMethod : TerminalDeviceMethod<SetVideoWindowCommand, SetVideoWindowResponse>
     {
-        public SetVideoWindowMethod(ITerminalDevice device)
+        public DisplaySetVideoWindowMethod(ITerminalDevice device)
             : base(device, "SetVideoWindow")
         {
             InvokeCommand = new TerminalDeviceCommand<SetVideoWindowCommand, SetVideoWindowResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new SetVideoWindowCommand
                     {
-                        {"fullScreen", true},
+                        FullScreen = true,
                     }
                 );
         }
@@ -528,14 +527,14 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             InvokeCommand = new TerminalDeviceCommand<DisplayStringCommand, DisplayStringResponse>(
                this,
                Name,
-                new SortedList<string, object>
+                () => new DisplayStringCommand
                     {
-                        {"message", "Please Pay inside (E01)"},
-                        {"id", 1},
-                        {"showDataEntry", false},
-                        {"showDataEntrySpecified", true},
-                        {"clearScreen", false},
-                        {"clearScreenSpecified", true},
+                        Message = "Please Pay inside (E01)",
+                        Id = 1,
+                        ShowDataEntry = false,
+                        ShowDataEntrySpecified = true,
+                        ClearScreen = false,
+                        ClearScreenSpecified = true,
                     }
                );
         }
@@ -545,9 +544,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Events
 
-    public class CurrentLanguageChangedEvent : TerminalDeviceEvent<CurrentLanguageChanged>
+    public class DisplayCurrentLanguageChangedEvent : TerminalDeviceEvent<CurrentLanguageChanged>
     {
-        public CurrentLanguageChangedEvent(ITerminalDevice device) 
+        public DisplayCurrentLanguageChangedEvent(ITerminalDevice device) 
             : base(device, "CurrentLanguageChanged")
         {
         }

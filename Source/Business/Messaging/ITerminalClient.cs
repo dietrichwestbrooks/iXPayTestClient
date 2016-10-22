@@ -16,7 +16,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         Task<bool> ConnectAsync(IPEndPoint endPoint);
         Task<bool> ConnectAsync(string address, int port);
         void Disconnect();
-        int SendMessage(TerminalMessage message, Enums.MessagePriorty priority = Enums.MessagePriorty.Normal);
+        int SendMessage(TerminalMessage message, MessagePriorty priority = MessagePriorty.Normal);
         event EventHandler<IPEndPoint> Connected;
         event EventHandler<TerminalMessage> MessageSent;
         event EventHandler<IPEndPoint> Disconnected;

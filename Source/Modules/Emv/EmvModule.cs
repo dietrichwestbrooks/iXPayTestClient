@@ -23,7 +23,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv
         {
             try
             {
-                var terminalService = Container.GetExportedValue<ITerminalClientService>();
+                var terminalService = Container.GetExportedValue<ITerminalService>();
 
                 if (terminalService == null)
                     throw new InvalidOperationException("Unable to locate terminal service");

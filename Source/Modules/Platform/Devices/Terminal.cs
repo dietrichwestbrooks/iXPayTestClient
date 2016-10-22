@@ -14,33 +14,33 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
                     new TerminalIdProperty(this),
-                    new SupportedTerminalIdsProperty(this),
-                    new PackageVersionProperty(this),
-                    new OperationalStateProperty(this),
+                    new TerminalSupportedIdsProperty(this),
+                    new TerminalPackageVersionProperty(this),
+                    new TerminalOperationalStateProperty(this),
                     new TerminalStateProperty(this),
-                    new BatteryStateProperty(this),
+                    new TerminalBatteryStateProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new ResetMethod(this),
-                    new SetDateTimeMethod(this),
-                    new SetToIdleMethod(this),
-                    new DisplaySecurePromptMethod(this),
-                    new EnableFunctionKeysMethod(this),
-                    new DisableFunctionKeysMethod(this),
-                    new EnableCancelKeyMethod(this),
-                    new DisableCancelKeyMethod(this),
+                    new TerminalResetMethod(this),
+                    new TerminalSetDateTimeMethod(this),
+                    new TerminalSetToIdleMethod(this),
+                    new TerminalDisplaySecurePromptMethod(this),
+                    new TerminalEnableFunctionKeysMethod(this),
+                    new TerminalDisableFunctionKeysMethod(this),
+                    new TerminalEnableCancelKeyMethod(this),
+                    new TerminalDisableCancelKeyMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new CancelKeyPressedEvent(this),
-                    new FunctionKeyPressedEvent(this),
-                    new OperationalStatusChangedEvent(this),
+                    new TerminalCancelKeyPressedEvent(this),
+                    new TerminalFunctionKeyPressedEvent(this),
+                    new TerminalOperationalStatusChangedEvent(this),
                     new TerminalStatusChangedEvent(this),
-                    new BatteryStatusChangedEvent(this),
-                    new FunctionKeyEntryTimedOutEvent(this),
+                    new TerminalBatteryStatusChangedEvent(this),
+                    new TerminalFunctionKeyEntryTimedOutEvent(this),
                 });
         }
     }
@@ -62,10 +62,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("SupportedTerminal")]
-    public class SupportedTerminalIdsProperty : TerminalDeviceProperty<SupportedTerminal[],
+    public class TerminalSupportedIdsProperty : TerminalDeviceProperty<SupportedTerminal[],
         GetSupportedTerminalIdsCommand, GetSupportedTerminalIdsResponse>
     {
-        public SupportedTerminalIdsProperty(ITerminalDevice device)
+        public TerminalSupportedIdsProperty(ITerminalDevice device)
             : base(device, "SupportedTerminalIds")
         {
             GetCommand = new TerminalDeviceCommand<GetSupportedTerminalIdsCommand, GetSupportedTerminalIdsResponse>(
@@ -76,10 +76,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("PackageVersion")]
-    public class PackageVersionProperty : TerminalDeviceProperty<string,
+    public class TerminalPackageVersionProperty : TerminalDeviceProperty<string,
         GetPackageVersionCommand, GetPackageVersionResponse>
     {
-        public PackageVersionProperty(ITerminalDevice device)
+        public TerminalPackageVersionProperty(ITerminalDevice device)
             : base(device, "PackageVersion")
         {
             GetCommand = new TerminalDeviceCommand<GetPackageVersionCommand, GetPackageVersionResponse>(
@@ -90,10 +90,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("OperationalState")]
-    public class OperationalStateProperty : TerminalDeviceProperty<OperationalStatus,
+    public class TerminalOperationalStateProperty : TerminalDeviceProperty<OperationalStatus,
         GetOperationalStateCommand, GetOperationalStateResponse>
     {
-        public OperationalStateProperty(ITerminalDevice device)
+        public TerminalOperationalStateProperty(ITerminalDevice device)
             : base(device, "OperationalState")
         {
             GetCommand = new TerminalDeviceCommand<GetOperationalStateCommand, GetOperationalStateResponse>(
@@ -118,10 +118,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     }
 
     [ValueProperty("BatteryState")]
-    public class BatteryStateProperty : TerminalDeviceProperty<BatteryStatus,
+    public class TerminalBatteryStateProperty : TerminalDeviceProperty<BatteryStatus,
         GetBatteryStateCommand, GetBatteryStateResponse>
     {
-        public BatteryStateProperty(ITerminalDevice device)
+        public TerminalBatteryStateProperty(ITerminalDevice device)
             : base(device, "BatteryState")
         {
             GetCommand = new TerminalDeviceCommand<GetBatteryStateCommand, GetBatteryStateResponse>(
@@ -135,27 +135,27 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Methods
 
-    public class DisplaySecurePromptMethod : TerminalDeviceMethod<DisplaySecurePromptCommand, DisplaySecurePromptResponse>
+    public class TerminalDisplaySecurePromptMethod : TerminalDeviceMethod<DisplaySecurePromptCommand, DisplaySecurePromptResponse>
     {
-        public DisplaySecurePromptMethod(ITerminalDevice device)
+        public TerminalDisplaySecurePromptMethod(ITerminalDevice device)
             : base(device, "DisplaySecurePrompt")
         {
             InvokeCommand = new TerminalDeviceCommand<DisplaySecurePromptCommand, DisplaySecurePromptResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new DisplaySecurePromptCommand
                     {
-                        {"promptId", 1},
-                        {"language", "en"},
-                        {"securityLevel", SecurityLevels.Encrypted},
+                        PromptId = 1,
+                        Language = "en",
+                        SecurityLevel = SecurityLevels.Encrypted,
                     }
                 );
         }
     }
 
-    public class ResetMethod : TerminalDeviceMethod<ResetCommand, ResetResponse>
+    public class TerminalResetMethod : TerminalDeviceMethod<ResetCommand, ResetResponse>
     {
-        public ResetMethod(ITerminalDevice device)
+        public TerminalResetMethod(ITerminalDevice device)
             : base(device, "Reset")
         {
             InvokeCommand = new TerminalDeviceCommand<ResetCommand, ResetResponse>(
@@ -165,17 +165,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class SetDateTimeMethod : TerminalDeviceMethod<SetDateTimeCommand, SetDateTimeResponse>
+    public class TerminalSetDateTimeMethod : TerminalDeviceMethod<SetDateTimeCommand, SetDateTimeResponse>
     {
-        public SetDateTimeMethod(ITerminalDevice device)
+        public TerminalSetDateTimeMethod(ITerminalDevice device)
             : base(device, "SetDateTime")
         {
             InvokeCommand = new TerminalDeviceCommand<SetDateTimeCommand, ResetResponse>(
                 this,
                 Name,
-                new SortedList<string, object>
+                () => new SetDateTimeCommand
                     {
-                        {"systemClock", new SystemClock
+                        SystemClock = new SystemClock
                             {
                                 dateTime = "2003-04-18 13:24:45",
                                 TimeZone = new SystemClockTimeZone
@@ -184,15 +184,15 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
                                         standardName = "Central Standard Time",
                                         daylightName = "Central Daylight Time",
                                     }
-                            }},
+                            },
                     }
                 );
         }
     }
 
-    public class SetToIdleMethod : TerminalDeviceMethod<SetToIdleCommand, SetToIdleResponse>
+    public class TerminalSetToIdleMethod : TerminalDeviceMethod<SetToIdleCommand, SetToIdleResponse>
     {
-        public SetToIdleMethod(ITerminalDevice device)
+        public TerminalSetToIdleMethod(ITerminalDevice device)
             : base(device, "SetToIdle")
         {
             InvokeCommand = new TerminalDeviceCommand<SetToIdleCommand, SetToIdleResponse>(
@@ -202,9 +202,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class EnableFunctionKeysMethod : TerminalDeviceMethod<EnableFunctionKeysCommand, EnableFunctionKeysResponse>
+    public class TerminalEnableFunctionKeysMethod : TerminalDeviceMethod<EnableFunctionKeysCommand, EnableFunctionKeysResponse>
     {
-        public EnableFunctionKeysMethod(ITerminalDevice device)
+        public TerminalEnableFunctionKeysMethod(ITerminalDevice device)
             : base(device, "EnableFunctionKeys")
         {
             InvokeCommand = new TerminalDeviceCommand<EnableFunctionKeysCommand, EnableFunctionKeysResponse>(
@@ -214,9 +214,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class DisableFunctionKeysMethod : TerminalDeviceMethod<DisableFunctionKeysCommand, DisableFunctionKeysResponse>
+    public class TerminalDisableFunctionKeysMethod : TerminalDeviceMethod<DisableFunctionKeysCommand, DisableFunctionKeysResponse>
     {
-        public DisableFunctionKeysMethod(ITerminalDevice device)
+        public TerminalDisableFunctionKeysMethod(ITerminalDevice device)
             : base(device, "DisableFunctionKeys")
         {
             InvokeCommand = new TerminalDeviceCommand<DisableFunctionKeysCommand, DisableFunctionKeysResponse>(
@@ -226,9 +226,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class EnableCancelKeyMethod : TerminalDeviceMethod<EnableCancelKeyCommand, EnableCancelKeyResponse>
+    public class TerminalEnableCancelKeyMethod : TerminalDeviceMethod<EnableCancelKeyCommand, EnableCancelKeyResponse>
     {
-        public EnableCancelKeyMethod(ITerminalDevice device)
+        public TerminalEnableCancelKeyMethod(ITerminalDevice device)
             : base(device, "EnableCancelKey")
         {
             InvokeCommand = new TerminalDeviceCommand<EnableCancelKeyCommand, EnableCancelKeyResponse>(
@@ -238,9 +238,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         }
     }
 
-    public class DisableCancelKeyMethod : TerminalDeviceMethod<DisableCancelKeyCommand, DisableCancelKeyResponse>
+    public class TerminalDisableCancelKeyMethod : TerminalDeviceMethod<DisableCancelKeyCommand, DisableCancelKeyResponse>
     {
-        public DisableCancelKeyMethod(ITerminalDevice device)
+        public TerminalDisableCancelKeyMethod(ITerminalDevice device)
             : base(device, "DisableCancelKey")
         {
             InvokeCommand = new TerminalDeviceCommand<DisableCancelKeyCommand, DisableCancelKeyResponse>(
@@ -254,25 +254,25 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 
     #region Events
 
-    public class CancelKeyPressedEvent : TerminalDeviceEvent<CancelKeyPressed>
+    public class TerminalCancelKeyPressedEvent : TerminalDeviceEvent<CancelKeyPressed>
     {
-        public CancelKeyPressedEvent(ITerminalDevice device)
+        public TerminalCancelKeyPressedEvent(ITerminalDevice device)
             : base(device, "CancelKeyPressed")
         {
         }
     }
 
-    public class FunctionKeyPressedEvent : TerminalDeviceEvent<FunctionKeyPressed>
+    public class TerminalFunctionKeyPressedEvent : TerminalDeviceEvent<FunctionKeyPressed>
     {
-        public FunctionKeyPressedEvent(ITerminalDevice device)
+        public TerminalFunctionKeyPressedEvent(ITerminalDevice device)
             : base(device, "FunctionKeyPressed")
         {
         }
     }
 
-    public class OperationalStatusChangedEvent : TerminalDeviceEvent<OperationalStatusChanged>
+    public class TerminalOperationalStatusChangedEvent : TerminalDeviceEvent<OperationalStatusChanged>
     {
-        public OperationalStatusChangedEvent(ITerminalDevice device)
+        public TerminalOperationalStatusChangedEvent(ITerminalDevice device)
             : base(device, "OperationalStatusChanged")
         {
         }
@@ -281,22 +281,22 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
     public class TerminalStatusChangedEvent : TerminalDeviceEvent<TerminalStatusChanged>
     {
         public TerminalStatusChangedEvent(ITerminalDevice device)
-            : base(device, "TerminalStatusChanged")
+            : base(device, "StatusChanged")
         {
         }
     }
 
-    public class BatteryStatusChangedEvent : TerminalDeviceEvent<TerminalStatusChanged>
+    public class TerminalBatteryStatusChangedEvent : TerminalDeviceEvent<TerminalStatusChanged>
     {
-        public BatteryStatusChangedEvent(ITerminalDevice device)
+        public TerminalBatteryStatusChangedEvent(ITerminalDevice device)
             : base(device, "BatteryStatusChanged")
         {
         }
     }
 
-    public class FunctionKeyEntryTimedOutEvent : TerminalDeviceEvent<TerminalStatusChanged>
+    public class TerminalFunctionKeyEntryTimedOutEvent : TerminalDeviceEvent<TerminalStatusChanged>
     {
-        public FunctionKeyEntryTimedOutEvent(ITerminalDevice device)
+        public TerminalFunctionKeyEntryTimedOutEvent(ITerminalDevice device)
             : base(device, "FunctionKeyEntryTimedOut")
         {
         }
