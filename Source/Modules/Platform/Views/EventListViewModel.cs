@@ -21,7 +21,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
 
-            ClearOnRun = true;
+            ClearOnRun = false;
 
             EventAggregator.GetEvent<EventReceivedEvent>().Subscribe(OnEventReceived);
 

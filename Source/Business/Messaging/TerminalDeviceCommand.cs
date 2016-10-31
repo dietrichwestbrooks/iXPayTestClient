@@ -11,13 +11,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         where TCommand : class, new()
         where TResponse : class
     {
-        private readonly Func<TCommand> _getDefaultCommand;
+        private readonly Func<TCommand> _prepareCommand;
 
-        public TerminalDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> getDefaultCommand = null)
+        public TerminalDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> prepareCommand = null)
         {
             Member = member;
             Name = name;
-            _getDefaultCommand = getDefaultCommand ?? (() => new TCommand());
+            _prepareCommand = prepareCommand ?? (() => new TCommand());
         }
 
         public ITerminalDeviceMember Member { get; }
@@ -34,12 +34,38 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
         public TerminalMessage GetMessage(CommandParameters parameters = null)
         {
-            TCommand command = (parameters == null ? _getDefaultCommand() : (TCommand)CreateCommand(parameters));
+            TCommand command = (parameters == null ? _prepareCommand() : CreateCommand(parameters));
 
             return new TerminalMessage { Item = BuildCommand(command, Member.Device) };
         }
 
-        private object CreateCommand(CommandParameters parameters)
+        public object Execute(CommandParameters parameters)
+        {
+            object response;
+
+            try
+            {
+                TerminalMessage message = GetMessage(parameters);
+
+                response = SendMessageAsync(message).Result;
+                
+                if (!ProcessResponse(response))
+                    throw new InvalidOperationException(ResultMessage);
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException ?? ex;
+            }
+
+            return response;
+        }
+
+        protected virtual Task<object> SendMessageAsync(TerminalMessage message)
+        {
+            return new MessageBrokerTask(message).Task;
+        }
+
+        private TCommand CreateCommand(CommandParameters parameters)
         {
             var command = new TCommand();
 
@@ -81,34 +107,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             }
         }
 
-        public object Execute(CommandParameters parameters)
-        {
-            object response;
-
-            try
-            {
-                TerminalMessage message = GetMessage(parameters);
-
-                response = SendMessageAsync(message).Result;
-                ProcessResponse(response);
-
-                if (!Result)
-                    throw new InvalidOperationException(ResultMessage);
-            }
-            catch (AggregateException ex)
-            {
-                throw ex.InnerException ?? ex;
-            }
-
-            return response;
-        }
-
-        protected virtual Task<object> SendMessageAsync(TerminalMessage message)
-        {
-            return new MessageBrokerTask(message).Task;
-        }
-
-        public bool ProcessResponse(object response)
+        private bool ProcessResponse(object response)
         {
             BaseResponse baseResponse = response as BaseResponse;
 
@@ -133,6 +132,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         {
             ResultMessage = response.Message;
             return (Result = response.Success);
+        }
+
+        public ITerminalRequestHandler Successor { get; set; }
+
+        public object HandleRequest(object command)
+        {
+            return command;
         }
     }
 }

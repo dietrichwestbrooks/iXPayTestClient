@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Mef.Modularity;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Modules;
 using Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core
@@ -15,7 +15,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core
             RegionManager.Regions[RegionNames.RightWindowCommandsRegion].Add(ServiceLocator.Current.GetInstance<RightTitlebarCommands>());
             RegionManager.Regions[RegionNames.FlyoutRegion].Add(ServiceLocator.Current.GetInstance<ISettingsView>());
             RegionManager.Regions[RegionNames.FlyoutRegion].Add(ServiceLocator.Current.GetInstance<INotificationView>());
-            RegionManager.Regions[RegionNames.RightDockRegion].Add(ServiceLocator.Current.GetInstance<IOutputView>());
+            RegionManager.Regions[RegionNames.RightDockRegion].Add(ServiceLocator.Current.GetInstance<IOutputViewerView>());
+
+            RegionManager.RequestNavigate(RegionNames.OutputRegion, NavigateViewNames.LogView);
         }
     }
 }

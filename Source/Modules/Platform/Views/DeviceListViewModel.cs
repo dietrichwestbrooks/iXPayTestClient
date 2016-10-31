@@ -54,7 +54,20 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
                         new ObservableCollection<DeviceViewModel>(
                             TerminalService.Devices.Select(d => new DeviceViewModel(d)));
 
-                    TerminalService.Devices.DeviceAdded += (sender, d) => _devices.Add(new DeviceViewModel(d));
+                    //CollectionViewSource.GetDefaultView(_devices)
+                    //    .SortDescriptions
+                    //    .Add(new SortDescription("Title", ListSortDirection.Ascending));
+
+                    TerminalService.Devices.DeviceAdded += (sender, d) =>
+                    {
+                        _devices.Add(new DeviceViewModel(d));
+
+                        //CollectionViewSource.GetDefaultView(_devices).SortDescriptions.Clear();
+
+                        //CollectionViewSource.GetDefaultView(_devices)
+                        //.SortDescriptions
+                        //.Add(new SortDescription("Title", ListSortDirection.Ascending));
+                    };
                 }
 
                 return _devices;

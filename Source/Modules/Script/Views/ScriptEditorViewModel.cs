@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.Composition;
+﻿using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Windows.Input;
 using Microsoft.Practices.ServiceLocation;
@@ -19,6 +21,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
         private string _title;
         private string _code;
         private object _selectedItem;
+        private bool _isConnected;
 
         [ImportingConstructor]
         public ScriptEditorViewModel()
@@ -27,9 +30,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
             FileService = ServiceLocator.Current.GetInstance<IFileService>();
 
-            OpenFileCommand = new DelegateCommand(OnOpenFile, CanOpenFile);
-            NewFileCommand = new DelegateCommand(OnNewFile, CanNewFile);
-            SaveFileCommand = new DelegateCommand(OnSaveFile, CanSaveFile);
+            OpenCommand = new DelegateCommand(OnOpen, CanOpen);
+            NewCommand = new DelegateCommand(OnNew, CanNew);
+            SaveCommand = new DelegateCommand(OnSave, CanSave);
+            SaveAsCommand = new DelegateCommand(OnSaveAs, CanSaveAs);
             ExecuteCommand = new DelegateCommand(OnExecute, CanExecute);
 
             EventAggregator.GetEvent<DeviceSelectedEvent>().Subscribe(OnDeviceSelected);
@@ -38,6 +42,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             EventAggregator.GetEvent<CommandSelectedEvent>().Subscribe(OnCommandSelected);
             EventAggregator.GetEvent<EventSelectedEvent>().Subscribe(OnEventSelected);
             EventAggregator.GetEvent<EventSelectedEvent>().Subscribe(OnEventSelected);
+
+            EventAggregator.GetEvent<ConnectedEvent>().Subscribe(OnConnected);
+            EventAggregator.GetEvent<DisconnectedEvent>().Subscribe(OnDisconnected);
         }
 
         private void OnDeviceSelected(ITerminalDevice device)
@@ -57,7 +64,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
                     {"Code", $"{builder}"},
                 };
 
-            RegionManager.RequestNavigate(RegionNames.ScriptEditorRegion, "ScriptFileView", parameters);
+            RegionManager.RequestNavigate(RegionNames.ScriptEditorRegion, NavigateViewNames.ScriptFileView, parameters);
         }
 
         private void OnMethodSelected(ITerminalDeviceMethod method)
@@ -140,13 +147,15 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             RegionManager.RequestNavigate(RegionNames.ScriptEditorRegion, "ScriptFileView", parameters);
         }
 
-        public ICommand OpenFileCommand { get; set; }
+        public ICommand OpenCommand { get; set; }
 
-        public ICommand SaveFileCommand { get; set; }
+        public ICommand SaveCommand { get; set; }
 
-        public ICommand NewFileCommand { get; set; }
+        public ICommand SaveAsCommand { get; set; }
 
-        public ICommand ExecuteCommand { get; set; }
+        public ICommand NewCommand { get; set; }
+
+        public DelegateCommand ExecuteCommand { get; set; }
 
         public string Title
         {
@@ -166,11 +175,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             set { SetProperty(ref _selectedItem, value); }
         }
 
+        public bool IsConnected
+        {
+            get { return _isConnected; }
+            set { SetProperty(ref _isConnected, value); }
+        }
+
         private IFileService FileService { get; }
 
         private bool CanExecute()
         {
-            return true;
+            return IsConnected;
         }
 
         private void OnExecute()
@@ -187,22 +202,22 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             viewModel?.ExecuteScript();
         }
 
-        private bool CanNewFile()
+        private bool CanNew()
         {
             return true;
         }
 
-        private void OnNewFile()
+        private void OnNew()
         {
             RegionManager.RequestNavigate(RegionNames.ScriptEditorRegion, "ScriptFileView");
         }
 
-        private bool CanOpenFile()
+        private bool CanOpen()
         {
             return true;
         }
 
-        private void OnOpenFile()
+        private void OnOpen()
         {
             string filePath = FileService.OpenScriptFileDialog();
 
@@ -217,12 +232,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             RegionManager.RequestNavigate(RegionNames.ScriptEditorRegion, "ScriptFileView", parameters);
         }
 
-        private bool CanSaveFile()
+        private bool CanSave()
         {
             return true;
         }
 
-        private void OnSaveFile()
+        private void OnSave()
         {
             IRegion region = RegionManager.Regions[RegionNames.ScriptEditorRegion];
 
@@ -233,7 +248,26 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
             var viewModel = view.DataContext as IScriptFileViewModel;
 
-            viewModel?.SaveFile();
+            viewModel?.Save();
+        }
+
+        private bool CanSaveAs()
+        {
+            return true;
+        }
+
+        private void OnSaveAs()
+        {
+            IRegion region = RegionManager.Regions[RegionNames.ScriptEditorRegion];
+
+            var view = region.ActiveViews.FirstOrDefault() as IScriptFileView;
+
+            if (view == null)
+                return;
+
+            var viewModel = view.DataContext as IScriptFileViewModel;
+
+            viewModel?.Save(true);
         }
 
         private void BuildScript(ITerminalDevice device, StringBuilder builder)
@@ -304,7 +338,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
                 builder.AppendLine($"\t{p.Name.ToLower()} = e.{p.Name}");
             }
 
-            builder.AppendLine($"\t#Handler logic here");
+            builder.AppendLine("\tpass");
 
             builder.AppendLine($"\n{deviceName}.{eventName} += On{eventName}");
         }
@@ -379,5 +413,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
         //    return value;
         //}
+
+        private void OnConnected(IPEndPoint endPoint)
+        {
+            IsConnected = true;
+            ExecuteCommand.RaiseCanExecuteChanged();
+        }
+
+        private void OnDisconnected(IPEndPoint endPoint)
+        {
+            IsConnected = false;
+        }
     }
 }

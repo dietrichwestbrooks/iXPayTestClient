@@ -109,18 +109,23 @@
     <Compile Include="Commands\NotificationParameter.cs" />
     <Compile Include="Commands\NotificationType.cs" />
     <Compile Include="Constants\FlyoutNames.cs" />
+    <Compile Include="Constants\NavigateViewNames.cs" />
     <Compile Include="Converters\ConverterBase.cs" />
+    <Compile Include="Converters\GrayscaleConverter.cs" />
+    <Compile Include="Converters\GrayscaleEffect.cs" />
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\IPEndPointValueConverter.cs" />
     <Compile Include="Converters\LogicalOrConverter.cs" />
     <Compile Include="Converters\NullToBoolValueConverter.cs" />
     <Compile Include="Converters\ObjectToTypeConverter.cs" />
     <Compile Include="Converters\VisibilityToStarHeightConverter.cs" />
+    <Compile Include="Interfaces\CardBrand.cs" />
     <Compile Include="Events\ConnectionEventArgs.cs" />
     <Compile Include="Events\Events.cs" />
-    <Compile Include="Events\OutputTextEventArgs.cs" />
     <Compile Include="ExtendedHeader.cs" />
-    <Compile Include="Extensions\EnumerationExtension.cs" />
+    <Compile Include="Extensions\BitmapExtenstions.cs" />
+    <Compile Include="Interfaces\IUiService.cs" />
+    <Compile Include="Markup\EnumerationExtension.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Interfaces\IClosable.cs" />
     <Compile Include="Interfaces\IConfigurationService.cs" />
@@ -128,11 +133,11 @@
     <Compile Include="Interfaces\IFlyoutService.cs" />
     <Compile Include="Interfaces\IFlyoutView.cs" />
     <Compile Include="Interfaces\IConfirmCloseRequest.cs" />
+    <Compile Include="Interfaces\ILogService.cs" />
+    <Compile Include="Interfaces\ILogTarget.cs" />
     <Compile Include="Interfaces\IScriptService.cs" />
     <Compile Include="Interfaces\ITerminalService.cs" />
-    <Compile Include="Interfaces\IView.cs" />
-    <Compile Include="Interfaces\IViewModel.cs" />
-    <Compile Include="ModuleBase.cs" />
+    <Compile Include="Modules\ModuleBase.cs" />
     <Compile Include="Prism\ICreateRegionManagerScope.cs" />
     <Compile Include="Prism\IRegionManagerAware.cs" />
     <Compile Include="Prism\RegionManagerAwareBehavior.cs" />
@@ -149,6 +154,10 @@
     <Compile Include="Services\FlyoutService.cs" />
     <Compile Include="Services\LogService.cs" />
     <Compile Include="Services\ServiceBase.cs" />
+    <Compile Include="Services\UiService.cs" />
+    <Compile Include="Views\IOutputViewModel.cs" />
+    <Compile Include="Views\IView.cs" />
+    <Compile Include="Views\IViewModel.cs" />
     <Compile Include="Views\TitleViewModel.cs" />
     <Compile Include="Views\ViewModelBase.cs" />
     <Compile Include="Views\ViewModelDialogPopupBase.cs" />
@@ -158,6 +167,7 @@
     <Folder Include="Controls\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Converters\GrayscaleEffect.ps" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +191,7 @@
   <ItemGroup>
     <Content Include="BitmapGraphics\Icons\16x16\add_on.png" />
     <Content Include="BitmapGraphics\Icons\32x32\add_on.png" />
+    <Content Include="Converters\GrayscaleEffect.fx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Business\Messaging\iXPayTestClient.Business.Messaging.csproj">
@@ -193,6 +204,9 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(DXSDK_DIR)Utilities\Bin\x86\fxc.exe" /T ps_2_0 /E main /Fo"$(ProjectDir)Converters/GrayscaleEffect.ps" "$(ProjectDir)Converters/GrayscaleEffect.fx"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

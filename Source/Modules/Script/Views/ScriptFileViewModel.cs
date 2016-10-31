@@ -71,11 +71,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
             set { SetProperty(ref _code, value); }
         }
 
-        public void SaveFile()
+        public void Save(bool newFile = false)
         {
+            IsNewFile = IsNewFile || newFile;
+
             if (IsSelectedTarget)
             {
-                string filePath = FileService.SaveScriptFileDialog();
+                string filePath = FileService.SaveScriptFileDialog(Path.Combine(Directory.GetCurrentDirectory(), "Scripts\\ScriptFile.py"));
 
                 if (string.IsNullOrWhiteSpace(filePath))
                     return;
@@ -208,7 +210,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
         public bool ConfirmCloseRequest(NavigationContext navigationContext)
         {
             if (IsNewFile)
-                SaveFile();
+                Save();
 
             DeleteTempFile();
 

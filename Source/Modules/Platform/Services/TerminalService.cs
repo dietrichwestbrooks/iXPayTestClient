@@ -14,56 +14,61 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
     [Export(typeof(ITerminalService))]
     public class TerminalService : ServiceBase, ITerminalService
     {
+        private object _connectionLocker = new object();
+
         public TerminalService()
         {
             ScriptService = ServiceLocator.Current.GetInstance<IScriptService>();
-            Client = ServiceLocator.Current.GetInstance<ITerminalClient>();
             Configuration = ServiceLocator.Current.GetInstance<IConfigurationService>();
 
-            OnSetupScript(ScriptService);
+            ConnectionManager = ServiceLocator.Current.GetInstance<ITerminalConnectionManager>();
+            ConnectionManager.ConnectionChanged += OnConnectionChanged;
 
-            Client.Connected += OnClientConnected;
-            Client.Disconnected += OnClientDisconnected;
-            Client.Error += OnClientError;
-            Client.MessageSent += OnClientMessageSent;
-            Client.EventReceived += OnClientEventReceived;
-            Client.Pulse += OnClientPulse;
-            Client.ResponseReceived += OnClientResponseReceived;
+            OnSetupScript(ScriptService);
 
             EventAggregator.GetEvent<SetupScriptEvent>().Subscribe(OnSetupScript);
             EventAggregator.GetEvent<TeardownScriptEvent>().Subscribe(OnTeardownScript);
         }
 
-        public bool IsConnected => Client.IsConnected;
-
         public TerminalDeviceCollection Devices
             => new TerminalDeviceCollection(ServiceLocator.Current.GetAllInstances<ITerminalDevice>());
 
-        public void Connect(IPEndPoint endPoint)
+        public void Connect(IPEndPoint endPoint, bool isClient, bool keepAlive, bool isSecure)
         {
-            Client.ConnectAsync(endPoint);
-
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
-                {
-                    Type = ConnectionEventType.Connecting,
-                    EndPoint = endPoint
-                });
+            if (isClient)
+            {
+                ConnectionManager.ConnectAsync(endPoint, isSecure, keepAlive);
+                EventAggregator.GetEvent<ConnectingEvent>().Publish(endPoint);
+            }
+            else
+            {
+                ConnectionManager.StartAsync(endPoint, isSecure);
+                EventAggregator.GetEvent<ListeningEvent>().Publish(endPoint);
+            }
         }
 
         public void Disconnect(IPEndPoint endPoint)
         {
-            Client.Disconnect();
-
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
+            lock (_connectionLocker)
             {
-                Type = ConnectionEventType.Disconnecting,
-                EndPoint = endPoint
-            });
+                if (Connection == null)
+                    throw new InvalidOperationException("No Connection");
+
+                Connection.Disconnect(); 
+            }
+
+            EventAggregator.GetEvent<DisconnectedEvent>().Publish(endPoint);
         }
 
         public void SendMessage(TerminalMessage message)
         {
-            Client.SendMessage(message);
+            lock (_connectionLocker)
+            {
+                if (Connection == null)
+                    throw new InvalidOperationException("No Connection");
+
+                Connection.SendMessage(message); 
+            }
         }
 
         public void RegisterDevice(ITerminalDevice device)
@@ -83,67 +88,56 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
             return device;
         }
 
-        private void OnClientResponseReceived(object sender, TerminalMessage message)
+        private void OnResponseReceived(object sender, TerminalMessage message)
         {
             EventAggregator.GetEvent<ResponseReceivedEvent>().Publish(message);
         }
 
-        private void OnClientPulse(object sender, PulseEventArgs args)
+        private void OnPulse(object sender, IPEndPoint endPoint)
         {
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
-            {
-                Type = ConnectionEventType.Pulse,
-                EndPoint = args.EndPoint,
-                Pulse = args.Pulse
-            });
+            EventAggregator.GetEvent<PulseEvent>().Publish(endPoint);
         }
 
-        private void OnClientEventReceived(object sender, TerminalMessage message)
+        private void OnEventReceived(object sender, TerminalMessage message)
         {
             EventAggregator.GetEvent<EventReceivedEvent>().Publish(message);
         }
 
-        private void OnClientConnected(object sender, IPEndPoint endPoint)
+        private void OnConnected(object sender, IPEndPoint endPoint)
         {
             Configuration.HostAddress = endPoint.Address.ToString();
             Configuration.HostPort = endPoint.Port;
             Configuration.Save();
 
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
-            {
-                Type = ConnectionEventType.Connected,
-                EndPoint = endPoint,
-                Pulse = true
-            });
+            EventAggregator.GetEvent<ConnectedEvent>().Publish(endPoint);
         }
 
-        private void OnClientDisconnected(object sender, IPEndPoint endPoint)
+        private void OnDisconnected(object sender, IPEndPoint endPoint)
         {
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
-            {
-                Type = ConnectionEventType.Disconnected,
-                EndPoint = endPoint,
-                Pulse = false
-            });
+            EventAggregator.GetEvent<DisconnectedEvent>().Publish(endPoint);
         }
 
-        private void OnClientMessageSent(object sender, TerminalMessage message)
+        private void OnMessageSent(object sender, TerminalMessage message)
         {
             EventAggregator.GetEvent<MessageSentEvent>().Publish(message);
         }
 
-        private void OnClientError(object sender, ClientErrorEventArg args)
+        private void OnError(object sender, ConnectionErrorEventArgs args)
         {
             switch (args.ErrorType)
             {
                 case ClientErrorType.ConnectionError:
-                    EventAggregator.GetEvent<ConnectionStatusEvent>().Publish(new ConnectionEventArgs
-                    {
-                        Type = ConnectionEventType.Failed,
-                        EndPoint = args.EndPoint,
-                        Exception = args.Exception,
-                        Pulse = false
-                    });
+                    EventAggregator.GetEvent<ConnectionErrorEvent>().Publish(args.Exception);
+                    Logger.Log(args.Exception.Message, Category.Exception, Priority.High);
+                    break;
+
+                case ClientErrorType.DataSendError:
+                    EventAggregator.GetEvent<DataSendErrorEvent>().Publish(args.Exception);
+                    Logger.Log(args.Exception.Message, Category.Exception, Priority.High);
+                    break;
+
+                case ClientErrorType.DataReceiveError:
+                    EventAggregator.GetEvent<DataReceiveErrorEvent>().Publish(args.Exception);
                     Logger.Log(args.Exception.Message, Category.Exception, Priority.High);
                     break;
 
@@ -153,11 +147,13 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
             }
         }
 
-        private ITerminalClient Client { get; }
-
         private IConfigurationService Configuration { get; }
 
         private IScriptService ScriptService { get; }
+
+        private ITerminalConnectionManager ConnectionManager { get; }
+
+        private ITerminalConnection Connection { get; set; }
 
         private void OnTeardownScript(IScriptService scriptService)
         {
@@ -170,6 +166,33 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Services
                 device.ClearEventHandlers();
                 scriptService.SetVariable(device.Name, device);
             }
+        }
+
+        private void OnConnectionChanged(object sender, ActiveConnectionChangedArgs e)
+        {
+            if (e.OldConnection != null)
+            {
+                e.OldConnection.Connected -= OnConnected;
+                e.OldConnection.Disconnected -= OnDisconnected;
+                e.OldConnection.Error -= OnError;
+                e.OldConnection.MessageSent -= OnMessageSent;
+                e.OldConnection.EventReceived -= OnEventReceived;
+                e.OldConnection.Pulse -= OnPulse;
+                e.OldConnection.ResponseReceived -= OnResponseReceived;
+            }
+
+            if (e.NewConnection != null)
+            {
+                e.NewConnection.Connected += OnConnected;
+                e.NewConnection.Disconnected += OnDisconnected;
+                e.NewConnection.Error += OnError;
+                e.NewConnection.MessageSent += OnMessageSent;
+                e.NewConnection.EventReceived += OnEventReceived;
+                e.NewConnection.Pulse += OnPulse;
+                e.NewConnection.ResponseReceived += OnResponseReceived;
+            }
+
+            lock (_connectionLocker) Connection = e.NewConnection;
         }
     }
 }

@@ -235,6 +235,34 @@
   <ItemGroup>
     <Resource Include="Images\Lightning_24x24.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\play_green_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\stop_red_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\in_folder_16x16.png" />
+    <Resource Include="Images\out_folder_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\save_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\saveall_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\saveas_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\dropdownarrow_16x16.png" />
+    <Resource Include="Images\listdelete_16x16.png" />
+    <Resource Include="Images\listdelete_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\play_gray_16x16.png" />
+    <Resource Include="Images\stop_gray_16x16.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\XamlSpy.3.0.4\build\XamlSpy.targets" Condition="Exists('..\packages\XamlSpy.3.0.4\build\XamlSpy.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

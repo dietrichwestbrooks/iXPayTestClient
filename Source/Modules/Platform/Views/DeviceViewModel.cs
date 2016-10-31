@@ -33,17 +33,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
                     _members.AddRange(new ObservableCollection<IDeviceMemberViewModel>(
                         Object.Methods.Select(m => new DeviceMethodViewModel(m))));
 
-                    Object.Methods.MethodAdded += (sender, m) => _members.Add(new DeviceMethodViewModel(m));
-
                     _members.AddRange(new ObservableCollection<DevicePropertyViewModel>(
                         Object.Properties.Select(p => new DevicePropertyViewModel(p))));
 
-                    Object.Properties.PropertyAdded += (sender, p) => _members.Add(new DevicePropertyViewModel(p));
-
                     _members.AddRange(new ObservableCollection<DeviceEventViewModel>(
                         Object.Events.Select(p => new DeviceEventViewModel(p))));
-
-                    Object.Properties.PropertyAdded += (sender, p) => _members.Add(new DevicePropertyViewModel(p));
                 }
 
                 return new ObservableCollection<IDeviceMemberViewModel>(_members.OrderBy(c => c.Title));

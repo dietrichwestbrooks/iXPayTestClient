@@ -1,4 +1,6 @@
-﻿using Prism.Events;
+﻿using System;
+using System.Net;
+using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -49,11 +51,39 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events
     {
     }
 
-    public class ConnectionStatusEvent : PubSubEvent<ConnectionEventArgs>
+    public class ConnectingEvent : PubSubEvent<IPEndPoint>
     {
     }
 
-    public class OutputTextEvent : PubSubEvent<OutputTextEventArgs>
+    public class ListeningEvent : PubSubEvent<IPEndPoint>
+    {
+    }
+
+    public class ConnectedEvent : PubSubEvent<IPEndPoint>
+    {
+    }
+
+    public class PulseEvent : PubSubEvent<IPEndPoint>
+    {
+    }
+
+    public class DisconnectedEvent : PubSubEvent<IPEndPoint>
+    {
+    }
+
+    public class ConnectionErrorEvent : PubSubEvent<Exception>
+    {
+    }
+
+    public class DataSendErrorEvent : PubSubEvent<Exception>
+    {
+    }
+
+    public class DataReceiveErrorEvent : PubSubEvent<Exception>
+    {
+    }
+
+    public class ScriptOutputTextEvent : PubSubEvent<string>
     {
     }
 
@@ -70,6 +100,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events
     }
 
     public class PreviewRunCommandsEvent : PubSubEvent
+    {
+    }
+
+    public class ShutdownEvent : PubSubEvent
     {
     }
 }

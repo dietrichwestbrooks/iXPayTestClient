@@ -48,11 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientErrorEventArg.cs" />
+    <Compile Include="ActiveConnectionChangedArgs.cs" />
+    <Compile Include="ConnectionErrorEventArgs.cs" />
     <Compile Include="CommandParameters.cs" />
+    <Compile Include="TerminalRequestHandlerByName.cs" />
+    <Compile Include="TerminalConnectionLocker.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions\TerminalMessageExtensions.cs" />
     <Compile Include="ITerminalClient.cs" />
+    <Compile Include="ITerminalConnection.cs" />
+    <Compile Include="ITerminalConnectionManager.cs" />
     <Compile Include="ITerminalDeviceCommand.cs" />
     <Compile Include="ITerminalDeviceEvent.cs" />
     <Compile Include="ITerminalDeviceMember.cs" />
@@ -61,15 +66,17 @@
     <Compile Include="ITerminalDeviceEventHandlerResolver.cs" />
     <Compile Include="ITerminalMessageSerializer.cs" />
     <Compile Include="INamedObject.cs" />
+    <Compile Include="ITerminalServer.cs" />
+    <Compile Include="TerminalClient.cs" />
+    <Compile Include="TerminalConnectionManager.cs" />
     <Compile Include="TerminalDeviceEvent.cs" />
     <Compile Include="CastEventHandlerResolver.cs" />
     <Compile Include="TerminalDeviceMethod.cs" />
     <Compile Include="ProducerConsumerQueue.cs" />
+    <Compile Include="MimicDepProp.cs" />
     <Compile Include="TerminalDeviceProperty.cs" />
-    <Compile Include="PulseEventArgs.cs" />
     <Compile Include="MessageBrokerTask.cs" />
-    <Compile Include="TerminalClient.cs" />
-    <Compile Include="TerminalCommandsEx.cs" />
+    <Compile Include="TerminalConnection.cs" />
     <Compile Include="TerminalDevice.cs" />
     <Compile Include="TerminalDeviceCollection.cs" />
     <Compile Include="TerminalDeviceCommand.cs" />
@@ -84,6 +91,7 @@
     <Compile Include="TerminalDeviceEventCollection.cs" />
     <Compile Include="TerminalMessageSerializer.cs" />
     <Compile Include="TerminalObjectCollection.cs" />
+    <Compile Include="TerminalServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

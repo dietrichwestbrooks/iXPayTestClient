@@ -64,7 +64,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Services
                     FileName = (string.IsNullOrWhiteSpace(filePath) ? string.Empty : Path.GetFileName(filePath))
                 };
 
-            saveFileDialog.ShowDialog();
+            var returnVal = saveFileDialog.ShowDialog();
+
+            if (!returnVal.HasValue || !returnVal.Value)
+                return null;
 
             return saveFileDialog.FileName;
         }

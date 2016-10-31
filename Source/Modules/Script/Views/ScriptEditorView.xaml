@@ -7,6 +7,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay"
              xmlns:prism="http://www.codeplex.com/prism"
+             xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     
@@ -18,10 +19,30 @@
         <ToolBarTray Grid.Column="0" Orientation="Vertical">
             <ToolBar>
                 <Button Command="{Binding ExecuteCommand}"
+                    CommandParameter="{Binding ElementName=CodeTextEditor, Path=Document.Text}"
                     Padding="5"
                     Height="20"
                     Margin="0,0,0,5"
+                        ToolTip="Execute">
+                    <Image>
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Setter Property="Source" Value="{StaticResource playIconImageSource}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=IsEnabled}" Value="False">
+                                        <Setter Property="Source" Value="{StaticResource playDisableIconImageSource}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </Button>
+                <!--<Button Command="{Binding ExecuteCommand}"
                     CommandParameter="{Binding ElementName=CodeTextEditor, Path=Document.Text}"
+                    Padding="5"
+                    Height="20"
+                    Margin="0,0,0,5"
+                        ToolTip="Execute"
                     Foreground="SeaGreen">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Width="12" Height="12"
@@ -32,11 +53,21 @@
                             </Rectangle.OpacityMask>
                         </Rectangle>
                     </StackPanel>
-                </Button>
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Foreground" Value="#999" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>-->
                 <Button Command="{Binding CancelCommand}"
                     Padding="5"
                     Height="20"
                     Margin="0,0,0,5"
+                        ToolTip="Cancel"
                     Foreground="Firebrick">
                     <Rectangle Width="12" Height="12"
                        Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
@@ -46,10 +77,11 @@
                         </Rectangle.OpacityMask>
                     </Rectangle>
                 </Button>
-                <Button Command="{Binding NewFileCommand}"
+                <Button Command="{Binding NewCommand}"
                     Padding="5"
                     Height="20"
                     Margin="0,0,0,5"
+                        ToolTip="New"
                     Foreground="#fff">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Width="12" Height="12"
@@ -61,10 +93,11 @@
                         </Rectangle>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding OpenFileCommand}"
+                <Button Command="{Binding OpenCommand}"
                     Padding="5"
                     Height="20"
                     Margin="0,0,0,5"
+                        ToolTip="Open"
                     Foreground="#fff">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Width="16" Height="12"
@@ -76,10 +109,11 @@
                         </Rectangle>
                     </StackPanel>
                 </Button>
-                <Button Command="{Binding SaveFileCommand}"
+                <Button Command="{Binding SaveCommand}"
                     Padding="5"
                     Height="20"
                     Margin="0,0,0,5"
+                        ToolTip="Save"
                     Foreground="#fff">
                     <StackPanel Orientation="Horizontal">
                         <Rectangle Width="12" Height="12"
@@ -87,6 +121,22 @@
                             <Rectangle.OpacityMask>
                                 <VisualBrush Stretch="Fill"
                                  Visual="{StaticResource appbar_save}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding SaveAsCommand}"
+                    Padding="5"
+                    Height="20"
+                    Margin="0,0,0,5"
+                        ToolTip="Save As"
+                    Foreground="#fff">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="14" Height="14"
+                       Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill"
+                                 Visual="{StaticResource appbar_disk_download}" />
                             </Rectangle.OpacityMask>
                         </Rectangle>
                     </StackPanel>
@@ -110,6 +160,18 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource AccentSelectedColorBrush}" />
+                        </Trigger>
+                        <!--<Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource AccentSelectedColorBrush}" />
+                        </Trigger>-->
+                    </Style.Triggers>
+                </Style>
+
+                <Style x:Key="TabOverflowButtonStyle" TargetType="{x:Type metro:DropDownButton}">
+                    <Setter Property="Foreground" Value="{StaticResource AccentColorBrush}" />
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{StaticResource AccentSelectedColorBrush}" />
@@ -148,6 +210,7 @@
                                                         <ColumnDefinition Width="25"/>
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="25"/>
+                                                        <ColumnDefinition Width="auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="Auto"/>
@@ -177,6 +240,22 @@
                                                             </Rectangle.OpacityMask>
                                                         </Rectangle>
                                                     </RepeatButton>
+                                                    <metro:DropDownButton Grid.Column="3" Margin="20,5,0,0" Style="{StaticResource TabOverflowButtonStyle}">
+                                                        <metro:DropDownButton.Template>
+                                                            <ControlTemplate>
+                                                                <Rectangle Width="6" Height="8"
+                                                                   Fill="{Binding RelativeSource={RelativeSource AncestorType=metro:DropDownButton}, Path=Foreground}">
+                                                                    <Rectangle.RenderTransform>
+                                                                        <RotateTransform CenterX="0" CenterY="0" Angle="90" />
+                                                                    </Rectangle.RenderTransform>
+                                                                    <Rectangle.OpacityMask>
+                                                                        <VisualBrush Stretch="Fill"
+                                                                             Visual="{StaticResource appbar_control_play}" />
+                                                                    </Rectangle.OpacityMask>
+                                                                </Rectangle>
+                                                            </ControlTemplate>
+                                                        </metro:DropDownButton.Template>
+                                                    </metro:DropDownButton>
                                                 </Grid>
                                             </ControlTemplate>
                                         </Setter.Value>

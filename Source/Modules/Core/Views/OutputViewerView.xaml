@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views.OutputViewerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views"
+             xmlns:prism="http://www.codeplex.com/prism"
+             xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:ixpay="http://schemas.wayne.com/xaml/ixpay"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0">
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar>
+                    <ComboBox Margin="5,0,0,0" 
+                             ItemsSource="{Binding Views}" 
+                             DisplayMemberPath="DataContext.Title"
+                             SelectedItem="{Binding ActiveView}"
+                             HorizontalAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             VerticalContentAlignment="Center"
+                             VerticalAlignment="Center"
+                              IsSynchronizedWithCurrentItem="True" />
+                </ToolBar>
+            </ToolBarTray>
+        </Border>
+        <Border Grid.Row="1">
+            <metro:TransitioningContentControl Transition="LeftReplace" prism:RegionManager.RegionName="{x:Static ixpay:RegionNames.OutputRegion}" />
+        </Border>
+    </Grid>
+</UserControl>

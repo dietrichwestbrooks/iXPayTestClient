@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Practices.ServiceLocation;
-using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
@@ -15,185 +11,218 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public MagStripeReader()
             : base("MagStripeReader")
         {
-            IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
-            eventAggregator.GetEvent<ModulesInitializedEvent>().Subscribe(OnModulesInitialized);
-
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new MagStripeReaderStatusProperty(this),
-                    new MagStripeReaderOpenedProperty(this),
-                    new MagStripeReaderCardPositionProperty(this),
-                    new MagStripeReaderTypeProperty(this),
+                    new StatusProperty(this),
+                    new OpenedProperty(this),
+                    new CardPositionProperty(this),
+                    new TypeProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new MagStripeReaderOpenMethod(this),
-                    new MagStripeReaderCloseMethod(this),
+                    new OpenMethod(this),
+                    new CloseMethod(this),
+                    new TurnLightOnMethod(this),
+                    new FlashLightMethod(this),
+                    new TurnLightOffMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new MagStripeReaderOpenChangedEvent(this),
-                    new MagStripeReaderStatusChangedEvent(this),
-                    new MagStripeReaderCardPositionChangedEvent(this),
-                    new MagStripeReaderDataReadEvent(this),
-                    new MagStripeReaderInvalidDataReadEvent(this),
-                    new MagStripeReaderTimedOutEvent(this),
+                    new OpenChangedEvent(this),
+                    new StatusChangedEvent(this),
+                    new CardPositionChangedEvent(this),
+                    new DataReadEvent(this),
+                    new InvalidDataReadEvent(this),
+                    new TimedOutEvent(this),
                 });
         }
 
-        public void OnModulesInitialized()
+        #region Device Properties
+
+        [ValueProperty("State")]
+        public class StatusProperty : TerminalDeviceProperty<Status,
+            GetStatusCommand, GetStatusResponse>
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
-            Successor = terminal.Devices["Terminal"];
+            public StatusProperty(ITerminalDevice device)
+                : base(device, "Status")
+            {
+                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    #region Properties
-
-    [ValueProperty("State")]
-    public class MagStripeReaderStatusProperty : TerminalDeviceProperty<Status,
-        GetStatusCommand, GetStatusResponse>
-    {
-        public MagStripeReaderStatusProperty(ITerminalDevice device)
-            : base(device, "Status")
+        [ValueProperty("Open")]
+        public class OpenedProperty : TerminalDeviceProperty<bool,
+            GetOpenedCommand, GetOpenedResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public OpenedProperty(ITerminalDevice device)
+                : base(device, "Opened")
+            {
+                GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("Open")]
-    public class MagStripeReaderOpenedProperty : TerminalDeviceProperty<bool,
-        GetOpenedCommand, GetOpenedResponse>
-    {
-        public MagStripeReaderOpenedProperty(ITerminalDevice device)
-            : base(device, "Opened")
+        [ValueProperty("CardPosition")]
+        public class CardPositionProperty : TerminalDeviceProperty<CardPosition,
+            GetCardPositionCommand, GetCardPositionResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public CardPositionProperty(ITerminalDevice device)
+                : base(device, "CardPosition")
+            {
+                GetCommand = new TerminalDeviceCommand<GetCardPositionCommand, GetCardPositionResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("CardPosition")]
-    public class MagStripeReaderCardPositionProperty : TerminalDeviceProperty<CardPosition,
-        GetCardPositionCommand, GetCardPositionResponse>
-    {
-        public MagStripeReaderCardPositionProperty(ITerminalDevice device)
-            : base(device, "CardPosition")
+        [ValueProperty("ReaderType")]
+        public class TypeProperty : TerminalDeviceProperty<CardReader,
+            GetReaderTypeCommand, GetReaderTypeResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetCardPositionCommand, GetCardPositionResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public TypeProperty(ITerminalDevice device)
+                : base(device, "ReaderType")
+            {
+                GetCommand = new TerminalDeviceCommand<GetReaderTypeCommand, GetReaderTypeResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("ReaderType")]
-    public class MagStripeReaderTypeProperty : TerminalDeviceProperty<CardReader,
-        GetReaderTypeCommand, GetReaderTypeResponse>
-    {
-        public MagStripeReaderTypeProperty(ITerminalDevice device)
-            : base(device, "ReaderType")
+        #endregion
+
+        #region Device Methods
+
+        public class OpenMethod :
+        TerminalDeviceMethod<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetReaderTypeCommand, GetReaderTypeResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public OpenMethod(ITerminalDevice device)
+                : base(device, "Open")
+            {
+                InvokeCommand = new TerminalDeviceCommand<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>(
+                    this,
+                    Name,
+                    () => new OpenMagStripeReaderCommand
+                        {
+                            Timeout = 30,
+                            TimeoutSpecified = true,
+                        }
+                    );
+            }
         }
-    }
 
-    #endregion
-
-    #region Methods
-
-    public class MagStripeReaderOpenMethod :
-    TerminalDeviceMethod<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>
-    {
-        public MagStripeReaderOpenMethod(ITerminalDevice device)
-            : base(device, "Open")
+        public class CloseMethod :
+            TerminalDeviceMethod<CloseMagStripeReaderCommand, CloseMagStripeReaderResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<OpenMagStripeReaderCommand, OpenMagStripeReaderResponse>(
-                this,
-                Name,
-                () => new OpenMagStripeReaderCommand
-                    {
-                        Timeout = 0,
-                        TimeoutSpecified = false,
-                    }
-                );
+            public CloseMethod(ITerminalDevice device)
+                : base(device, "Close")
+            {
+                InvokeCommand = new TerminalDeviceCommand<CloseMagStripeReaderCommand, CloseMagStripeReaderResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    public class MagStripeReaderCloseMethod :
-        TerminalDeviceMethod<CloseMagStripeReaderCommand, CloseMagStripeReaderResponse>
-    {
-        public MagStripeReaderCloseMethod(ITerminalDevice device)
-            : base(device, "Close")
+        public class TurnLightOnMethod :
+            TerminalDeviceMethod<TurnLightOnCommand, TurnLightOnResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<CloseMagStripeReaderCommand, CloseMagStripeReaderResponse>(
-                this,
-                Name
-                );
+            public TurnLightOnMethod(ITerminalDevice device)
+                : base(device, "TurnLightOn")
+            {
+                InvokeCommand = new TerminalDeviceCommand<TurnLightOnCommand, TurnLightOnResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    #endregion
-
-    #region Events
-
-    public class MagStripeReaderOpenChangedEvent : TerminalDeviceEvent<OpenChanged>
-    {
-        public MagStripeReaderOpenChangedEvent(ITerminalDevice device)
-            : base(device, "OpenChanged")
+        public class FlashLightMethod :
+            TerminalDeviceMethod<FlashLightCommand, FlashLightResponse>
         {
+            public FlashLightMethod(ITerminalDevice device)
+                : base(device, "FlashLight")
+            {
+                InvokeCommand = new TerminalDeviceCommand<FlashLightCommand, FlashLightResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    public class MagStripeReaderStatusChangedEvent : TerminalDeviceEvent<StatusChanged>
-    {
-        public MagStripeReaderStatusChangedEvent(ITerminalDevice device)
-            : base(device, "StatusChanged")
+        public class TurnLightOffMethod :
+            TerminalDeviceMethod<TurnLightOffCommand, TurnLightOffResponse>
         {
+            public TurnLightOffMethod(ITerminalDevice device)
+                : base(device, "TurnLightOff")
+            {
+                InvokeCommand = new TerminalDeviceCommand<TurnLightOffCommand, TurnLightOffResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    public class MagStripeReaderCardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
-    {
-        public MagStripeReaderCardPositionChangedEvent(ITerminalDevice device)
-            : base(device, "CardPositionChanged")
+        #endregion
+
+        #region Device Events
+
+        public class OpenChangedEvent : TerminalDeviceEvent<OpenChanged>
         {
+            public OpenChangedEvent(ITerminalDevice device)
+                : base(device, "OpenChanged")
+            {
+            }
         }
-    }
 
-    public class MagStripeReaderDataReadEvent : TerminalDeviceEvent<MagStripeData>
-    {
-        public MagStripeReaderDataReadEvent(ITerminalDevice device)
-            : base(device, "DataRead")
+        public class StatusChangedEvent : TerminalDeviceEvent<StatusChanged>
         {
+            public StatusChangedEvent(ITerminalDevice device)
+                : base(device, "StatusChanged")
+            {
+            }
         }
-    }
 
-    public class MagStripeReaderInvalidDataReadEvent : TerminalDeviceEvent<MagStripeInvalidData>
-    {
-        public MagStripeReaderInvalidDataReadEvent(ITerminalDevice device)
-            : base(device, "InvalidDataRead")
+        public class CardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
         {
+            public CardPositionChangedEvent(ITerminalDevice device)
+                : base(device, "CardPositionChanged")
+            {
+            }
         }
-    }
 
-    public class MagStripeReaderTimedOutEvent : TerminalDeviceEvent<MagStripeReaderTimedOut>
-    {
-        public MagStripeReaderTimedOutEvent(ITerminalDevice device)
-            : base(device, "TimedOut")
+        public class DataReadEvent : TerminalDeviceEvent<MagStripeData>
         {
+            public DataReadEvent(ITerminalDevice device)
+                : base(device, "DataRead")
+            {
+            }
         }
-    }
 
-    #endregion
+        public class InvalidDataReadEvent : TerminalDeviceEvent<MagStripeInvalidData>
+        {
+            public InvalidDataReadEvent(ITerminalDevice device)
+                : base(device, "InvalidDataRead")
+            {
+            }
+        }
+
+        public class TimedOutEvent : TerminalDeviceEvent<MagStripeReaderTimedOut>
+        {
+            public TimedOutEvent(ITerminalDevice device)
+                : base(device, "TimedOut")
+            {
+            }
+        }
+
+        #endregion
+    }
 }

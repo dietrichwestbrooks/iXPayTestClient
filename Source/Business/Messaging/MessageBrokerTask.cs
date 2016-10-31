@@ -7,25 +7,23 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public class MessageBrokerTask
+    internal class MessageBrokerTask
     {
-        private readonly TerminalMessage _message;
-        private ITerminalClient _terminalClient;
         private ManualResetEventSlim _responseReceived = new ManualResetEventSlim(false);
         private int _sequenceNumber;
-        private Exception _exception;
         private object _response;
 
         public MessageBrokerTask(TerminalMessage message, CancellationToken cancelToken = default(CancellationToken))
         {
-            _message = message;
+            var connectionManager = ServiceLocator.Current.GetInstance<ITerminalConnectionManager>();
+            var connection = connectionManager.Connection;
 
-            _terminalClient = ServiceLocator.Current.GetInstance<ITerminalClient>();
+            if (connection == null)
+                throw new InvalidOperationException("No connection");
 
-            _terminalClient.Error += OnError;
-            _terminalClient.ResponseReceived += OnReceived;
+            connection.ResponseReceived += OnReceived;
 
-            Task = System.Threading.Tasks.Task.Run(() => SendAndWait(), cancelToken);
+            Task = System.Threading.Tasks.Task.Run(() => Send(connection, message), cancelToken);
         }
 
         public Task<object> Task { get; }
@@ -35,29 +33,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             if (message.GetResponseSequenceNumber() != _sequenceNumber)
                 return;
 
-            _exception = null;
             _response = message.GetLastItem();
             _responseReceived.Set();
         }
 
-        private void OnError(object sender, ClientErrorEventArg args)
+        private object Send(ITerminalConnection connection, TerminalMessage message)
         {
-            _exception = args.Exception;
-            _response = null;
-            _responseReceived.Set();
-        }
-
-        private object SendAndWait()
-        {
-            _sequenceNumber = _terminalClient.SendMessage(_message);
+            _sequenceNumber = connection.SendMessage(message);
 
             if (!_responseReceived.Wait(30000))
                 throw new TimeoutException("Timeout waiting for message response");
-
-            if (_exception != null)
-                throw _exception;
-
-            _responseReceived.Reset();
 
             return _response;
         }

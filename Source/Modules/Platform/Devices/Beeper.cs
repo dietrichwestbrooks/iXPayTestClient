@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using Microsoft.Practices.ServiceLocation;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
     [TerminalRequestHandler]
     [TerminalDevice]
-    public class Beeper : TerminalDevice<BeeperCommand, BeeperResponse>, IPartImportsSatisfiedNotification
+    public class Beeper : TerminalDevice<BeeperCommand, BeeperResponse>
     {
         public Beeper() 
             : base("Beeper")
@@ -18,12 +15,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
                 {
                     new BeeperBeepMethod(this),
                 });
-        }
-
-        public void OnImportsSatisfied()
-        {
-            var terminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
-            Successor = terminalService.Devices["Terminal"];
         }
     }
 
@@ -37,10 +28,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
                 Name,
                 () => new BeepCommand
                     {
-                        OnTime = 1000,
+                        OnTime = 50,
                         OnTimeSpecified = true,
                         OffTime = 100,
                         OffTimeSpecified = true,
+                        NumBeeps = 3,
+                        NumBeepsSpecified = true,
                     }
                 );
         }

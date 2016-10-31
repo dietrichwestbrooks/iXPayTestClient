@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Practices.ServiceLocation;
-using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
@@ -15,240 +11,238 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public SecurityModule() 
             : base("SecurityModule")
         {
-            IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
-            eventAggregator.GetEvent<ModulesInitializedEvent>().Subscribe(OnModulesInitialized);
-
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new SecurityModuleHierarchyInUseProperty(this),
-                    new SecurityModuleSupportedKeyHierarchiesProperty(this),
-                    new SecurityModuleSupportedWorkingKeysProperty(this),
-                    new SecurityModuleSerialNumberProperty(this),
-                    new SecurityModuleBankSerialNumberProperty(this),
-                    new SecurityModuleCapabilitiesProperty(this),
+                    new HierarchyInUseProperty(this),
+                    new SupportedKeyHierarchiesProperty(this),
+                    new SupportedWorkingKeysProperty(this),
+                    new SerialNumberProperty(this),
+                    new BankSerialNumberProperty(this),
+                    new CapabilitiesProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
-                    new SecurityModuleSwitchKeyHierarchyMethod(this),
-                    new SecurityModuleCalculateMacMethod(this),
-                    new SecurityModuleVerifyMacMethod(this),
-                    new SecurityModuleEncryptMessageMethod(this),
-                    new SecurityModuleSetWorkingKeyMethod(this),
-                    new SecurityModuleGetWorkingKeyStatisticsMethod(this),
-                    new SecurityModuleIncrementKsnMethod(this),
+                    new SwitchKeyHierarchyMethod(this),
+                    new CalculateMacMethod(this),
+                    new VerifyMacMethod(this),
+                    new EncryptMessageMethod(this),
+                    new SetWorkingKeyMethod(this),
+                    new GetWorkingKeyStatisticsMethod(this),
+                    new IncrementKsnMethod(this),
                 });
         }
 
-        public void OnModulesInitialized()
+        #region Device Properties
+
+        [ValueProperty("Id")]
+        public class HierarchyInUseProperty : TerminalDeviceProperty<int,
+        GetHierarchyInUseCommand, GetHierarchyInUseResponse,
+        SetHierarchyInUseCommand, SetHierarchyInUseResponse>
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
-            Successor = terminal.Devices["Terminal"];
+            public HierarchyInUseProperty(ITerminalDevice device)
+                : base(device, "HierarchyInUse")
+            {
+                GetCommand = new TerminalDeviceCommand<GetHierarchyInUseCommand, GetHierarchyInUseResponse>(
+               this,
+               $"get_{Name}"
+               );
+
+                SetCommand = new TerminalDeviceCommand<SetHierarchyInUseCommand, SetHierarchyInUseResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetHierarchyInUseCommand
+                        {
+                            Id = 1,
+                        }
+                    );
+            }
         }
-    }
 
-    #region Properties
-
-    public class SecurityModuleHierarchyInUseProperty : TerminalDeviceProperty<int,
-    GetHierarchyInUseCommand, GetHierarchyInUseResponse,
-    SetHierarchyInUseCommand, SetHierarchyInUseResponse>
-    {
-        public SecurityModuleHierarchyInUseProperty(ITerminalDevice device)
-            : base(device, "HierarchyInUse")
+        [ValueProperty("SupportedKeyHierarchy")]
+        public class SupportedKeyHierarchiesProperty : TerminalDeviceProperty<SupportedKeyHierarchy[],
+            GetSupportedKeyHierarchiesCommand, GetSupportedKeyHierarchiesResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetHierarchyInUseCommand, GetHierarchyInUseResponse>(
-           this,
-           $"get_{Name}"
-           );
-
-            SetCommand = new TerminalDeviceCommand<SetHierarchyInUseCommand, SetHierarchyInUseResponse>(
-                this,
-                $"set_{Name}",
-                () => new SetHierarchyInUseCommand
-                    {
-                        Id = 1,
-                    }
-                );
+            public SupportedKeyHierarchiesProperty(ITerminalDevice device)
+                : base(device, "SupportedKeyHierarchies")
+            {
+                GetCommand = new TerminalDeviceCommand
+                    <GetSupportedKeyHierarchiesCommand, GetSupportedKeyHierarchiesResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleSupportedKeyHierarchiesProperty : TerminalDeviceProperty<SupportedKeyHierarchy[],
-        GetSupportedKeyHierarchiesCommand, GetSupportedKeyHierarchiesResponse>
-    {
-        public SecurityModuleSupportedKeyHierarchiesProperty(ITerminalDevice device)
-            : base(device, "SupportedKeyHierarchies")
+        [ValueProperty("WorkingKey")]
+        public class SupportedWorkingKeysProperty : TerminalDeviceProperty<WorkingKey[],
+            GetSupportedWorkingKeysCommand, GetSupportedWorkingKeysResponse>
         {
-            GetCommand = new TerminalDeviceCommand
-                <GetSupportedKeyHierarchiesCommand, GetSupportedKeyHierarchiesResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public SupportedWorkingKeysProperty(ITerminalDevice device)
+                : base(device, "SupportedWorkingKeys")
+            {
+                GetCommand = new TerminalDeviceCommand<GetSupportedWorkingKeysCommand, GetSupportedWorkingKeysResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleSupportedWorkingKeysProperty : TerminalDeviceProperty<WorkingKey[],
-        GetSupportedWorkingKeysCommand, GetSupportedWorkingKeysResponse>
-    {
-        public SecurityModuleSupportedWorkingKeysProperty(ITerminalDevice device)
-            : base(device, "SupportedWorkingKeys")
+        [ValueProperty("SerialNumber")]
+        public class SerialNumberProperty : TerminalDeviceProperty<byte[],
+            GetSerialNumberCommand, GetSerialNumberResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetSupportedWorkingKeysCommand, GetSupportedWorkingKeysResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public SerialNumberProperty(ITerminalDevice device)
+                : base(device, "SerialNumber")
+            {
+                GetCommand = new TerminalDeviceCommand<GetSerialNumberCommand, GetSerialNumberResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleSerialNumberProperty : TerminalDeviceProperty<byte[],
-        GetSerialNumberCommand, GetSerialNumberResponse>
-    {
-        public SecurityModuleSerialNumberProperty(ITerminalDevice device)
-            : base(device, "SerialNumber")
+        [ValueProperty("BankSerialNumber")]
+        public class BankSerialNumberProperty : TerminalDeviceProperty<byte[],
+            GetBankSerialNumberCommand, GetBankSerialNumberResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetSerialNumberCommand, GetSerialNumberResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public BankSerialNumberProperty(ITerminalDevice device)
+                : base(device, "BankSerialNumber")
+            {
+                GetCommand = new TerminalDeviceCommand<GetBankSerialNumberCommand, GetBankSerialNumberResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleBankSerialNumberProperty : TerminalDeviceProperty<byte[],
-        GetBankSerialNumberCommand, GetBankSerialNumberResponse>
-    {
-        public SecurityModuleBankSerialNumberProperty(ITerminalDevice device)
-            : base(device, "BankSerialNumber")
+        [ValueProperty("MultipleKeyHierarchies")]
+        public class CapabilitiesProperty : TerminalDeviceProperty<bool,
+            GetSecurityModuleCapabilitiesCommand, GetSecurityModuleCapabilitiesResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetBankSerialNumberCommand, GetBankSerialNumberResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public CapabilitiesProperty(ITerminalDevice device)
+                : base(device, "Capabilities")
+            {
+                GetCommand = new TerminalDeviceCommand
+                    <GetSecurityModuleCapabilitiesCommand, GetSecurityModuleCapabilitiesResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleCapabilitiesProperty : TerminalDeviceProperty<bool,
-        GetSecurityModuleCapabilitiesCommand, GetSecurityModuleCapabilitiesResponse>
-    {
-        public SecurityModuleCapabilitiesProperty(ITerminalDevice device)
-            : base(device, "Capabilities")
+        #endregion
+
+        #region Device Methods
+
+        public class SwitchKeyHierarchyMethod : TerminalDeviceMethod<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>
         {
-            GetCommand = new TerminalDeviceCommand
-                <GetSecurityModuleCapabilitiesCommand, GetSecurityModuleCapabilitiesResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public SwitchKeyHierarchyMethod(ITerminalDevice device)
+                : base(device, "SwitchKeyHierarchy")
+            {
+                InvokeCommand = new TerminalDeviceCommand<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    #endregion
-
-    #region Methods
-
-    public class SecurityModuleSwitchKeyHierarchyMethod : TerminalDeviceMethod<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>
-    {
-        public SecurityModuleSwitchKeyHierarchyMethod(ITerminalDevice device)
-            : base(device, "SwitchKeyHierarchy")
+        public class CalculateMacMethod : TerminalDeviceMethod<CalculateMACCommand, CalculateMACResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<SwitchKeyHierarchyCommand, SwitchKeyHierarchyResponse>(
-                this,
-                Name
-                );
+            public CalculateMacMethod(ITerminalDevice device)
+                : base(device, "CalculateMac")
+            {
+                InvokeCommand = new TerminalDeviceCommand<CalculateMACCommand, CalculateMACResponse>(
+                    this,
+                    Name,
+                    () => new CalculateMACCommand
+                        {
+                            Value = new byte[] {0x45, 0x4C, 0x67, 0x75, 0x56, 0x63, 0x87, 0x3A},
+                        }
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleCalculateMacMethod : TerminalDeviceMethod<CalculateMACCommand, CalculateMACResponse>
-    {
-        public SecurityModuleCalculateMacMethod(ITerminalDevice device)
-            : base(device, "CalculateMac")
+        public class VerifyMacMethod : TerminalDeviceMethod<VerifyMACCommand, VerifyMACResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<CalculateMACCommand, CalculateMACResponse>(
-                this,
-                Name,
-                () => new CalculateMACCommand
-                    {
-                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
-                    }
-                );
+            public VerifyMacMethod(ITerminalDevice device)
+                : base(device, "VerifyMac")
+            {
+                InvokeCommand = new TerminalDeviceCommand<VerifyMACCommand, VerifyMACResponse>(
+                    this,
+                    Name,
+                    () => new VerifyMACCommand
+                        {
+                            Value = new byte[] {0x45, 0x4C, 0x67, 0x75, 0x56, 0x63, 0x87, 0x3A},
+                            MACValue = new byte[] {0x34, 0x42, 0x68, 0x31},
+                            KSN = new byte[] {0x00, 0x00, 0x00, 0x00, 0x01},
+                        }
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleVerifyMacMethod : TerminalDeviceMethod<VerifyMACCommand, VerifyMACResponse>
-    {
-        public SecurityModuleVerifyMacMethod(ITerminalDevice device)
-            : base(device, "VerifyMac")
+        public class EncryptMessageMethod : TerminalDeviceMethod<EncryptMessageCommand, EncryptMessageResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<VerifyMACCommand, VerifyMACResponse>(
-                this,
-                Name,
-                () => new VerifyMACCommand
-                    {
-                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
-                        MACValue = ConvertHelper.ToHexByteArray("34426831"),
-                        KSN = ConvertHelper.ToHexByteArray("0000000001"),
-                    }
-                );
+            public EncryptMessageMethod(ITerminalDevice device)
+                : base(device, "EncryptMessage")
+            {
+                InvokeCommand = new TerminalDeviceCommand<EncryptMessageCommand, EncryptMessageResponse>(
+                    this,
+                    Name,
+                    () => new EncryptMessageCommand
+                        {
+                            Value = new byte[] {0x45, 0x4C, 0x67, 0x75, 0x56, 0x63, 0x87, 0x3A},
+                        }
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleEncryptMessageMethod : TerminalDeviceMethod<EncryptMessageCommand, EncryptMessageResponse>
-    {
-        public SecurityModuleEncryptMessageMethod(ITerminalDevice device)
-            : base(device, "EncryptMessage")
+        public class SetWorkingKeyMethod : TerminalDeviceMethod<SetWorkingKeyCommand, SetWorkingKeyResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<EncryptMessageCommand, EncryptMessageResponse>(
-                this,
-                Name,
-                () => new EncryptMessageCommand
-                    {
-                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
-                    }
-                );
+            public SetWorkingKeyMethod(ITerminalDevice device)
+                : base(device, "SetWorkingKey")
+            {
+                InvokeCommand = new TerminalDeviceCommand<SetWorkingKeyCommand, SetWorkingKeyResponse>(
+                    this,
+                    Name,
+                    () => new SetWorkingKeyCommand
+                        {
+                            Value = new byte[] {0x45, 0x4C, 0x67, 0x75, 0x56, 0x63, 0x87, 0x3A},
+                            KeyType = WorkingKeyType.PIN,
+                        }
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleSetWorkingKeyMethod : TerminalDeviceMethod<SetWorkingKeyCommand, SetWorkingKeyResponse>
-    {
-        public SecurityModuleSetWorkingKeyMethod(ITerminalDevice device)
-            : base(device, "SetWorkingKey")
+        public class GetWorkingKeyStatisticsMethod : TerminalDeviceMethod<GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<SetWorkingKeyCommand, SetWorkingKeyResponse>(
-                this,
-                Name,
-                () => new SetWorkingKeyCommand
-                    {
-                        Value = ConvertHelper.ToHexByteArray("454C67755663873A"),
-                        KeyType = WorkingKeyType.PIN,
-                    }
-                );
+            public GetWorkingKeyStatisticsMethod(ITerminalDevice device)
+                : base(device, "GetWorkingKeyStatistics")
+            {
+                InvokeCommand = new TerminalDeviceCommand
+                    <GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>(
+                    this,
+                    Name,
+                    () => new GetWorkingKeyStatisticsCommand
+                        {
+                            KeyType = WorkingKeyType.PIN,
+                        }
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleGetWorkingKeyStatisticsMethod : TerminalDeviceMethod<GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>
-    {
-        public SecurityModuleGetWorkingKeyStatisticsMethod(ITerminalDevice device)
-            : base(device, "GetWorkingKeyStatistics")
+        public class IncrementKsnMethod : TerminalDeviceMethod<IncrementKSNCommand, IncrementKSNResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<GetWorkingKeyStatisticsCommand, GetWorkingKeyStatisticsResponse>(
-                this,
-                Name,
-                () => new GetWorkingKeyStatisticsCommand
-                    {
-                        KeyType = WorkingKeyType.PIN,
-                    }
-                );
+            public IncrementKsnMethod(ITerminalDevice device)
+                : base(device, "IncrementKsn")
+            {
+                InvokeCommand = new TerminalDeviceCommand<IncrementKSNCommand, IncrementKSNResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    public class SecurityModuleIncrementKsnMethod : TerminalDeviceMethod<IncrementKSNCommand, IncrementKSNResponse>
-    {
-        public SecurityModuleIncrementKsnMethod(ITerminalDevice device)
-            : base(device, "IncrementKsn")
-        {
-            InvokeCommand = new TerminalDeviceCommand<IncrementKSNCommand, IncrementKSNResponse>(
-                this,
-                Name
-                );
-        }
+        #endregion
     }
-
-    #endregion
 }

@@ -93,6 +93,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MahApps.Metro.1.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -133,6 +134,8 @@
     <Compile Include="Views\IScriptEditorView.cs" />
     <Compile Include="Views\IScriptEditorViewModel.cs" />
     <Compile Include="Services\ScriptOuputWriter.cs" />
+    <Compile Include="Views\IScriptOutputView.cs" />
+    <Compile Include="Views\IScriptOutputViewModel.cs" />
     <Compile Include="Views\ScriptFileView.xaml.cs">
       <DependentUpon>ScriptFileView.xaml</DependentUpon>
     </Compile>
@@ -141,6 +144,10 @@
       <DependentUpon>ScriptEditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ScriptEditorViewModel.cs" />
+    <Compile Include="Views\ScriptOutputView.xaml.cs">
+      <DependentUpon>ScriptOutputView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScriptOutputViewModel.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -175,6 +182,10 @@
     <Page Include="Views\ScriptEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ScriptOutputView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup />

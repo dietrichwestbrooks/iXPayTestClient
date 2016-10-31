@@ -19,9 +19,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events
         Failed,
         Disconnected,
         Connecting,
+        Listening,
         Connected,
         Pulse,
-        Disconnecting
+        Disconnecting,
     }
 
 }

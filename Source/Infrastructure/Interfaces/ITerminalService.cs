@@ -7,11 +7,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces
     public interface ITerminalService
     {
         TerminalDeviceCollection Devices { get; }
-        bool IsConnected { get; }
         void RegisterDevice(ITerminalDevice device);
         ITerminalDevice RegisterDeviceFromFile(string path);
-        void Connect(IPEndPoint endPoint);
         void Disconnect(IPEndPoint endPoint);
         void SendMessage(TerminalMessage message);
+        void Connect(IPEndPoint endPoint, bool isClient, bool autoReConnect, bool isSecure);
     }
 }

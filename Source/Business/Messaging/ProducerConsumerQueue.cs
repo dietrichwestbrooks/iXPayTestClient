@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public class ProducerConsumerQueue : IDisposable
+    internal class ProducerConsumerQueue : IDisposable
     {
         private bool _disposed;
         private BlockingCollection<Task> _messageQueue = new BlockingCollection<Task>();

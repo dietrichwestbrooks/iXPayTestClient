@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Net;
 using System.Windows.Input;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Commands;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
@@ -15,26 +17,33 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
     public class ConnectViewModel : ViewModelBase, IConnectViewModel
     {
         private string _title = "Connection";
-        private string _hostAddress;
-        private int _hostPort;
+        private string _serverAddress;
+        private int _serverPort;
         private bool _isConnecting;
         private bool _isConnected;
         private IPEndPoint _ipEndPoint;
-        private bool _autoReConnect;
+        private bool _autoReconnect;
+        private bool _isClient;
+        private bool _isSecure;
 
         public ConnectViewModel()
         {
-            Terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
+            TerminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
             Configuration = ServiceLocator.Current.GetInstance<IConfigurationService>();
 
-            HostAddress = Configuration.HostAddress;
-            HostPort = Configuration.HostPort;
-            AutoReConnect = true;
+            ServerAddress = Configuration.HostAddress;
+            ServerPort = Configuration.HostPort;
+            AutoReconnect = true;
+            IsSecure = false;
+            IsClient = true;
 
             ConnectCommand = new DelegateCommand<IPEndPoint>(OnConnect, CanConnect);
             DisconnectCommand = new DelegateCommand<IPEndPoint>(OnDisconnect, CanDisconnect);
 
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Subscribe(OnConnectionStatus);
+            EventAggregator.GetEvent<ConnectingEvent>().Subscribe(OnConnecting);
+            EventAggregator.GetEvent<ConnectedEvent>().Subscribe(OnConnected);
+            EventAggregator.GetEvent<ConnectionErrorEvent>().Subscribe(OnConnectionError);
+            EventAggregator.GetEvent<DisconnectedEvent>().Subscribe(OnDisconnected);
         }
 
         public ICommand ConnectCommand { get; private set; }
@@ -47,22 +56,34 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
             set { SetProperty(ref _title, value); }
         }
 
-        public string HostAddress
+        public string ServerAddress
         {
-            get { return _hostAddress; }
-            set { SetProperty(ref _hostAddress, value); }
+            get { return _serverAddress; }
+            set { SetProperty(ref _serverAddress, value); }
         }
 
-        public int HostPort
+        public int ServerPort
         {
-            get { return _hostPort; }
-            set { SetProperty(ref _hostPort, value); }
+            get { return _serverPort; }
+            set { SetProperty(ref _serverPort, value); }
         }
 
-        public bool AutoReConnect
+        public bool AutoReconnect
         {
-            get { return _autoReConnect; }
-            set { SetProperty(ref _autoReConnect, value); }
+            get { return _autoReconnect; }
+            set { SetProperty(ref _autoReconnect, value); }
+        }
+
+        public bool IsSecure
+        {
+            get { return _isSecure; }
+            set { SetProperty(ref _isSecure, value); }
+        }
+
+        public bool IsClient
+        {
+            get { return _isClient; }
+            set { SetProperty(ref _isClient, value); }
         }
 
         public bool IsConnecting
@@ -85,7 +106,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         private IConfigurationService Configuration { get; }
 
-        private ITerminalService Terminal { get; }
+        private ITerminalService TerminalService { get; }
 
         private bool CanConnect(IPEndPoint endPoint)
         {
@@ -97,7 +118,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
         {
             ApplicationCommands.ShowFlyoutCommand.Execute(FlyoutNames.ConnectFlyout);
 
-            Terminal.Connect(endPoint);
+            TerminalService.Connect(endPoint, IsClient, AutoReconnect, IsSecure);
         }
 
         private bool CanDisconnect(IPEndPoint arg)
@@ -107,34 +128,40 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         private void OnDisconnect(IPEndPoint endPoint)
         {
-            Terminal.Disconnect(endPoint);
+            TerminalService.Disconnect(endPoint);
         }
 
-        private void OnConnectionStatus(ConnectionEventArgs args)
+        private void OnConnecting(IPEndPoint endPoint)
         {
-            switch (args.Type)
+            EndPoint = endPoint;
+            IsConnecting = true;
+        }
+
+        private void OnConnected(IPEndPoint endPoint)
+        {
+            EndPoint = endPoint;
+            IsConnecting = false;
+            IsConnected = true;
+        }
+
+        private void OnConnectionError(Exception exception)
+        {
+            IsConnected = false;
+            IsConnecting = false;
+
+            ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter
             {
-                case ConnectionEventType.Connecting:
-                    EndPoint = args.EndPoint;
-                    IsConnecting = true;
-                    break;
+                Title = "Connection Failed",
+                Type = NotificationType.Failed,
+                Message = exception?.Message
+            });
+        }
 
-                case ConnectionEventType.Connected:
-                    EndPoint = args.EndPoint;
-                    IsConnecting = false;
-                    IsConnected = true;
-                    break;
-
-                case ConnectionEventType.Disconnected:
-                    EndPoint = args.EndPoint;
-                    IsConnecting = false;
-                    IsConnected = false;
-                    break;
-
-                default:
-                    IsConnecting = false;
-                    break;
-            }
+        private void OnDisconnected(IPEndPoint endPoint)
+        {
+            IsConnected = false;
+            IsConnecting = false;
+            EndPoint = null;
         }
     }
 }

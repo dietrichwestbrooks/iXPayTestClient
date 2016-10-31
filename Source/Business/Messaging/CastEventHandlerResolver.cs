@@ -4,7 +4,7 @@ using System.ComponentModel.Composition;
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
     [Export(typeof(ITerminalDeviceEventHandlerResolver))]
-    public class CastEventHandlerResolver : ITerminalDeviceEventHandlerResolver
+    internal class CastEventHandlerResolver : ITerminalDeviceEventHandlerResolver
     {
         public EventHandler<object> GetEventHandler(object function)
         {

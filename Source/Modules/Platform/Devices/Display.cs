@@ -1,10 +1,6 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Practices.ServiceLocation;
-using Prism.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
@@ -15,542 +11,623 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
         public Display()
             : base("Display")
         {
-            IEventAggregator eventAggregator = ServiceLocator.Current.GetInstance<IEventAggregator>();
-            eventAggregator.GetEvent<ModulesInitializedEvent>().Subscribe(OnModulesInitialized);
-
             Properties.AddRange(new List<ITerminalDeviceProperty>
                 {
-                    new DisplayCurrentLanguageProperty(this),
-                    new DisplayMessageWindowPropertiesProperty(this),
-                    new DisplaySoftKeyPropertiesProperty(this),
-                    new DisplayDataEntryWindowPropertiesProperty(this),
-                    new DisplayImageDetailsProperty(this),
-                    new DisplayImageListProperty(this),
-                    new DisplayAnimationDetailsProperty(this),
-                    new DisplayAnimationListProperty(this),
-                    new DisplayPromptDetailsProperty(this),
-                    new DisplayPromptListProperty(this),
-                    new DisplayFontsProperty(this),
-                    new DisplayStatusProperty(this),
-                    new DisplayTypeProperty(this),
-                    new DisplaySupportedLanguagesProperty(this),
+                    new CurrentLanguageProperty(this),
+                    new MessageWindowPropertiesProperty(this),
+                    new SoftKeyPropertiesProperty(this),
+                    new DataEntryWindowPropertiesProperty(this),
+                    new ImageDetailsProperty(this),
+                    new ImageListProperty(this),
+                    new AnimationDetailsProperty(this),
+                    new AnimationListProperty(this),
+                    new PromptDetailsProperty(this),
+                    new PromptListProperty(this),
+                    new FontsProperty(this),
+                    new StatusProperty(this),
+                    new FontsProperty(this),
+                    new TypeProperty(this),
+                    new SupportedLanguagesProperty(this),
                 });
 
             Methods.AddRange(new List<ITerminalDeviceMethod>
                 {
                     new DisplayPromptMethod(this),
+                    new DisplayPromptImmediateMethod(this),
                     new DeletePromptMethod(this),
-                    new DisplayDeleteAllPromptsMethod(this),
-                    new DisplayDeleteImageMethod(this),
-                    new DisplayDeleteAllImagesMethod(this),
-                    new DisplayDeleteAnimationMethod(this),
-                    new DisplayDeleteAllAnimationsMethod(this),
-                    new DisplayDeleteAllMethod(this),
-                    new DisplayRestoreDefaultMethod(this),
-                    new DisplaySetVideoWindowMethod(this),
-                    new DisplayStringMethod(this),
+                    new DeleteAllPromptsMethod(this),
+                    new DeleteImageMethod(this),
+                    new DeleteAllImagesMethod(this),
+                    new DeleteAnimationMethod(this),
+                    new DeleteAllAnimationsMethod(this),
+                    new DeleteAllMethod(this),
+                    new RestoreDefaultMethod(this),
+                    new SetVideoWindowMethod(this),
+                    new StringMethod(this),
                 });
 
             Events.AddRange(new List<ITerminalDeviceEvent>
                 {
-                    new DisplayCurrentLanguageChangedEvent(this),
+                    new CurrentLanguageChangedEvent(this),
                 });
         }
 
-        private void OnModulesInitialized()
+        #region Device Properties
+
+        [ValueProperty("Language")]
+        public class CurrentLanguageProperty : TerminalDeviceProperty<string,
+            GetCurrentLanguageCommand, GetCurrentLanguageResponse,
+            SetCurrentLanguageCommand, SetCurrentLanguageResponse>
         {
-            var terminal = ServiceLocator.Current.GetInstance<ITerminalService>();
-            Successor = terminal.Devices["Terminal"];
+            public CurrentLanguageProperty(ITerminalDevice device)
+                : base(device, "CurrentLanguage")
+            {
+                GetCommand = new TerminalDeviceCommand<GetCurrentLanguageCommand, GetCurrentLanguageResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+
+                SetCommand = new TerminalDeviceCommand<SetCurrentLanguageCommand, SetCurrentLanguageResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetCurrentLanguageCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    #region Properties
-
-    [ValueProperty("Language")]
-    public class DisplayCurrentLanguageProperty : TerminalDeviceProperty<string,
-        GetCurrentLanguageCommand, GetCurrentLanguageResponse,
-        SetCurrentLanguageCommand, SetCurrentLanguageResponse>
-    {
-        public DisplayCurrentLanguageProperty(ITerminalDevice device)
-            : base(device, "CurrentLanguage")
+        [ValueProperty("MessageWindowProperties")]
+        public class MessageWindowPropertiesProperty : TerminalDeviceProperty<MessageWindowProperties,
+            GetMessageWindowPropertiesCommand, GetMessageWindowPropertiesResponse,
+            SetMessageWindowPropertiesCommand, SetMessageWindowPropertiesResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetCurrentLanguageCommand, GetCurrentLanguageResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public MessageWindowPropertiesProperty(ITerminalDevice device)
+                : base(device, "MessageWindowProperties")
+            {
+                GetCommand = new TerminalDeviceCommand<GetMessageWindowPropertiesCommand, GetMessageWindowPropertiesResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
 
-            SetCommand = new TerminalDeviceCommand<SetCurrentLanguageCommand, SetCurrentLanguageResponse>(
-                this,
-                $"set_{Name}",
-                () => new SetCurrentLanguageCommand
-                    {
-                        Language = "en",
-                    }
-                );
+                SetCommand = new TerminalDeviceCommand
+                    <SetMessageWindowPropertiesCommand, SetMessageWindowPropertiesResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetMessageWindowPropertiesCommand
+                        {
+                            MessageWindowProperties = new MessageWindowProperties
+                                {
+                                    BackColor = new byte[] {0xFF, 0xFF, 0xFF, 0xFF},
+                                    ForeColor = new byte[] {0xFF, 0x00, 0x00, 0x00},
+                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                    VerticalAlignment = VerticalAlignment.Middle,
+                                    Location = new Location {Top = 0, Left = 0},
+                                    Size = new Size {Width = 320, Height = 240},
+                                    Font = new Font {Name = "Arial", Size = 22, Style = 0}
+                                }
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("MessageWindowProperties")]
-    public class DisplayMessageWindowPropertiesProperty : TerminalDeviceProperty<MessageWindowProperties,
-        GetMessageWindowPropertiesCommand, GetMessageWindowPropertiesResponse,
-        SetMessageWindowPropertiesCommand, SetMessageWindowPropertiesResponse>
-    {
-        public DisplayMessageWindowPropertiesProperty(ITerminalDevice device)
-            : base(device, "MessageWindowProperties")
+        [ValueProperty("SoftKeyProperties")]
+        public class SoftKeyPropertiesProperty : TerminalDeviceProperty<SoftKeyProperties,
+            GetSoftKeyPropertiesCommand, GetSoftKeyPropertiesResponse,
+            SetSoftKeyPropertiesCommand, SetSoftKeyPropertiesResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetMessageWindowPropertiesCommand, GetMessageWindowPropertiesResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public SoftKeyPropertiesProperty(ITerminalDevice device)
+                : base(device, "SoftKeyProperties")
+            {
+                GetCommand = new TerminalDeviceCommand<GetSoftKeyPropertiesCommand, GetSoftKeyPropertiesResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
 
-            SetCommand = new TerminalDeviceCommand<SetMessageWindowPropertiesCommand, SetMessageWindowPropertiesResponse>(
-                this,
-                $"set_{Name}"
-                );
+                SetCommand = new TerminalDeviceCommand<SetSoftKeyPropertiesCommand, SetSoftKeyPropertiesResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetSoftKeyPropertiesCommand
+                        {
+                            SoftKeyProperties = new SoftKeyProperties
+                                {
+                                    BackColor = new byte[] {0xFF, 0x00, 0x00, 0x00},
+                                    ForeColor = new byte[] {0xFF, 0xFF, 0xFF, 0xFF},
+                                    PixelsFromEdge = 5,
+                                    SoftKeyAlignment = SoftKeyAlignment.Center,
+                                    SoftKeyHeight = 38,
+                                    SoftKeyWidth = 150,
+                                    Font = new Font {Name = "Arial", Size = 30, Style = 0}
+                                }
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("SoftKeyProperties")]
-    public class DisplaySoftKeyPropertiesProperty : TerminalDeviceProperty<SoftKeyProperties,
-        GetSoftKeyPropertiesCommand, GetSoftKeyPropertiesResponse,
-        SetSoftKeyPropertiesCommand, SetSoftKeyPropertiesResponse>
-    {
-        public DisplaySoftKeyPropertiesProperty(ITerminalDevice device)
-            : base(device, "SoftKeyProperties")
+        [ValueProperty("DataEntryWindowProperties")]
+        public class DataEntryWindowPropertiesProperty : TerminalDeviceProperty<DataEntryWindowProperties,
+            GetDataEntryWindowPropertiesCommand, GetDataEntryWindowPropertiesResponse,
+            SetDataEntryWindowPropertiesCommand, SetDataEntryWindowPropertiesResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetSoftKeyPropertiesCommand, GetSoftKeyPropertiesResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public DataEntryWindowPropertiesProperty(ITerminalDevice device)
+                : base(device, "DataEntryWindowProperties")
+            {
+                GetCommand = new TerminalDeviceCommand<GetDataEntryWindowPropertiesCommand, GetDataEntryWindowPropertiesResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
 
-            SetCommand = new TerminalDeviceCommand<SetSoftKeyPropertiesCommand, SetSoftKeyPropertiesResponse>(
-                this,
-                $"set_{Name}"
-                );
+                SetCommand = new TerminalDeviceCommand
+                    <SetDataEntryWindowPropertiesCommand, SetDataEntryWindowPropertiesResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetDataEntryWindowPropertiesCommand
+                        {
+                            DataEntryWindowProperties = new DataEntryWindowProperties
+                                {
+                                    ForeColor = new byte[] {0xFF, 0x00, 0x00, 0x00},
+                                    Location = new Location {Left = 76, Top = 145},
+                                    Size = new Size {Height = 37, Width = 160},
+                                    Font = new Font {Name = "Arial", Size = 18, Style = 0},
+                                }
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("DataEntryWindowProperties")]
-    public class DisplayDataEntryWindowPropertiesProperty : TerminalDeviceProperty<DataEntryWindowProperties,
-        GetDataEntryWindowPropertiesCommand, GetDataEntryWindowPropertiesResponse,
-        SetDataEntryWindowPropertiesCommand, SetDataEntryWindowPropertiesResponse>
-    {
-        public DisplayDataEntryWindowPropertiesProperty(ITerminalDevice device)
-            : base(device, "DataEntryWindowProperties")
+        [ValueProperty("PromptDetails")]
+        public class PromptDetailsProperty : TerminalDeviceProperty<PromptDetails,
+            GetPromptDetailsCommand, GetPromptDetailsResponse,
+            SetPromptDetailsCommand, SetPromptDetailsResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetDataEntryWindowPropertiesCommand, GetDataEntryWindowPropertiesResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public PromptDetailsProperty(ITerminalDevice device)
+                : base(device, "PromptDetails")
+            {
+                GetCommand = new TerminalDeviceCommand<GetPromptDetailsCommand, GetPromptDetailsResponse>(
+                    this,
+                    $"get_{Name}",
+                    () => new GetPromptDetailsCommand
+                        {
+                            PromptId = 1,
+                            Language = "en",
+                        }
+                    );
 
-            SetCommand = new TerminalDeviceCommand<SetDataEntryWindowPropertiesCommand, SetDataEntryWindowPropertiesResponse>(
-                this,
-                $"set_{Name}"
-                );
+                SetCommand = new TerminalDeviceCommand<SetPromptDetailsCommand, SetPromptDetailsResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetPromptDetailsCommand
+                        {
+                            Language = "en",
+                            PromptDetails = new PromptDetails
+                                {
+                                    PromptId = 1,
+                                    PromptText = "Please Insert Card",
+                                    Images = new Images
+                                        {
+                                            ImageInstance = new[]
+                                                {
+                                                    new ImageInstance
+                                                        {
+                                                            ImageId = 1,
+                                                            Location = new Location {Left = 0, Top = 0},
+                                                        },
+                                                }
+                                        },
+                                    Animations = new Animations
+                                        {
+                                            AnimationInstance = new []
+                                                {
+                                                    new AnimationInstance
+                                                        {
+                                                            AnimationId = 1,
+                                                            Location = new Location {Left = 50, Top = 200},
+                                                        }
+                                                }
+                                        }
+                                },
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("PromptDetails")]
-    public class DisplayPromptDetailsProperty : TerminalDeviceProperty<PromptDetails,
-        GetPromptDetailsCommand, GetPromptDetailsResponse,
-        SetPromptDetailsCommand, SetPromptDetailsResponse>
-    {
-        public DisplayPromptDetailsProperty(ITerminalDevice device)
-            : base(device, "PromptDetails")
+        [ValueProperty("PromptSummary")]
+        public class PromptListProperty : TerminalDeviceProperty<PromptSummary[],
+            GetPromptListCommand, GetPromptListResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetPromptDetailsCommand, GetPromptDetailsResponse>(
-                this,
-                $"get_{Name}",
-                () => new GetPromptDetailsCommand
-                    {
-                        PromptId = 1,
-                        Language = "en",
-                    }
-                );
-
-            SetCommand = new TerminalDeviceCommand<SetPromptDetailsCommand, SetPromptDetailsResponse>(
-                this,
-                $"set_{Name}",
-                () => new SetPromptDetailsCommand
-                    {
-                        Language = "en",
-                        PromptDetails = new PromptDetails(),
-                    }
-                );
+            public PromptListProperty(ITerminalDevice device)
+                : base(device, "PromptList")
+            {
+                GetCommand = new TerminalDeviceCommand<GetPromptListCommand, GetPromptListResponse>(
+                    this,
+                    $"get_{Name}",
+                    () => new GetPromptListCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("PromptSummary")]
-    public class DisplayPromptListProperty : TerminalDeviceProperty<PromptSummary[],
-        GetPromptListCommand, GetPromptListResponse>
-    {
-        public DisplayPromptListProperty(ITerminalDevice device)
-            : base(device, "PromptList")
+        [ValueProperty("Value")]
+        public class ImageDetailsProperty : TerminalDeviceProperty<byte[],
+            GetImageDetailsCommand, GetImageDetailsResponse,
+            SetImageDetailsCommand, SetImageDetailsResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetPromptListCommand, GetPromptListResponse>(
-                this,
-                $"get_{Name}",
-                () => new GetPromptListCommand
-                    {
-                        Language = "en",
-                    }
-                );
-        }
-    }
+            public ImageDetailsProperty(ITerminalDevice device)
+                : base(device, "ImageDetails")
+            {
+                GetCommand = new TerminalDeviceCommand<GetImageDetailsCommand, GetImageDetailsResponse>(
+                    this,
+                    $"get_{Name}",
+                    () => new GetImageDetailsCommand
+                        {
+                            ImageId = 1,
+                            Language = "en",
+                        }
+                    );
 
-    [ValueProperty("Value")]
-    public class DisplayImageDetailsProperty : TerminalDeviceProperty<byte[],
-        GetImageDetailsCommand, GetImageDetailsResponse,
-        SetImageDetailsCommand, SetImageDetailsResponse>
-    {
-        public DisplayImageDetailsProperty(ITerminalDevice device)
-            : base(device, "ImageDetails")
+                SetCommand = new TerminalDeviceCommand<SetImageDetailsCommand, SetImageDetailsResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetImageDetailsCommand
+                        {
+                            ImageId = 1,
+                            Filename = "bac1re1.bmp",
+                            Language = "en",
+                        }
+                    );
+            }
+        }
+
+        [ValueProperty("ImageSummary")]
+        public class ImageListProperty : TerminalDeviceProperty<ImageSummary[],
+            GetImageListCommand, GetImageListResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetImageDetailsCommand, GetImageDetailsResponse>(
-                this,
-                $"get_{Name}",
-                () => new GetImageDetailsCommand
-                    {
-                        ImageId = 1,
-                        Language = "en",
-                    }
-                );
-
-            SetCommand = new TerminalDeviceCommand<SetImageDetailsCommand, SetImageDetailsResponse>(
-                this,
-                $"set_{Name}",
-                () => new SetImageDetailsCommand
-                    {
-                        ImageId = 1,
-                        Filename = "bac1re1.bmp",
-                        Language = "en",
-                    }
-                );
+            public ImageListProperty(ITerminalDevice device)
+                : base(device, "ImageList")
+            {
+                GetCommand = new TerminalDeviceCommand<GetImageListCommand, GetImageListResponse>(
+                    this,
+                    $"get_{Name}",
+                    () => new GetImageListCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("ImageSummary")]
-    public class DisplayImageListProperty : TerminalDeviceProperty<ImageSummary[],
-        GetImageListCommand, GetImageListResponse>
-    {
-        public DisplayImageListProperty(ITerminalDevice device)
-            : base(device, "ImageList")
+        [ValueProperty("AnimationDetails")]
+        public class AnimationDetailsProperty : TerminalDeviceProperty<AnimationDetails,
+            GetAnimationDetailsCommand, GetAnimationDetailsResponse,
+            SetAnimationDetailsCommand, SetAnimationDetailsResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetImageListCommand, GetImageListResponse>(
-                this,
-                $"get_{Name}",
-                () => new GetImageListCommand
-                    {
-                        Language = "en",
-                    }
-                );
-        }
-    }
+            public AnimationDetailsProperty(ITerminalDevice device)
+                : base(device, "AnimationDetails")
+            {
+                GetCommand = new TerminalDeviceCommand<GetAnimationDetailsCommand, GetAnimationDetailsResponse>(
+                    this,
+                    $"get_{Name}",
+                    () => new GetAnimationDetailsCommand
+                        {
+                            AnimationId = 1,
+                            Language = "en",
+                        }
+                    );
 
-    [ValueProperty("AnimationDetails")]
-    public class DisplayAnimationDetailsProperty : TerminalDeviceProperty<AnimationDetails,
-        GetAnimationDetailsCommand, GetAnimationDetailsResponse,
-        SetAnimationDetailsCommand, SetAnimationDetailsResponse>
-    {
-        public DisplayAnimationDetailsProperty(ITerminalDevice device)
-            : base(device, "AnimationDetails")
+                SetCommand = new TerminalDeviceCommand<SetAnimationDetailsCommand, SetAnimationDetailsResponse>(
+                    this,
+                    $"set_{Name}",
+                    () => new SetAnimationDetailsCommand
+                        {
+                            Language = "en",
+                            AnimationDetails = new AnimationDetails
+                                {
+                                    AnimationId = 1,
+                                    Description = "Card Swipe",
+                                    AnimationFrame = new[]
+                                        {
+                                            new AnimationFrame {ImageId = 1, Duration = 500},
+                                            new AnimationFrame {ImageId = 2, Duration = 500},
+                                            new AnimationFrame {ImageId = 3, Duration = 500},
+                                        },
+                                },
+                        }
+                    );
+            }
+        }
+
+        [ValueProperty("AnimationSummary")]
+        public class AnimationListProperty : TerminalDeviceProperty<AnimationSummary[],
+            GetAnimationListCommand, GetAnimationListResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetAnimationDetailsCommand, GetAnimationDetailsResponse>(
-                this,
-                $"get_{Name}",
-                () => new GetAnimationDetailsCommand
-                    {
-                        Language = "en",
-                    }
-                );
-
-            SetCommand = new TerminalDeviceCommand<SetAnimationDetailsCommand, SetAnimationDetailsResponse>(
-                this,
-                $"set_{Name}",
-                () => new SetAnimationDetailsCommand
-                    {
-                        Language = "en",
-                    }
-                );
+            public AnimationListProperty(ITerminalDevice device)
+                : base(device, "AnimationList")
+            {
+                GetCommand = new TerminalDeviceCommand<GetAnimationListCommand, GetAnimationListResponse>(
+                    this,
+                    $"get_{Name}",
+                    () => new GetAnimationListCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    [ValueProperty("AnimationSummary")]
-    public class DisplayAnimationListProperty : TerminalDeviceProperty<AnimationSummary[],
-        GetAnimationListCommand, GetAnimationListResponse>
-    {
-        public DisplayAnimationListProperty(ITerminalDevice device)
-            : base(device, "AnimationList")
+        [ValueProperty("Font")]
+        public class FontsProperty : TerminalDeviceProperty<PrinterFont[],
+            GetFontsCommand, GetFontsResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetAnimationListCommand, GetAnimationListResponse>(
-                this,
-                $"get_{Name}",
-                () => new GetAnimationListCommand
-                    {
-                        Language = "en",
-                    }
-                );
+            public FontsProperty(ITerminalDevice device)
+                : base(device, "Fonts")
+            {
+                GetCommand = new TerminalDeviceCommand<GetFontsCommand, GetFontsResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("Font")]
-    public class DisplayFontsProperty : TerminalDeviceProperty<PrinterFont[],
-        GetFontsCommand, GetFontsResponse>
-    {
-        public DisplayFontsProperty(ITerminalDevice device)
-            : base(device, "Fonts")
+        [ValueProperty("State")]
+        public class StatusProperty : TerminalDeviceProperty<Status,
+            GetStatusCommand, GetStatusResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetFontsCommand, GetFontsResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public StatusProperty(ITerminalDevice device)
+                : base(device, "Status")
+            {
+                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("State")]
-    public class DisplayStatusProperty : TerminalDeviceProperty<Status,
-        GetStatusCommand, GetStatusResponse>
-    {
-        public DisplayStatusProperty(ITerminalDevice device)
-            : base(device, "Status")
+        [ValueProperty("SupportedLanguage")]
+        public class SupportedLanguagesProperty : TerminalDeviceProperty<SupportedLanguage[],
+            GetSupportedLanguagesCommand, GetSupportedLanguagesResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public SupportedLanguagesProperty(ITerminalDevice device)
+                : base(device, "SupportedLanguages")
+            {
+                GetCommand = new TerminalDeviceCommand<GetSupportedLanguagesCommand, GetSupportedLanguagesResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("SupportedLanguage")]
-    public class DisplaySupportedLanguagesProperty : TerminalDeviceProperty<SupportedLanguage[],
-        GetSupportedLanguagesCommand, GetSupportedLanguagesResponse>
-    {
-        public DisplaySupportedLanguagesProperty(ITerminalDevice device)
-            : base(device, "SupportedLanguages")
+        [ValueProperty("DisplayType")]
+        public class TypeProperty : TerminalDeviceProperty<DisplayType,
+            GetDisplayTypeCommand, GetDisplayTypeResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetSupportedLanguagesCommand, GetSupportedLanguagesResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public TypeProperty(ITerminalDevice device)
+                : base(device, "DisplayType")
+            {
+                GetCommand = new TerminalDeviceCommand<GetDisplayTypeCommand, GetDisplayTypeResponse>(
+                    this,
+                    $"get_{Name}"
+                    );
+            }
         }
-    }
 
-    [ValueProperty("DisplayType")]
-    public class DisplayTypeProperty : TerminalDeviceProperty<DisplayType,
-        GetDisplayTypeCommand, GetDisplayTypeResponse>
-    {
-        public DisplayTypeProperty(ITerminalDevice device)
-            : base(device, "DisplayType")
+        #endregion
+
+        #region Device Methods
+
+        public class DisplayPromptMethod : TerminalDeviceMethod<DisplayPromptCommand, DisplayPromptResponse>
         {
-            GetCommand = new TerminalDeviceCommand<GetDisplayTypeCommand, GetDisplayTypeResponse>(
-                this,
-                $"get_{Name}"
-                );
+            public DisplayPromptMethod(ITerminalDevice device)
+                : base(device, "DisplayPrompt")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DisplayPromptCommand, DisplayPromptResponse>(
+                    this,
+                    Name,
+                    () => new DisplayPromptCommand
+                        {
+                            Id = 1,
+                            Language = "en",
+                            IgnoreSoftKeySet = false,
+                            IgnoreSoftKeySetSpecified = true,
+                            SubstituteParameter = new[]
+                                {
+                                    new SubstituteParameter {Text = "A Text"}
+                                },
+                        }
+                    );
+            }
         }
-    }
 
-    #endregion
-
-    #region Methods
-
-    public class DisplayPromptMethod : TerminalDeviceMethod<DisplayPromptCommand, DisplayPromptResponse>
-    {
-        public DisplayPromptMethod(ITerminalDevice device)
-            : base(device, "DisplayPrompt")
+        public class DisplayPromptImmediateMethod : TerminalDeviceMethod<DisplayPromptImmediateCommand, DisplayPromptImmediateResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DisplayPromptCommand, DisplayPromptResponse>(
-                this,
-                Name,
-                () => new DisplayPromptCommand
-                    {
-                        Id = 1,
-                        Language = "en",
-                        IgnoreSoftKeySet = false,
-                        IgnoreSoftKeySetSpecified = true,
-                        SubstituteParameter = new[]
-                            {
-                                new SubstituteParameter {Text = "A Text"}
-                            },
-                    }
-                );
+            public DisplayPromptImmediateMethod(ITerminalDevice device)
+                : base(device, "DisplayPromptImmediate")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DisplayPromptImmediateCommand, DisplayPromptImmediateResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    public class DeletePromptMethod : TerminalDeviceMethod<DeletePromptCommand, DeletePromptResponse>
-    {
-        public DeletePromptMethod(ITerminalDevice device)
-            : base(device, "DeletePrompt")
+        public class DeletePromptMethod : TerminalDeviceMethod<DeletePromptCommand, DeletePromptResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeletePromptCommand, DeletePromptResponse>(
-                this,
-                Name,
-                () => new DeletePromptCommand
-                    {
-                        Id = 1,
-                        Language = "en",
-                    }
-                );
+            public DeletePromptMethod(ITerminalDevice device)
+                : base(device, "DeletePrompt")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeletePromptCommand, DeletePromptResponse>(
+                    this,
+                    Name,
+                    () => new DeletePromptCommand
+                        {
+                            Id = 1,
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayDeleteAllPromptsMethod : TerminalDeviceMethod<DeleteAllPromptsCommand, DeleteAllPromptsResponse>
-    {
-        public DisplayDeleteAllPromptsMethod(ITerminalDevice device)
-            : base(device, "DeleteAllPrompts")
+        public class DeleteAllPromptsMethod : TerminalDeviceMethod<DeleteAllPromptsCommand, DeleteAllPromptsResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeleteAllPromptsCommand, DeleteAllPromptsResponse>(
-                this,
-                Name,
-                () => new DeleteAllPromptsCommand
-                    {
-                        Language = "en",
-                    }
-                );
+            public DeleteAllPromptsMethod(ITerminalDevice device)
+                : base(device, "DeleteAllPrompts")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeleteAllPromptsCommand, DeleteAllPromptsResponse>(
+                    this,
+                    Name,
+                    () => new DeleteAllPromptsCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayDeleteImageMethod : TerminalDeviceMethod<DeleteImageCommand, DeleteImageResponse>
-    {
-        public DisplayDeleteImageMethod(ITerminalDevice device)
-            : base(device, "DeleteImage")
+        public class DeleteImageMethod : TerminalDeviceMethod<DeleteImageCommand, DeleteImageResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeleteImageCommand, DeleteImageResponse>(
-                this,
-                Name,
-                () => new DeleteImageCommand
-                    {
-                        Id = 1,
-                        Language = "en",
-                    }
-                );
+            public DeleteImageMethod(ITerminalDevice device)
+                : base(device, "DeleteImage")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeleteImageCommand, DeleteImageResponse>(
+                    this,
+                    Name,
+                    () => new DeleteImageCommand
+                        {
+                            Id = 1,
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayDeleteAllImagesMethod : TerminalDeviceMethod<DeleteAllImagesCommand, DeleteAllImagesResponse>
-    {
-        public DisplayDeleteAllImagesMethod(ITerminalDevice device)
-            : base(device, "DeleteAllImages")
+        public class DeleteAllImagesMethod : TerminalDeviceMethod<DeleteAllImagesCommand, DeleteAllImagesResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeleteAllImagesCommand, DeleteAllImagesResponse>(
-                this,
-                Name,
-                () => new DeleteAllImagesCommand
-                    {
-                        Language = "en",
-                    }
-                );
+            public DeleteAllImagesMethod(ITerminalDevice device)
+                : base(device, "DeleteAllImages")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeleteAllImagesCommand, DeleteAllImagesResponse>(
+                    this,
+                    Name,
+                    () => new DeleteAllImagesCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayDeleteAnimationMethod : TerminalDeviceMethod<DeleteAnimationCommand, DeleteAnimationResponse>
-    {
-        public DisplayDeleteAnimationMethod(ITerminalDevice device)
-            : base(device, "DeleteAnimation")
+        public class DeleteAnimationMethod : TerminalDeviceMethod<DeleteAnimationCommand, DeleteAnimationResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeleteAnimationCommand, DeleteAnimationResponse>(
-                this,
-                Name,
-                () => new DeleteAnimationCommand
-                    {
-                        Id = 1,
-                        Language = "en",
-                    }
-                );
+            public DeleteAnimationMethod(ITerminalDevice device)
+                : base(device, "DeleteAnimation")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeleteAnimationCommand, DeleteAnimationResponse>(
+                    this,
+                    Name,
+                    () => new DeleteAnimationCommand
+                        {
+                            Id = 1,
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayDeleteAllAnimationsMethod : TerminalDeviceMethod<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>
-    {
-        public DisplayDeleteAllAnimationsMethod(ITerminalDevice device)
-            : base(device, "DeleteAllAnimations")
+        public class DeleteAllAnimationsMethod : TerminalDeviceMethod<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>(
-                this,
-                Name,
-                () => new DeleteAllAnimationsCommand
-                    {
-                        Language = "en",
-                    }
-                );
+            public DeleteAllAnimationsMethod(ITerminalDevice device)
+                : base(device, "DeleteAllAnimations")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeleteAllAnimationsCommand, DeleteAllAnimationsResponse>(
+                    this,
+                    Name,
+                    () => new DeleteAllAnimationsCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayDeleteAllMethod : TerminalDeviceMethod<DeleteAllCommand, DeleteAllResponse>
-    {
-        public DisplayDeleteAllMethod(ITerminalDevice device)
-            : base(device, "DeleteAll")
+        public class DeleteAllMethod : TerminalDeviceMethod<DeleteAllCommand, DeleteAllResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DeleteAllCommand, DeleteAllResponse>(
-                this,
-                Name,
-                () => new DeleteAllCommand
-                    {
-                        Language = "en",
-                    }
-                );
+            public DeleteAllMethod(ITerminalDevice device)
+                : base(device, "DeleteAll")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DeleteAllCommand, DeleteAllResponse>(
+                    this,
+                    Name,
+                    () => new DeleteAllCommand
+                        {
+                            Language = "en",
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayRestoreDefaultMethod : TerminalDeviceMethod<RestoreDefaultCommand, RestoreDefaultResponse>
-    {
-        public DisplayRestoreDefaultMethod(ITerminalDevice device)
-            : base(device, "RestoreDefault")
+        public class RestoreDefaultMethod : TerminalDeviceMethod<RestoreDefaultCommand, RestoreDefaultResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<RestoreDefaultCommand, RestoreDefaultResponse>(
-                this,
-                Name
-                );
+            public RestoreDefaultMethod(ITerminalDevice device)
+                : base(device, "RestoreDefault")
+            {
+                InvokeCommand = new TerminalDeviceCommand<RestoreDefaultCommand, RestoreDefaultResponse>(
+                    this,
+                    Name
+                    );
+            }
         }
-    }
 
-    public class DisplaySetVideoWindowMethod : TerminalDeviceMethod<SetVideoWindowCommand, SetVideoWindowResponse>
-    {
-        public DisplaySetVideoWindowMethod(ITerminalDevice device)
-            : base(device, "SetVideoWindow")
+        public class SetVideoWindowMethod : TerminalDeviceMethod<SetVideoWindowCommand, SetVideoWindowResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<SetVideoWindowCommand, SetVideoWindowResponse>(
-                this,
-                Name,
-                () => new SetVideoWindowCommand
-                    {
-                        FullScreen = true,
-                    }
-                );
+            public SetVideoWindowMethod(ITerminalDevice device)
+                : base(device, "SetVideoWindow")
+            {
+                InvokeCommand = new TerminalDeviceCommand<SetVideoWindowCommand, SetVideoWindowResponse>(
+                    this,
+                    Name,
+                    () => new SetVideoWindowCommand
+                        {
+                            FullScreen = true,
+                        }
+                    );
+            }
         }
-    }
 
-    public class DisplayStringMethod : TerminalDeviceMethod<DisplayStringCommand, DisplayStringResponse>
-    {
-        public DisplayStringMethod(ITerminalDevice device)
-            : base(device, "DisplayString")
+        public class StringMethod : TerminalDeviceMethod<DisplayStringCommand, DisplayStringResponse>
         {
-            InvokeCommand = new TerminalDeviceCommand<DisplayStringCommand, DisplayStringResponse>(
-               this,
-               Name,
-                () => new DisplayStringCommand
-                    {
-                        Message = "Please Pay inside (E01)",
-                        Id = 1,
-                        ShowDataEntry = false,
-                        ShowDataEntrySpecified = true,
-                        ClearScreen = false,
-                        ClearScreenSpecified = true,
-                    }
-               );
+            public StringMethod(ITerminalDevice device)
+                : base(device, "DisplayString")
+            {
+                InvokeCommand = new TerminalDeviceCommand<DisplayStringCommand, DisplayStringResponse>(
+                    this,
+                    Name,
+                    () => new DisplayStringCommand
+                        {
+                            Message = "Please Pay inside (E01)",
+                            Id = 1,
+                            ShowDataEntry = false,
+                            ShowDataEntrySpecified = true,
+                            ClearScreen = false,
+                            ClearScreenSpecified = true,
+                        }
+                    );
+            }
         }
-    }
 
-    #endregion
+        #endregion
 
-    #region Events
+        #region Device Events
 
-    public class DisplayCurrentLanguageChangedEvent : TerminalDeviceEvent<CurrentLanguageChanged>
-    {
-        public DisplayCurrentLanguageChangedEvent(ITerminalDevice device) 
-            : base(device, "CurrentLanguageChanged")
+        public class CurrentLanguageChangedEvent : TerminalDeviceEvent<CurrentLanguageChanged>
         {
+            public CurrentLanguageChangedEvent(ITerminalDevice device)
+                : base(device, "CurrentLanguageChanged")
+            {
+            }
         }
-    }
 
-    #endregion
+        #endregion
+    }
 }

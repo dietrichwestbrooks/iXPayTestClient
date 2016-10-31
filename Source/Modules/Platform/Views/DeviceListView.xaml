@@ -15,7 +15,7 @@
         <Grid.Resources>
             <CollectionViewSource x:Key="Devices" Source="{Binding Path=Devices}" >
                 <CollectionViewSource.SortDescriptions>
-                    <cm:SortDescription PropertyName="Name" />
+                    <cm:SortDescription PropertyName="Title" />
                 </CollectionViewSource.SortDescriptions>
             </CollectionViewSource>
         </Grid.Resources>
@@ -37,7 +37,7 @@
             </ToolBarTray>
             <TreeView x:Name="_devices" ItemsSource="{Binding Source={StaticResource Devices}}">
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Members}" DataType="{x:Type local:DeviceViewModel}">
+                    <HierarchicalDataTemplate DataType="{x:Type local:DeviceViewModel}" ItemsSource="{Binding Members}">
                         <TextBlock Text="{Binding Title}" />
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Commands}" DataType="{x:Type local:DevicePropertyViewModel}">

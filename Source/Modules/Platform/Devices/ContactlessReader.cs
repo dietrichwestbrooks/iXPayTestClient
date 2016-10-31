@@ -9,7 +9,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
     [TerminalRequestHandler]
     [TerminalDevice]
-    public class ContactlessReader : TerminalDevice<ContactlessReaderCommand, ContactlessReaderResponse>, IPartImportsSatisfiedNotification
+    public class ContactlessReader : TerminalDevice<ContactlessReaderCommand, ContactlessReaderResponse>
     {
         public ContactlessReader()
             : base("ContactlessReader")
@@ -50,12 +50,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
                     new ContactlessReaderOperationalStateChangedEvent(this),
                     new ContactlessReaderDataReadEvent(this),
                 });
-        }
-
-        public void OnImportsSatisfied()
-        {
-            var terminalService = ServiceLocator.Current.GetInstance<ITerminalService>();
-            Successor = terminalService.Devices["Terminal"];
         }
     }
 

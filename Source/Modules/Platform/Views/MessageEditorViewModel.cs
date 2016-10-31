@@ -59,7 +59,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views
 
         private ITerminalService TerminalService { get; }
 
-        private ITerminalMessageSerializer MessageSerializer { get; set; }
+        private ITerminalMessageSerializer MessageSerializer { get; }
 
         private void OnCommandSelected(ITerminalDeviceCommand command)
         {

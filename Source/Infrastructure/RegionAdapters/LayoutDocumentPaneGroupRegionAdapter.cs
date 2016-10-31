@@ -2,6 +2,7 @@
 using System.ComponentModel.Composition;
 using Prism.Regions;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.RegionAdapters

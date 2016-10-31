@@ -3,7 +3,7 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public interface ITerminalDeviceCommand
+    public interface ITerminalDeviceCommand : ITerminalRequestHandler
     {
         string Name { get; }
         Type CommandType { get; }

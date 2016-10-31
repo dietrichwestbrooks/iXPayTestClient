@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
@@ -17,8 +18,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             CommandType = typeof(TCommand);
             ResponseType = typeof(TResponse);
 
-            var client = ServiceLocator.Current.GetInstance<ITerminalClient>();
-            client.EventReceived += OnEventReceived;
+            var connectionManager = ServiceLocator.Current.GetInstance<ITerminalConnectionManager>();
+
+            connectionManager.ConnectionChanged += (sender, e) =>
+            {
+                if (e.OldConnection != null)
+                    e.OldConnection.EventReceived -= OnEventReceived;
+
+                if (e.NewConnection != null)
+                    e.NewConnection.EventReceived += OnEventReceived;
+            };
         }
 
         public string Name { get; protected set; }
@@ -27,13 +36,19 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         public Type ResponseType { get; set; }
         public Type EventType { get; set; }
 
-        public TerminalDeviceMethodCollection Methods { get; } = new TerminalDeviceMethodCollection();
+        IEnumerable<ITerminalDeviceMethod> ITerminalDevice.Methods => Methods;
 
-        public TerminalDevicePropertyCollection Properties { get; } = new TerminalDevicePropertyCollection();
+        IEnumerable<ITerminalDeviceProperty> ITerminalDevice.Properties => Properties;
 
-        public TerminalDeviceEventCollection Events { get; } = new TerminalDeviceEventCollection();
+        IEnumerable<ITerminalDeviceEvent> ITerminalDevice.Events => Events;
 
-        public virtual ITerminalRequestHandler Successor { get; protected set; }
+        public List<ITerminalDeviceMethod> Methods { get; } = new List<ITerminalDeviceMethod>();
+
+        public List<ITerminalDeviceProperty> Properties { get; } = new List<ITerminalDeviceProperty>();
+
+        public List<ITerminalDeviceEvent> Events { get; } = new List<ITerminalDeviceEvent>();
+
+        public virtual ITerminalRequestHandler Successor { get; set; }
 
         public virtual object HandleRequest(object command)
         {

@@ -12,7 +12,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views
     [Export(typeof(INotificationViewModel))]
     public class NotificationViewModel : ViewModelBase, INotificationViewModel
     {
-        private string _title = "Notifications";
+        private string _title;
         private string _message;
         private DispatcherTimer _hideTimer;
         private Dispatcher _dispatcher;
@@ -20,6 +20,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views
         public NotificationViewModel()
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
+
+            Title = "Notifications";
 
             ShowNotificationCommand = new DelegateCommand<NotificationParameter>(OnShowNotification, parameter => true);
 
@@ -52,6 +54,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Views
 
         private void OnShowNotification(NotificationParameter parameter)
         {
+            Title = parameter?.Title ?? "Notification";
             Message = parameter?.Message;
 
             _dispatcher.BeginInvoke(DispatcherPriority.DataBind,

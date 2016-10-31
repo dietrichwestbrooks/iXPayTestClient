@@ -9,7 +9,6 @@
               Theme="Dark"
               Position="Bottom"
               Header="{Binding Title}"
-              CloseButtonVisibility="Hidden"
               Height="200"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>

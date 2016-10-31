@@ -4,6 +4,7 @@ using Prism.Events;
 using Prism.Logging;
 using Prism.Mvvm;
 using Prism.Regions;
+using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views
 {
@@ -21,7 +22,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views
             if (RegionManager == null)
                 throw new InvalidOperationException("Unable to locate Region Manager");
 
-            Logger = ServiceLocator.Current.GetInstance<ILoggerFacade>();
+            Logger = ServiceLocator.Current.GetInstance<ILogService>();
 
             if (Logger == null)
                 throw new InvalidOperationException("Unable to locate Logger Service");
@@ -33,7 +34,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views
 
         protected IRegionManager RegionManager { get; set; }
 
-        protected ILoggerFacade Logger { get; set; }
+        protected ILogService Logger { get; set; }
 
         #endregion
 

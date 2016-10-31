@@ -80,7 +80,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
             {
                 ScriptSource source = _py.CreateScriptSourceFromFile(path);
                 source.Execute(_pyScope);
-                device = _pyScope.Device();
+                device = _pyScope.CreateDevice();
             }
             catch (Exception ex)
             {
@@ -165,6 +165,7 @@ clr.AddReference('Microsoft.Dynamic')
 clr.AddReference('mscorlib')
 clr.AddReference('System')
 clr.AddReference('System.Data')
+from Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands import *
 ";
 
                 ScriptSource source = _py.CreateScriptSourceFromString(references, SourceCodeKind.Statements);
@@ -199,12 +200,7 @@ clr.AddReference('System.Data')
             }
             catch (Exception ex)
             {
-                EventAggregator.GetEvent<OutputTextEvent>().Publish(new OutputTextEventArgs
-                    {
-                        Category = OutputTextCategory.Script,
-                        Text = ex.Message
-                    });
-
+                EventAggregator.GetEvent<ScriptOutputTextEvent>().Publish($"{ex.Message}\n");
                 Logger.Log(ex.Message, Category.Exception, Priority.Medium);
             }
         }

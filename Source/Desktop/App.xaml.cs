@@ -2,8 +2,6 @@
 using System.Windows;
 using System.Windows.Threading;
 using MahApps.Metro;
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Practices.ServiceLocation;
 using Wayne.Payment.Tools.iXPayTestClient.Desktop.Views;
 
@@ -16,7 +14,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
     {
         public App()
         {
-            this.DispatcherUnhandledException += OnDispatcherUnhandledException;
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            Exit += OnExit;
+        }
+
+        private void OnExit(object sender, ExitEventArgs exitEventArgs)
+        {
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -25,10 +28,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop
 
             var container = ServiceLocator.Current.GetInstance<CompositionContainer>();
 
-            var mainWindow = container.GetExportedValue<IShellView>() as MetroWindow;
+            var mainWindow = container.GetExportedValue<IShellView>() as Window;
 
-            mainWindow?.ShowMessageAsync("Application Error", e.Exception.Message, MessageDialogStyle.Affirmative,
-                mainWindow.MetroDialogOptions);
+            MessageBox.Show(e.Exception.Message, mainWindow?.Title, MessageBoxButton.OK, MessageBoxImage.Stop);
+
+            mainWindow?.Close();
+
+            //var mainWindow = container.GetExportedValue<IShellView>() as MetroWindow;
+            //
+            //mainWindow?.ShowMessageAsync("Application Error", e.Exception.Message, MessageDialogStyle.Affirmative,
+            //    mainWindow.MetroDialogOptions);
         }
 
         protected override void OnStartup(StartupEventArgs e)

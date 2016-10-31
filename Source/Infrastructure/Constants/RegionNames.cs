@@ -16,7 +16,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants
 
         public static string MesssageEditorRegion = "MesssageEditorRegion";
         public static string ScriptEditorRegion = "ScriptEditorRegion";
-        public static string ScriptOutputRegion = "ScriptOutputRegion";
+        public static string OutputRegion = "OutputRegion";
 
         public static string DialogPopupRegion = "DialogPopupRegion";
     }

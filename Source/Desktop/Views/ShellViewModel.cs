@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Net;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Commands;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Views;
 
@@ -19,7 +19,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop.Views
         private bool _isConnecting;
         private string _connectionMessage;
         private string _statusBarMessage;
-        private IPEndPoint _endPoint;
 
         public ShellViewModel()
         {
@@ -29,7 +28,11 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop.Views
 
             ConnectionMessage = "Not Connected";
 
-            EventAggregator.GetEvent<ConnectionStatusEvent>().Subscribe(OnConnectionStatus);
+            EventAggregator.GetEvent<ConnectingEvent>().Subscribe(OnConnecting);
+            EventAggregator.GetEvent<ConnectedEvent>().Subscribe(OnConnected);
+            EventAggregator.GetEvent<ConnectionErrorEvent>().Subscribe(OnConnectionError);
+            EventAggregator.GetEvent<DisconnectedEvent>().Subscribe(OnDisconnected);
+            EventAggregator.GetEvent<PulseEvent>().Subscribe(OnPulse);
         }
 
         public ImageSource IconSource { get; set; }
@@ -40,6 +43,12 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop.Views
         {
             get { return _hostAddress; }
             set { SetProperty(ref _hostAddress, value); }
+        }
+
+        public string StatusBarMessage
+        {
+            get { return _statusBarMessage; }
+            set { SetProperty(ref _statusBarMessage, value); }
         }
 
         public bool IsHeartBeating
@@ -66,67 +75,42 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Desktop.Views
             set { SetProperty(ref _isConnecting, value); }
         }
 
-        private void OnConnectionStatus(ConnectionEventArgs args)
+        private void OnConnecting(IPEndPoint endPoint)
         {
-            switch (args.Type)
-            {
-                case ConnectionEventType.Connecting:
-                    ConnectionMessage = $"Connecting to {args.EndPoint}...";
-                    IsConnecting = true;
-                    break;
-
-                case ConnectionEventType.Connected:
-                    IsConnecting = false;
-                    IsConnected = true;
-                    IsHeartBeating = true;
-
-                    if (!Equals(args.EndPoint, _endPoint))
-                    {
-                        ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter
-                            {
-                                Type = NotificationType.Succeeded,
-                                Message = $"Connected to {args.EndPoint}"
-                            });
-                    }
-
-                    _endPoint = args.EndPoint;
-                    HostAddress = args.EndPoint?.ToString();
-                    ConnectionMessage = $"Connected to: {HostAddress}";
-                    break;
-
-                case ConnectionEventType.Pulse:
-                    IsHeartBeating = args.Pulse;
-                    break;
-
-                case ConnectionEventType.Disconnected:
-                    HostAddress = string.Empty;
-                    IsConnected = false;
-                    ConnectionMessage = "Not Connected";
-                    break;
-
-                case ConnectionEventType.Failed:
-                    IsConnecting = false;
-                    IsConnected = false;
-                    IsHeartBeating = false;
-
-                    ApplicationCommands.ShowNotificationCommand.Execute(new NotificationParameter
-                        {
-                        Type = NotificationType.Failed,
-                        Message = args.Exception.Message
-                    });
-                    ConnectionMessage = "Not Connected";
-                    break;
-
-                default:
-                    IsConnecting = false;
-                    break;
-            }
+            ConnectionMessage = $"Connecting to {endPoint}...";
+            IsConnecting = true;
         }
 
-        public string StatusBarMessage
+        private void OnConnected(IPEndPoint endPoint)
         {
-            get { return _statusBarMessage; }
-            set { SetProperty(ref _statusBarMessage, value); }
+            IsConnecting = false;
+            IsConnected = true;
+            IsHeartBeating = true;
+            HostAddress = endPoint?.ToString();
+            ConnectionMessage = $"Connected to: {HostAddress}";
+        }
+
+        private void OnConnectionError(Exception exception)
+        {
+            HostAddress = string.Empty;
+            IsConnected = false;
+            IsConnecting = false;
+            IsHeartBeating = false;
+            ConnectionMessage = "Not Connected";
+        }
+
+        private void OnDisconnected(IPEndPoint endPoint)
+        {
+            HostAddress = string.Empty;
+            IsConnected = false;
+            IsConnecting = false;
+            IsHeartBeating = false;
+            ConnectionMessage = "Not Connected";
+        }
+
+        private void OnPulse(IPEndPoint endPoint)
+        {
+            IsHeartBeating = true;
         }
     }
 }

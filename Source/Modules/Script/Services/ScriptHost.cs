@@ -13,11 +13,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Services
 
         public void Write(string text)
         {
-            EventAggregator.GetEvent<OutputTextEvent>().Publish(new OutputTextEventArgs
-                {
-                    Category = OutputTextCategory.Script,
-                    Text = text
-                });
+            EventAggregator.GetEvent<ScriptOutputTextEvent>().Publish(text);
         }
 
         public void WriteIf(bool condition, string message)

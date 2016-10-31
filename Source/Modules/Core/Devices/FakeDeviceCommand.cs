@@ -23,8 +23,8 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Core.Devices
             _delay = new Random().Next(1000, 5000);
         }
 
-        public FakeDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> getDefaultCommand = null) 
-            : base(member, name, getDefaultCommand)
+        public FakeDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> prepareCommand = null) 
+            : base(member, name, prepareCommand)
         {
             _delay = new Random().Next(1000, 5000);
         }

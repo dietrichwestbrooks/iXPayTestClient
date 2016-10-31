@@ -1,8 +1,8 @@
 ﻿namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public static class Constants
+    internal static class Constants
     {
-        public static class DeviceNames
+        internal static class DeviceNames
         {
             public const string Display = "Display";
             public const string BarcodeReader = "BarcodeReader";

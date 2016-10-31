@@ -38,7 +38,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv.Views
                                                                     "E11B9F02060000000005009F02060000000010009F0206000000002000")
                                                         }
                                                 }
-                                        }
+                                    }
                                 }
                         }
                 };
@@ -60,7 +60,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Emv.Views
                                                                     "E11B9F02060000000005009F02060000000010009F0206000000002000")
                                                         }
                                                 }
-                                        }
+                                    }
                                 }
                         }
                 };

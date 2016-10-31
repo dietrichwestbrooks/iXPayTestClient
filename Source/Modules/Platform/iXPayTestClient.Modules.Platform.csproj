@@ -91,13 +91,17 @@
   <ItemGroup>
     <Compile Include="Devices\BarcodeReader.cs" />
     <Compile Include="Devices\Beeper.cs" />
+    <Compile Include="Devices\BillAcceptor.cs" />
     <Compile Include="Devices\ChipCardReader.cs" />
     <Compile Include="Devices\ContactlessReader.cs" />
+    <Compile Include="Devices\DallasKey.cs" />
     <Compile Include="Devices\Display.cs" />
+    <Compile Include="Devices\NonSecureKeypad.cs" />
     <Compile Include="Devices\Keypad.cs" />
     <Compile Include="Devices\MagStripeReader.cs" />
     <Compile Include="Devices\Printer.cs" />
     <Compile Include="Devices\SecurityModule.cs" />
+    <Compile Include="Devices\TamperDetectors.cs" />
     <Compile Include="Devices\Terminal.cs" />
     <Compile Include="PlatformModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -185,6 +189,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="ClassDiagram1.cd" />
+    <None Include="Devices\Beeper.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="ICSharpCode.PythonBinding.Resources.Python.xshd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -252,6 +259,7 @@
     <PostBuildEvent>xcopy /y $(TargetPath) $(SolutionDir)Desktop\bin\Debug\Modules\
 xcopy /y $(TargetDir)ICSharpCode.* $(SolutionDir)Desktop\bin\Debug\
 rem xcopy /y $(TargetDir)ICSharpCode.* $(SolutionDir)Desktop\bin\Debug\bin\
+xcopy /y $(TargetDir)Devices\Beeper.py $(SolutionDir)Desktop\bin\Debug\Scripts\Devices\
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Converters
 {
-    [ValueConversion(typeof(object), typeof(string))]
+    [ValueConversion(typeof(object), typeof(Type))]
     public class ObjectToTypeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
