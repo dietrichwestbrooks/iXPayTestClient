@@ -3577,7 +3577,8 @@
       <xs:element name="SetTransactionIndicatorCommand" type="SetTransactionIndicatorCommand"/>
       <xs:element name="OpenContactlessReaderCommand" type="OpenContactlessReaderCommand"/>
       <xs:element name="CloseContactlessReaderCommand" type="CloseContactlessReaderCommand"/>
-      <xs:element name="ResetContactlessConfigurationCommand" type="ResetContactlessConfigurationCommand"/>      
+      <xs:element name="ResetContactlessConfigurationCommand" type="ResetContactlessConfigurationCommand"/>
+      <xs:element name="SetTransactionOnlineCompletionCommand" type="SetTransactionOnlineCompletionCommand"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="GetContactlessReaderCapabilitiesCommand">
@@ -3719,6 +3720,7 @@
         <xs:attribute name="StatusCheckAmount" type="xs:hexBinary" use="optional"/>
         <xs:attribute name="UnpredictableNumberRange" type="xs:unsignedByte" use="optional"/>
         <xs:attribute name="RemovalTimeout" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="OnlineTimeout" type="xs:hexBinary" use="optional"/>
         <xs:attribute name="MaxLifetimeTornTransaction" type="xs:hexBinary" use="optional"/>
         <xs:attribute name="MaxNumberOfTornTransaction" type="xs:unsignedByte" use="optional"/>
       </xs:extension>
@@ -3790,7 +3792,16 @@
     <xs:complexContent>
       <xs:extension base="BaseCommand"/>
     </xs:complexContent>
-  </xs:complexType>  
+  </xs:complexType>
+  <xs:complexType name="SetTransactionOnlineCompletionCommand">
+    <xs:complexContent>
+      <xs:extension base="BaseCommand">
+        <xs:sequence maxOccurs="unbounded">
+          <xs:element name="EmvDataElement" type="EmvDataElement"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:simpleType name="PaymentSchemes">
     <xs:restriction base="xs:string">
       <xs:enumeration value="StandardPayment"/>
@@ -3825,6 +3836,7 @@
       <xs:element name="StatusChanged" type="StatusChanged"/>
       <xs:element name="ContactlessOperationalStateChanged" type="ContactlessOperationalStateChanged"/>
       <xs:element name="ContactlessData" type="ContactlessData"/>
+      <xs:element name="NotificationData" type="NotificationData"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="ContactlessOperationalStateChanged">
@@ -3841,6 +3853,7 @@
       <xs:enumeration value="AmexMagStripe"/>
       <xs:enumeration value="AmexChip"/>
       <xs:enumeration value="DiscoverMagStripe"/>
+      <xs:enumeration value="DiscoverDPAS"/>
       <xs:enumeration value="InteracChip"/>
     </xs:restriction>
   </xs:simpleType>
@@ -3853,6 +3866,7 @@
       <xs:enumeration value="ChipOnlineRequest"/>
       <xs:enumeration value="Terminated"/>
       <xs:enumeration value="TryAgain"/>
+      <xs:enumeration value="FullOnline"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="TransactionCVM">
@@ -3905,6 +3919,28 @@
       <xs:element name="WalletData" type="WalletData" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:simpleType name="NotificationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="UiMessage"/>
+      <xs:enumeration value="OnlineOutcome"/>
+      <xs:enumeration value="IssuerUpdateProcessOutcome"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="NotificationMessage">
+    <xs:sequence>
+      <xs:element name="AdditionalData" type="AdditionalData" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="NotificationType" type="NotificationType" use="required"/>
+    <xs:attribute name="BrandName" type="BrandName" use="optional"/>
+    <xs:attribute name="CardScheme" type="CardScheme" use="optional"/>
+    <xs:attribute name="TransactionResult" type="TransactionResult" use="optional"/>
+    <xs:attribute name="TransactionErrorCode" type="xs:unsignedByte" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="NotificationData">
+    <xs:sequence>
+      <xs:element name="NotificationMessage" type="NotificationMessage" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
   <!--   END EVENTS-->
   <!--   RESPONSES-->
   <xs:complexType name="ContactlessReaderResponse">
@@ -3929,7 +3965,8 @@
       <xs:element name="SetTransactionIndicatorResponse" type="SetTransactionIndicatorResponse"/>
       <xs:element name="OpenContactlessReaderResponse" type="OpenContactlessReaderResponse"/>
       <xs:element name="CloseContactlessReaderResponse" type="CloseContactlessReaderResponse"/>
-      <xs:element name="ResetContactlessConfigurationResponse" type="ResetContactlessConfigurationResponse"/>      
+      <xs:element name="ResetContactlessConfigurationResponse" type="ResetContactlessConfigurationResponse"/>
+      <xs:element name="SetTransactionOnlineCompletionResponse" type="SetTransactionOnlineCompletionResponse"/>
     </xs:choice>
   </xs:complexType>
   <xs:complexType name="SupportedPaymentScheme">
@@ -4056,6 +4093,7 @@
         <xs:attribute name="StatusCheckAmount" type="xs:hexBinary" use="optional"/>
         <xs:attribute name="UnpredictableNumberRange" type="xs:unsignedByte" use="optional"/>
         <xs:attribute name="RemovalTimeout" type="xs:hexBinary" use="optional"/>
+        <xs:attribute name="OnlineTimeout" type="xs:hexBinary" use="optional"/>
         <xs:attribute name="MaxLifetimeTornTransaction" type="xs:hexBinary" use="optional"/>
         <xs:attribute name="MaxNumberOfTornTransaction" type="xs:unsignedByte" use="optional"/>
       </xs:extension>
@@ -4084,6 +4122,11 @@
     </xs:complexContent>
   </xs:complexType>
   <xs:complexType name="ResetContactlessConfigurationResponse">
+    <xs:complexContent>
+      <xs:extension base="BaseResponse"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SetTransactionOnlineCompletionResponse">
     <xs:complexContent>
       <xs:extension base="BaseResponse"/>
     </xs:complexContent>

@@ -1,275 +1,94 @@
-﻿using System.Collections.Generic;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    [TerminalRequestHandler]
-    [TerminalDevice]
-    public class BillAcceptor : TerminalDevice<BillAcceptorCommand, BillAcceptorResponse, BillAcceptorEvent>
+    public class BillAcceptor
     {
-        public BillAcceptor() 
-            : base("BillAcceptor")
+        public static void RegisterDeviceProxy()
         {
-            Properties.AddRange(new List<ITerminalDeviceProperty>
-                {
-                    new AcceptorIdProperty(this),
-                    new StatusProperty(this),
-                    new BankNoteStatusProperty(this),
-                    new SafeboxStatusProperty(this),
-                    new OpenedProperty(this),
-                    new CurrentNoteProperty(this),
-                    new CapabilitiesProperty(this),
-                });
-
-            Methods.AddRange(new List<ITerminalDeviceMethod>
-                {
-                    new OpenMethod(this),
-                    new CloseMethod(this),
-                    new CollectMethod(this),
-                    new EjectMethod(this),
-                    new NoteStateConfirmMethod(this),
-                });
-
-            Events.AddRange(new List<ITerminalDeviceEvent>
-                {
-                    new StatusChangedEvent(this),
-                    new OpenChangedEvent(this),
-                    new AcceptorStatusChangedEvent(this),
-                    new BankNoteStatusChangedEvent(this),
-                    new StatusBytesChangedEvent(this),
-                    new SafeboxStatusChangedEvent(this),
-                    new StackerStatusChangedEvent(this),
-                });
+            TerminalDevice.Register<BillAcceptorCommand, BillAcceptorResponse, BillAcceptorEvent>(
+                    "BillAcceptor", new TerminalRequestHandlerByName("Terminal"), typeof(BillAcceptor));
         }
 
         #region Device Properties
 
-        [ValueProperty("AcceptorId")]
-        public class AcceptorIdProperty :
-            TerminalDeviceProperty<string, GetAcceptorIdCommand, GetAcceptorIdResponse>
-        {
-            public AcceptorIdProperty(ITerminalDevice device)
-                : base(device, "AcceptorId")
-            {
-                GetCommand = new TerminalDeviceCommand<GetAcceptorIdCommand, GetAcceptorIdResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty AcceptorIdProperty =
+            TerminalDeviceProperty.Register<string, GetAcceptorIdCommand, GetAcceptorIdResponse>("AcceptorId",
+                "AcceptorId", typeof(BillAcceptor));
 
-        [ValueProperty("State")]
-        public class StatusProperty :
-            TerminalDeviceProperty<Status, GetStatusCommand, GetStatusResponse>
-        {
-            public StatusProperty(ITerminalDevice device)
-                : base(device, "Status")
-            {
-                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty StatusProperty =
+            TerminalDeviceProperty.Register<Status, GetStatusCommand, GetStatusResponse>("Status",
+                "State", typeof(BillAcceptor));
 
-        [ValueProperty("BankNoteState")]
-        public class BankNoteStatusProperty :
-            TerminalDeviceProperty<BankNoteStatus, GetBankNoteStatusCommand, GetBankNoteStatusResponse>
-        {
-            public BankNoteStatusProperty(ITerminalDevice device)
-                : base(device, "BankNoteStatus")
-            {
-                GetCommand = new TerminalDeviceCommand<GetBankNoteStatusCommand, GetBankNoteStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty BankNoteStatusProperty =
+            TerminalDeviceProperty.Register<BankNoteStatus, GetBankNoteStatusCommand, GetBankNoteStatusResponse>("BankNoteStatus",
+                "BankNoteState", typeof(BillAcceptor));
 
-        [ValueProperty("SafeboxState")]
-        public class SafeboxStatusProperty :
-            TerminalDeviceProperty<SafeboxStatus, GetSafeboxStatusCommand, GetSafeboxStatusResponse>
-        {
-            public SafeboxStatusProperty(ITerminalDevice device)
-                : base(device, "SafeboxStatus")
-            {
-                GetCommand = new TerminalDeviceCommand<GetSafeboxStatusCommand, GetSafeboxStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty SafeboxStatusProperty =
+            TerminalDeviceProperty.Register<SafeboxStatus, GetSafeboxStatusCommand, GetSafeboxStatusResponse>("SafeboxStatus",
+                "SafeboxState", typeof(BillAcceptor));
 
-        [ValueProperty("Open")]
-        public class OpenedProperty : TerminalDeviceProperty<bool, GetOpenedCommand, GetOpenedResponse>
-        {
-            public OpenedProperty(ITerminalDevice device)
-                : base(device, "Opened")
-            {
-                GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty OpenedProperty =
+            TerminalDeviceProperty.Register<bool, GetOpenedCommand, GetOpenedResponse>("Opened",
+                "Open", typeof(BillAcceptor));
 
-        [ValueProperty("BankNoteValue")]
-        public class CurrentNoteProperty : TerminalDeviceProperty<BankNoteValue, GetCurrentNoteCommand, GetCurrentNoteResponse>
-        {
-            public CurrentNoteProperty(ITerminalDevice device)
-                : base(device, "CurrentNote")
-            {
-                GetCommand = new TerminalDeviceCommand<GetCurrentNoteCommand, GetCurrentNoteResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty CurrentNoteProperty =
+            TerminalDeviceProperty.Register<BankNoteValue, GetCurrentNoteCommand, GetCurrentNoteResponse>("CurrentNote",
+                "BankNoteValue", typeof(BillAcceptor));
 
-        [ValueProperty("CapSafebox")]
-        public class CapabilitiesProperty : 
-            TerminalDeviceProperty<bool, GetBillAcceptorCapabilitiesCommand, GetBillAcceptorCapabilitiesResponse>
-        {
-            public CapabilitiesProperty(ITerminalDevice device)
-                : base(device, "Capabilities")
-            {
-                GetCommand = new TerminalDeviceCommand
-                    <GetBillAcceptorCapabilitiesCommand, GetBillAcceptorCapabilitiesResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty CapabilitiesProperty =
+            TerminalDeviceProperty.Register<bool, GetBillAcceptorCapabilitiesCommand, GetBillAcceptorCapabilitiesResponse>("Capabilities",
+                "CapSafebox", typeof(BillAcceptor));
 
         #endregion
 
         #region Device Methods
 
-        public class OpenMethod :
-            TerminalDeviceMethod<OpenBillAcceptorCommand, OpenBillAcceptorResponse>
-        {
-            public OpenMethod(ITerminalDevice device)
-                : base(device, "Open")
-            {
-                InvokeCommand = new TerminalDeviceCommand<OpenBillAcceptorCommand, OpenBillAcceptorResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod OpenMethod =
+         TerminalDeviceMethod.Register<OpenBillAcceptorCommand, OpenBillAcceptorResponse>("Open",
+             typeof(BillAcceptor));
 
-        public class CloseMethod :
-            TerminalDeviceMethod<CloseBillAcceptorCommand, CloseBillAcceptorResponse>
-        {
-            public CloseMethod(ITerminalDevice device)
-                : base(device, "Close")
-            {
-                InvokeCommand = new TerminalDeviceCommand<CloseBillAcceptorCommand, CloseBillAcceptorResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod CloseMethod =
+         TerminalDeviceMethod.Register<CloseBillAcceptorCommand, CloseBillAcceptorResponse>("Close",
+             typeof(BillAcceptor));
 
-        public class CollectMethod :
-            TerminalDeviceMethod<CollectCommand, CollectResponse>
-        {
-            public CollectMethod(ITerminalDevice device)
-                : base(device, "Collect")
-            {
-                InvokeCommand = new TerminalDeviceCommand<CollectCommand, CollectResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod CollectMethod =
+         TerminalDeviceMethod.Register<CollectCommand, CollectResponse>("Collect",
+             typeof(BillAcceptor));
 
-        public class EjectMethod :
-            TerminalDeviceMethod<EjectCommand, EjectResponse>
-        {
-            public EjectMethod(ITerminalDevice device)
-                : base(device, "Eject")
-            {
-                InvokeCommand = new TerminalDeviceCommand<EjectCommand, EjectResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod EjectMethod =
+         TerminalDeviceMethod.Register<EjectCommand, EjectResponse>("Eject",
+             typeof(BillAcceptor));
 
-        public class NoteStateConfirmMethod :
-            TerminalDeviceMethod<NoteStateConfirmCommand, NoteStateConfirmResponse>
-        {
-            public NoteStateConfirmMethod(ITerminalDevice device)
-                : base(device, "NoteStateConfirm")
-            {
-                InvokeCommand = new TerminalDeviceCommand<NoteStateConfirmCommand, NoteStateConfirmResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod NoteStateConfirmMethod =
+         TerminalDeviceMethod.Register<NoteStateConfirmCommand, NoteStateConfirmResponse>("NoteStateConfirm",
+             typeof(BillAcceptor));
 
         #endregion
 
         #region Device Events
 
-        public class StatusChangedEvent : TerminalDeviceEvent<StatusChanged>
-        {
-            public StatusChangedEvent(ITerminalDevice device)
-                : base(device, "StatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusChangedEvent =
+         TerminalDeviceEvent.Register<StatusChanged>("StatusChanged", typeof(BillAcceptor));
 
-        public class OpenChangedEvent : TerminalDeviceEvent<OpenChanged>
-        {
-            public OpenChangedEvent(ITerminalDevice device)
-                : base(device, "OpenChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent OpenChangedEvent =
+         TerminalDeviceEvent.Register<OpenChanged>("OpenChanged", typeof(BillAcceptor));
 
-        public class AcceptorStatusChangedEvent : TerminalDeviceEvent<AcceptorStatusChanged>
-        {
-            public AcceptorStatusChangedEvent(ITerminalDevice device)
-                : base(device, "AcceptorStatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent AcceptorStatusChangedEvent =
+         TerminalDeviceEvent.Register<AcceptorStatusChanged>("AcceptorStatusChanged", typeof(BillAcceptor));
 
-        public class BankNoteStatusChangedEvent : TerminalDeviceEvent<BankNoteStatusChanged>
-        {
-            public BankNoteStatusChangedEvent(ITerminalDevice device)
-                : base(device, "BankNoteStatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent BankNoteStatusChangedEvent =
+         TerminalDeviceEvent.Register<BankNoteStatusChanged>("BankNoteStatusChanged", typeof(BillAcceptor));
 
-        public class StatusBytesChangedEvent : TerminalDeviceEvent<BillAcceptorStatusBytesChanged>
-        {
-            public StatusBytesChangedEvent(ITerminalDevice device)
-                : base(device, "StatusBytesChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusBytesChangedEvent =
+         TerminalDeviceEvent.Register<BillAcceptorStatusBytesChanged>("StatusBytesChanged", typeof(BillAcceptor));
 
-        public class SafeboxStatusChangedEvent : TerminalDeviceEvent<SafeboxStatusChanged>
-        {
-            public SafeboxStatusChangedEvent(ITerminalDevice device)
-                : base(device, "SafeboxStatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent SafeboxStatusChangedEvent =
+         TerminalDeviceEvent.Register<SafeboxStatusChanged>("SafeboxStatusChanged", typeof(BillAcceptor));
 
-        public class StackerStatusChangedEvent : TerminalDeviceEvent<StackerStatusChanged>
-        {
-            public StackerStatusChangedEvent(ITerminalDevice device)
-                : base(device, "StackerStatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StackerStatusChangedEvent =
+         TerminalDeviceEvent.Register<StackerStatusChanged>("StackerStatusChanged", typeof(BillAcceptor));
 
         #endregion
     }

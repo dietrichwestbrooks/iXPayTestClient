@@ -1,269 +1,94 @@
-﻿using System.Collections.Generic;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    [TerminalRequestHandler]
-    [TerminalDevice]
-    public class ChipCardReader : TerminalDevice<ChipCardReaderCommand, ChipCardReaderResponse, ChipCardReaderEvent>
+    public class ChipCardReader
     {
-        public ChipCardReader()
-            : base("ChipCardReader")
+        public static void RegisterDeviceProxy()
         {
-            Properties.AddRange(new List<ITerminalDeviceProperty>
-                {
-                    new StatusProperty(this),
-                    new OpenedProperty(this),
-                    new CardPositionProperty(this),
-                    new ReaderTypeProperty(this),
-                });
-
-            Methods.AddRange(new List<ITerminalDeviceMethod>
-                {
-                    new OpenMethod(this),
-                    new CloseMethod(this),
-                    new TurnLightOnMethod(this),
-                    new FlashLightMethod(this),
-                    new TurnLightOffMethod(this),
-                    new DeactivateMethod(this),
-                    new SoftResetMethod(this),
-                    new ProcessApduMethod(this),
-                });
-
-            Events.AddRange(new List<ITerminalDeviceEvent>
-                {
-                    new OpenChangedEvent(this),
-                    new StatusChangedEvent(this),
-                    new CardPositionChangedEvent(this),
-                    new DataReadEvent(this),
-                    new InvalidDataReadEvent(this),
-                    new ChipCardReaderTimedOutEvent(this),
-                });
+            TerminalDevice.Register<ChipCardReaderCommand, ChipCardReaderResponse, ChipCardReaderEvent>(
+                    "ChipCardReader", new TerminalRequestHandlerByName("Terminal"), typeof(ChipCardReader));
         }
 
         #region Device Properties
 
-        [ValueProperty("State")]
-        public class StatusProperty : TerminalDeviceProperty<Status,
-            GetStatusCommand, GetStatusResponse>
-        {
-            public StatusProperty(ITerminalDevice device)
-                : base(device, "Status")
-            {
-                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty StatusProperty =
+            TerminalDeviceProperty.Register<Status, GetStatusCommand, GetStatusResponse>("Status",
+                "State", typeof(ChipCardReader));
 
-        [ValueProperty("Open")]
-        public class OpenedProperty : TerminalDeviceProperty<bool,
-            GetOpenedCommand, GetOpenedResponse>
-        {
-            public OpenedProperty(ITerminalDevice device)
-                : base(device, "Opened")
-            {
-                GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty OpenedProperty =
+            TerminalDeviceProperty.Register<bool, GetOpenedCommand, GetOpenedResponse>("Opened",
+                "Open", typeof(ChipCardReader));
 
-        [ValueProperty("CardPosition")]
-        public class CardPositionProperty : TerminalDeviceProperty<CardPosition,
-            GetCardPositionCommand, GetCardPositionResponse>
-        {
-            public CardPositionProperty(ITerminalDevice device)
-                : base(device, "CardPosition")
-            {
-                GetCommand = new TerminalDeviceCommand<GetCardPositionCommand, GetCardPositionResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty CardPositionProperty =
+            TerminalDeviceProperty.Register<CardPosition, GetCardPositionCommand, GetCardPositionResponse>("CardPosition",
+                "CardPosition", typeof(ChipCardReader));
 
-        [ValueProperty("ReaderType")]
-        public class ReaderTypeProperty : TerminalDeviceProperty<CardReader,
-            GetReaderTypeCommand, GetReaderTypeResponse>
-        {
-            public ReaderTypeProperty(ITerminalDevice device)
-                : base(device, "ReaderType")
-            {
-                GetCommand = new TerminalDeviceCommand<GetReaderTypeCommand, GetReaderTypeResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty ReaderTypeProperty =
+            TerminalDeviceProperty.Register<CardReader, GetReaderTypeCommand, GetReaderTypeResponse>("ReaderType",
+                "ReaderType", typeof(ChipCardReader));
 
         #endregion
 
         #region Device Methods
 
-        public class OpenMethod : TerminalDeviceMethod<OpenChipCardReaderCommand, OpenChipCardReaderResponse>
-        {
-            public OpenMethod(ITerminalDevice device)
-                : base(device, "Open")
-            {
-                InvokeCommand = new TerminalDeviceCommand<OpenChipCardReaderCommand, OpenChipCardReaderResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod OpenMethod =
+         TerminalDeviceMethod.Register<OpenChipCardReaderCommand, OpenChipCardReaderResponse>("Open",
+             typeof(ChipCardReader));
 
-        public class CloseMethod :
-            TerminalDeviceMethod<CloseChipCardReaderCommand, CloseChipCardReaderResponse>
-        {
-            public CloseMethod(ITerminalDevice device)
-                : base(device, "Close")
-            {
-                InvokeCommand = new TerminalDeviceCommand<CloseChipCardReaderCommand, CloseChipCardReaderResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod CloseMethod =
+         TerminalDeviceMethod.Register<CloseChipCardReaderCommand, CloseChipCardReaderResponse>("Close",
+             typeof(ChipCardReader));
 
+        public static readonly TerminalDeviceMethod TurnLightOnMethod =
+         TerminalDeviceMethod.Register<TurnLightOnCommand, TurnLightOnResponse>("TurnLightOn",
+             typeof(ChipCardReader));
 
-        public class TurnLightOnMethod :
-            TerminalDeviceMethod<TurnLightOnCommand, TurnLightOnResponse>
-        {
-            public TurnLightOnMethod(ITerminalDevice device)
-                : base(device, "TurnLightOn")
-            {
-                InvokeCommand = new TerminalDeviceCommand<TurnLightOnCommand, TurnLightOnResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod FlashLightMethod =
+         TerminalDeviceMethod.Register<FlashLightCommand, FlashLightResponse>("FlashLight",
+             typeof(ChipCardReader));
 
-        public class FlashLightMethod :
-            TerminalDeviceMethod<FlashLightCommand, FlashLightResponse>
-        {
-            public FlashLightMethod(ITerminalDevice device)
-                : base(device, "FlashLight")
-            {
-                InvokeCommand = new TerminalDeviceCommand<FlashLightCommand, FlashLightResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod TurnLightOffMethod =
+         TerminalDeviceMethod.Register<TurnLightOffCommand, TurnLightOffResponse>("FlashLight",
+             typeof(ChipCardReader));
 
-        public class TurnLightOffMethod :
-            TerminalDeviceMethod<TurnLightOffCommand, TurnLightOffResponse>
-        {
-            public TurnLightOffMethod(ITerminalDevice device)
-                : base(device, "TurnLightOff")
-            {
-                InvokeCommand = new TerminalDeviceCommand<TurnLightOffCommand, TurnLightOffResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod DeactivateMethod =
+         TerminalDeviceMethod.Register<DeactivateChipCardCommand, DeactivateChipCardResponse>("Deactivate",
+             typeof(ChipCardReader));
 
-        public class DeactivateMethod : TerminalDeviceMethod<DeactivateChipCardCommand, DeactivateChipCardResponse>
-        {
-            public DeactivateMethod(ITerminalDevice device)
-                : base(device, "Deactivate")
-            {
-                InvokeCommand = new TerminalDeviceCommand<DeactivateChipCardCommand, DeactivateChipCardResponse>(
-                    this,
-                    Name,
-                    () => new DeactivateChipCardCommand
-                    {
-                        ReleaseCard = true,
-                    }
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod SoftResetMethod =
+         TerminalDeviceMethod.Register<SoftResetChipCardCommand, SoftResetChipCardResponse>("SoftReset",
+             typeof(ChipCardReader));
 
-        public class SoftResetMethod : TerminalDeviceMethod<SoftResetChipCardCommand, SoftResetChipCardResponse>
-        {
-            public SoftResetMethod(ITerminalDevice device)
-                : base(device, "SoftReset")
-            {
-                InvokeCommand = new TerminalDeviceCommand<SoftResetChipCardCommand, SoftResetChipCardResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
-
-        public class ProcessApduMethod : TerminalDeviceMethod<ChipCardProcessAPDUCommand, ChipCardProcessAPDUResponse>
-        {
-            public ProcessApduMethod(ITerminalDevice device)
-                : base(device, "ProcessAPDU")
-            {
-                InvokeCommand = new TerminalDeviceCommand<ChipCardProcessAPDUCommand, ChipCardProcessAPDUResponse>(
-                    this,
-                    Name,
-                    () => new ChipCardProcessAPDUCommand
-                    {
-                        CAPDU = new byte[] { 0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x0, 0x0, 0x0, 0x04, 0x10, 0x10 },
-                    }
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod ProcessApduMethod =
+         TerminalDeviceMethod.Register<ChipCardProcessAPDUCommand, ChipCardProcessAPDUResponse>("ProcessAPDU",
+             typeof(ChipCardReader), () => new ChipCardProcessAPDUCommand
+             {
+                 CAPDU = new byte[] { 0x00, 0xA4, 0x04, 0x00, 0x07, 0xA0, 0x0, 0x0, 0x0, 0x04, 0x10, 0x10 },
+             });
 
         #endregion
 
         #region Device Events
 
-        public class OpenChangedEvent : TerminalDeviceEvent<OpenChanged>
-        {
-            public OpenChangedEvent(ITerminalDevice device)
-                : base(device, "OpenChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent OpenChangedEvent =
+            TerminalDeviceEvent.Register<OpenChanged>("OpenChanged", typeof(ChipCardReader));
 
-        public class StatusChangedEvent : TerminalDeviceEvent<StatusChanged>
-        {
-            public StatusChangedEvent(ITerminalDevice device)
-                : base(device, "StatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusChangedEvent =
+            TerminalDeviceEvent.Register<StatusChanged>("StatusChanged", typeof(ChipCardReader));
 
-        public class CardPositionChangedEvent : TerminalDeviceEvent<CardPositionChanged>
-        {
-            public CardPositionChangedEvent(ITerminalDevice device)
-                : base(device, "CardPositionChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent CardPositionChangedEvent =
+            TerminalDeviceEvent.Register<CardPositionChanged>("CardPositionChanged", typeof(ChipCardReader));
 
-        public class DataReadEvent : TerminalDeviceEvent<ChipCardData>
-        {
-            public DataReadEvent(ITerminalDevice device)
-                : base(device, "DataRead")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent DataReadEvent =
+            TerminalDeviceEvent.Register<ChipCardData>("DataRead", typeof(ChipCardReader));
 
-        public class InvalidDataReadEvent : TerminalDeviceEvent<ChipCardInvalidData>
-        {
-            public InvalidDataReadEvent(ITerminalDevice device)
-                : base(device, "InvalidDataRead")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent InvalidDataReadEvent =
+            TerminalDeviceEvent.Register<ChipCardInvalidData>("InvalidDataRead", typeof(ChipCardReader));
 
-        public class ChipCardReaderTimedOutEvent : TerminalDeviceEvent<ChipCardReaderTimedOut>
-        {
-            public ChipCardReaderTimedOutEvent(ITerminalDevice device)
-                : base(device, "TimedOut")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent ChipCardReaderTimedOutEvent =
+            TerminalDeviceEvent.Register<ChipCardReaderTimedOut>("TimedOut", typeof(ChipCardReader));
 
         #endregion
     }

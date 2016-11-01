@@ -385,10 +385,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Script.Views
 
         private string GetValueProperty(ITerminalDeviceCommand command)
         {
-            var attribute = command.Member.GetType().GetCustomAttributes(typeof (ValuePropertyAttribute), false)
-                .FirstOrDefault() as ValuePropertyAttribute;
+            var property = command.Member as ITerminalDeviceProperty;
 
-            return attribute == null ? string.Empty : attribute.PropertyName;
+            return property == null ? string.Empty : property.ValuePropertyName;
         }
 
         //private string GetScriptValue(PropertyInfo prop, object instance)

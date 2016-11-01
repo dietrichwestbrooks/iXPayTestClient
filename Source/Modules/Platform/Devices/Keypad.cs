@@ -5,182 +5,74 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    [TerminalRequestHandler]
-    [TerminalDevice]
-    public class Keypad : TerminalDevice<KeypadCommand, KeypadResponse, KeypadEvent>
+    public class Keypad
     {
-        public Keypad() 
-            : base("Keypad")
+        public static void RegisterDeviceProxy()
         {
-            Properties.AddRange(new List<ITerminalDeviceProperty>
-                {
-                    new StatusProperty(this),
-                    new OpenedProperty(this),
-                });
-
-            Methods.AddRange(new List<ITerminalDeviceMethod>
-                {
-                    new DisableMethod(this),
-                    new EnableFunctionKeysMethod(this),
-                    new ValidatePinBlockMethod(this),
-                });
-
-            Events.AddRange(new List<ITerminalDeviceEvent>
-                {
-                    new OpenChangedEvent(this),
-                    new StatusChangedEvent(this),
-                    new KeyPressedEvent(this),
-                    new FunctionKeyPressedEvent(this),
-                    new EntryCompleteEvent(this),
-                    new PinEntryCompleteEvent(this),
-                    new EntryTimedOutEvent(this),
-                });
+            TerminalDevice.Register<KeypadCommand, KeypadResponse, KeypadEvent>(
+                    "Keypad", new TerminalRequestHandlerByName("Terminal"), typeof(Keypad));
         }
 
         #region Device Properties
 
-        [ValueProperty("State")]
-        public class StatusProperty : TerminalDeviceProperty<Status, GetStatusCommand, GetStatusResponse>
-        {
-            public StatusProperty(ITerminalDevice device)
-                : base(device, "Status")
-            {
-                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty StatusProperty =
+            TerminalDeviceProperty.Register<Status, GetStatusCommand, GetStatusResponse>("Status",
+                "State", typeof(Keypad));
 
-        [ValueProperty("Open")]
-        public class OpenedProperty : TerminalDeviceProperty<bool, GetOpenedCommand, GetOpenedResponse>
-        {
-            public OpenedProperty(ITerminalDevice device)
-                : base(device, "Opened")
-            {
-                GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty OpenedProperty =
+            TerminalDeviceProperty.Register<bool, GetOpenedCommand, GetOpenedResponse>("Opened",
+                "Open", typeof(Keypad));
 
         #endregion
 
         #region Device Methods
 
-        public class DisableMethod :
-        TerminalDeviceMethod<DisableKeypadCommand, DisableKeypadResponse>
-        {
-            public DisableMethod(ITerminalDevice device)
-                : base(device, "Disable")
-            {
-                InvokeCommand = new TerminalDeviceCommand<DisableKeypadCommand, DisableKeypadResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod DisableMethod =
+         TerminalDeviceMethod.Register<DisableKeypadCommand, DisableKeypadResponse>("Disable",
+             typeof(Keypad));
 
-        public class EnableFunctionKeysMethod :
-        TerminalDeviceMethod<EnableKeypadFunctionKeysCommand, EnableKeypadFunctionKeysResponse>
-        {
-            public EnableFunctionKeysMethod(ITerminalDevice device)
-                : base(device, "EnableFunctionKeys")
-            {
-                InvokeCommand = new TerminalDeviceCommand
-                    <EnableKeypadFunctionKeysCommand, EnableKeypadFunctionKeysResponse>
-                    (
-                    this,
-                    Name,
-                    () => new EnableKeypadFunctionKeysCommand
-                        {
-                            KeypadFunctionKey = new[]
+        public static readonly TerminalDeviceMethod EnableFunctionKeysMethod =
+         TerminalDeviceMethod.Register<EnableKeypadFunctionKeysCommand, EnableKeypadFunctionKeysResponse>("EnableFunctionKeys",
+             typeof(Keypad), () => new EnableKeypadFunctionKeysCommand
+             {
+                 KeypadFunctionKey = new[]
                                 {
                                     new KeypadFunctionKey {Function = KeypadFunctionKeyEnum.Num1, ReturnValue = 1},
                                     new KeypadFunctionKey {Function = KeypadFunctionKeyEnum.Num2, ReturnValue = 2},
                                 }
-                        }
-                    );
-            }
-        }
+             });
 
-        public class ValidatePinBlockMethod :
-        TerminalDeviceMethod<ValidatePINBlockCommand, ValidatePINBlockResponse>
-        {
-            public ValidatePinBlockMethod(ITerminalDevice device)
-                : base(device, "ValidatePinBlock")
-            {
-                InvokeCommand = new TerminalDeviceCommand<ValidatePINBlockCommand, ValidatePINBlockResponse>(
-                    this,
-                    Name,
-                    () => new ValidatePINBlockCommand
-                        {
-                            PINBlock = new ASCIIEncoding().GetBytes("01020304CDFE4F")
-                        }
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod ValidatePinBlockMethod =
+         TerminalDeviceMethod.Register<ValidatePINBlockCommand, ValidatePINBlockResponse>("ValidatePinBlock",
+             typeof(Keypad), () => new ValidatePINBlockCommand
+             {
+                 PINBlock = new ASCIIEncoding().GetBytes("01020304CDFE4F")
+             });
 
         #endregion
 
         #region Device Events
 
-        public class OpenChangedEvent : TerminalDeviceEvent<OpenChanged>
-        {
-            public OpenChangedEvent(ITerminalDevice device)
-                : base(device, "OpenChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent OpenChangedEvent =
+            TerminalDeviceEvent.Register<OpenChanged>("OpenChanged", typeof(Keypad));
 
-        public class StatusChangedEvent : TerminalDeviceEvent<StatusChanged>
-        {
-            public StatusChangedEvent(ITerminalDevice device)
-                : base(device, "StatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusChangedEvent =
+            TerminalDeviceEvent.Register<StatusChanged>("StatusChanged", typeof(Keypad));
 
-        public class KeyPressedEvent : TerminalDeviceEvent<KeyPressed>
-        {
-            public KeyPressedEvent(ITerminalDevice device)
-                : base(device, "KeyPressed")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent KeyPressedEvent =
+            TerminalDeviceEvent.Register<KeyPressed>("KeyPressed", typeof(Keypad));
 
-        public class FunctionKeyPressedEvent : TerminalDeviceEvent<FunctionKeyPressed>
-        {
-            public FunctionKeyPressedEvent(ITerminalDevice device)
-                : base(device, "FunctionKeyPressed")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent FunctionKeyPressedEvent =
+            TerminalDeviceEvent.Register<FunctionKeyPressed>("FunctionKeyPressed", typeof(Keypad));
 
-        public class EntryCompleteEvent : TerminalDeviceEvent<EntryComplete>
-        {
-            public EntryCompleteEvent(ITerminalDevice device)
-                : base(device, "EntryComplete")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent EntryCompleteEvent =
+            TerminalDeviceEvent.Register<EntryComplete>("EntryComplete", typeof(Keypad));
 
-        public class PinEntryCompleteEvent : TerminalDeviceEvent<PINEntryComplete>
-        {
-            public PinEntryCompleteEvent(ITerminalDevice device)
-                : base(device, "PinEntryComplete")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent PinEntryCompleteEvent =
+            TerminalDeviceEvent.Register<PINEntryComplete>("PinEntryComplete", typeof(Keypad));
 
-        public class EntryTimedOutEvent : TerminalDeviceEvent<KeypadEntryTimedOut>
-        {
-            public EntryTimedOutEvent(ITerminalDevice device)
-                : base(device, "EntryTimedOut")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent EntryTimedOutEvent =
+            TerminalDeviceEvent.Register<KeypadEntryTimedOut>("EntryTimedOut", typeof(Keypad));
 
         #endregion
     }

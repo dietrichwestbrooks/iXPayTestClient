@@ -6,14 +6,24 @@ using Microsoft.Practices.ServiceLocation;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public abstract class TerminalDeviceEvent<TEvent> : TerminalDeviceMember, ITerminalDeviceEvent
+    public sealed class TerminalDeviceEvent : TerminalDeviceMember, ITerminalDeviceEvent
     {
         private List<EventHandler<object>> EventHandlers { get; } = new List<EventHandler<object>>();
 
-        protected TerminalDeviceEvent(ITerminalDevice device, string name)
-            : base(device, name)
+        private TerminalDeviceEvent(string name, Type eventType)
+            : base(name)
         {
-            EventType = typeof (TEvent);
+            EventType = eventType;
+        }
+
+        public static TerminalDeviceEvent Register<TEvent>(string name, Type ownerType)
+            where TEvent : class
+        {
+            var @event = new TerminalDeviceEvent(name, typeof(TEvent));
+
+            TerminalDevice.AddMember(ownerType, @event);
+
+            return @event;
         }
 
         public Type EventType { get; }
@@ -28,10 +38,9 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             return this == value;
         }
 
-        public virtual bool TryInvoke(object eventObject)
+        public bool TryInvoke(object eventObject)
         {
-            // Convert to array because handlers may be unsubscribed while
-            // being executed
+            // Convert to array because handlers may be unsubscribed while enumerating
             foreach (var handler in EventHandlers.ToArray())
             {
                 handler(this, eventObject);

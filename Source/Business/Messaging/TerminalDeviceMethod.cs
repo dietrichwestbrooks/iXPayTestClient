@@ -3,24 +3,34 @@ using System.Dynamic;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public abstract class TerminalDeviceMethod<TInvokeCommand, TInvokeResponse> : TerminalDeviceMember,
-        ITerminalDeviceMethod
-        where TInvokeCommand : class
-        where TInvokeResponse : class
+    public sealed class TerminalDeviceMethod : TerminalDeviceMember, ITerminalDeviceMethod
     {
-        protected TerminalDeviceMethod(ITerminalDevice device, string name)
-            : base(device, name)
+        public TerminalDeviceMethod(string name, Type commandType, Type responseType, Func<object> prepareCommandFunc)
+            : base(name)
         {
-            CommandType = typeof (TInvokeCommand);
-            ResponseType = typeof (TInvokeResponse);
+            CommandType = commandType;
+            ResponseType = responseType;
+            InvokeCommand = new TerminalDeviceCommand(this, name, CommandType, ResponseType, prepareCommandFunc);
+        }
+
+        public static TerminalDeviceMethod Register<TCommand, TResponse>(string name, Type ownerType, Func<TCommand> prepareCommandFunc = null)
+            where TCommand : class
+            where TResponse : class
+        {
+            var method = new TerminalDeviceMethod(name, typeof(TCommand), typeof(TResponse), prepareCommandFunc);
+
+            TerminalDevice.AddMember(ownerType, method);
+
+            return method;
         }
 
         public Type CommandType { get; }
+
         public Type ResponseType { get; }
 
-        public ITerminalDeviceCommand InvokeCommand { get; protected set; }
+        public ITerminalDeviceCommand InvokeCommand { get; }
 
-        public virtual bool TryInvoke(CommandParameters parameters, out object result)
+        public bool TryInvoke(CommandParameters parameters, out object result)
         {
             result = InvokeCommand.Execute(parameters);
             return true;

@@ -1,329 +1,133 @@
 ﻿using System;
-using System.Collections.Generic;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    [TerminalRequestHandler]
-    [TerminalDevice]
-    public class Terminal : TerminalDevice<TerminalCommand, TerminalResponse, TerminalEvent>
+    public class Terminal
     {
-        public Terminal() 
-            : base("Terminal")
+        public static void RegisterDeviceProxy()
         {
-            Properties.AddRange(new List<ITerminalDeviceProperty>
-                {
-                    new TerminalIdProperty(this),
-                    new SupportedTerminalIdsProperty(this),
-                    new PackageVersionProperty(this),
-                    new OperationalStateProperty(this),
-                    new TerminalStateProperty(this),
-                    new BatteryStateProperty(this),
-                });
-
-            Methods.AddRange(new List<ITerminalDeviceMethod>
-                {
-                    new ResetMethod(this),
-                    new SetDateTimeMethod(this),
-                    new SetToIdleMethod(this),
-                    new DisplaySecurePromptMethod(this),
-                    new EnableFunctionKeysMethod(this),
-                    new DisableFunctionKeysMethod(this),
-                    new EnableCancelKeyMethod(this),
-                    new DisableCancelKeyMethod(this),
-                    new PassThroughMethod(this),
-                });
-
-            Events.AddRange(new List<ITerminalDeviceEvent>
-                {
-                    new CancelKeyPressedEvent(this),
-                    new FunctionKeyPressedEvent(this),
-                    new OperationalStatusChangedEvent(this),
-                    new StatusChangedEvent(this),
-                    new BatteryStatusChangedEvent(this),
-                    new FunctionKeyEntryTimedOutEvent(this),
-                });
+            TerminalDevice.Register<TerminalCommand, TerminalResponse, TerminalEvent>(
+                    "Terminal", typeof(Terminal));
         }
 
         #region Device Properties
 
-        [ValueProperty("TerminalId")]
-        public class TerminalIdProperty : TerminalDeviceProperty<int,
-            GetTerminalIdCommand, GetTerminalIdResponse>
-        {
-            public TerminalIdProperty(ITerminalDevice device)
-                : base(device, "TerminalId")
-            {
-                GetCommand = new TerminalDeviceCommand<GetTerminalIdCommand, GetTerminalIdResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty TerminalIdProperty =
+            TerminalDeviceProperty.Register<int, GetTerminalIdCommand, GetTerminalIdResponse>("TerminalId",
+                "TerminalId", typeof(Terminal));
 
-        [ValueProperty("SupportedTerminal")]
-        public class SupportedTerminalIdsProperty : TerminalDeviceProperty<SupportedTerminal[],
-            GetSupportedTerminalIdsCommand, GetSupportedTerminalIdsResponse>
-        {
-            public SupportedTerminalIdsProperty(ITerminalDevice device)
-                : base(device, "SupportedTerminalIds")
-            {
-                GetCommand = new TerminalDeviceCommand<GetSupportedTerminalIdsCommand, GetSupportedTerminalIdsResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty SupportedTerminalIdsProperty =
+            TerminalDeviceProperty.Register<SupportedTerminal[],
+            GetSupportedTerminalIdsCommand, GetSupportedTerminalIdsResponse>("SupportedTerminalIds",
+                "SupportedTerminal", typeof(Terminal));
 
-        [ValueProperty("PackageVersion")]
-        public class PackageVersionProperty : TerminalDeviceProperty<string,
-            GetPackageVersionCommand, GetPackageVersionResponse>
-        {
-            public PackageVersionProperty(ITerminalDevice device)
-                : base(device, "PackageVersion")
-            {
-                GetCommand = new TerminalDeviceCommand<GetPackageVersionCommand, GetPackageVersionResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty PackageVersionProperty =
+            TerminalDeviceProperty.Register<string, GetPackageVersionCommand, GetPackageVersionResponse>("PackageVersion",
+                "PackageVersion", typeof(Terminal));
 
-        [ValueProperty("OperationalState")]
-        public class OperationalStateProperty : TerminalDeviceProperty<OperationalStatus,
-            GetOperationalStateCommand, GetOperationalStateResponse>
-        {
-            public OperationalStateProperty(ITerminalDevice device)
-                : base(device, "OperationalState")
-            {
-                GetCommand = new TerminalDeviceCommand<GetOperationalStateCommand, GetOperationalStateResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty OperationalStateProperty =
+            TerminalDeviceProperty.Register<OperationalStatus,
+            GetOperationalStateCommand, GetOperationalStateResponse>("OperationalState",
+                "OperationalState", typeof(Terminal));
 
-        [ValueProperty("TerminalState")]
-        public class TerminalStateProperty : TerminalDeviceProperty<TerminalStatus,
-            GetTerminalStateCommand, GetTerminalStateResponse>
-        {
-            public TerminalStateProperty(ITerminalDevice device)
-                : base(device, "TerminalState")
-            {
-                GetCommand = new TerminalDeviceCommand<GetTerminalStateCommand, GetTerminalStateResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty TerminalStateProperty =
+            TerminalDeviceProperty.Register<TerminalStatus, GetTerminalStateCommand, GetTerminalStateResponse>("TerminalState",
+                "TerminalState", typeof(Terminal));
 
-        [ValueProperty("BatteryState")]
-        public class BatteryStateProperty : TerminalDeviceProperty<BatteryStatus,
-            GetBatteryStateCommand, GetBatteryStateResponse>
-        {
-            public BatteryStateProperty(ITerminalDevice device)
-                : base(device, "BatteryState")
-            {
-                GetCommand = new TerminalDeviceCommand<GetBatteryStateCommand, GetBatteryStateResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty BatteryStateProperty =
+            TerminalDeviceProperty.Register<BatteryStatus, GetBatteryStateCommand, GetBatteryStateResponse>("BatteryState",
+                "BatteryState", typeof(Terminal));
 
         #endregion
 
         #region Device Methods
 
-        public class DisplaySecurePromptMethod : TerminalDeviceMethod<DisplaySecurePromptCommand, DisplaySecurePromptResponse>
-        {
-            public DisplaySecurePromptMethod(ITerminalDevice device)
-                : base(device, "DisplaySecurePrompt")
-            {
-                InvokeCommand = new TerminalDeviceCommand<DisplaySecurePromptCommand, DisplaySecurePromptResponse>(
-                    this,
-                    Name,
-                    () => new DisplaySecurePromptCommand
-                        {
-                            Language = "en",
-                            SecurityLevel = SecurityLevels.Unencrypted,
-                            EntryType = EntryType.AlphaNumeric,
-                        }
-                    );
-            }
-        }
-
-        public class ResetMethod : TerminalDeviceMethod<ResetCommand, ResetResponse>
-        {
-            public ResetMethod(ITerminalDevice device)
-                : base(device, "Reset")
-            {
-                InvokeCommand = new TerminalDeviceCommand<ResetCommand, ResetResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
-
-        public class SetDateTimeMethod : TerminalDeviceMethod<SetDateTimeCommand, SetDateTimeResponse>
-        {
-            public SetDateTimeMethod(ITerminalDevice device)
-                : base(device, "SetDateTime")
-            {
-                InvokeCommand = new TerminalDeviceCommand<SetDateTimeCommand, ResetResponse>(
-                    this,
-                    Name,
-                    () => new SetDateTimeCommand
+        public static readonly TerminalDeviceMethod OpenMethod =
+            TerminalDeviceMethod.Register<DisplaySecurePromptCommand, DisplaySecurePromptResponse>(
+                "DisplaySecurePrompt", 
+                typeof (Terminal), () => new DisplaySecurePromptCommand
                     {
-                        SystemClock = new SystemClock
-                        {
-                            dateTime = DateTime.Now.ToString("yyyy-MM-dd HH':'mm':'ss"),
-                            TimeZone = new SystemClockTimeZone
-                            {
-                                utcOffsetMinutes = (int)TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).TotalMinutes,
-                                standardName = TimeZone.CurrentTimeZone.StandardName,
-                                daylightName = TimeZone.CurrentTimeZone.DaylightName,
-                            }
-                        },
-                    }
-                    );
-            }
-        }
+                        Language = "en",
+                        SecurityLevel = SecurityLevels.Unencrypted,
+                        EntryType = EntryType.AlphaNumeric,
+                    });
 
-        public class SetToIdleMethod : TerminalDeviceMethod<SetToIdleCommand, SetToIdleResponse>
-        {
-            public SetToIdleMethod(ITerminalDevice device)
-                : base(device, "SetToIdle")
-            {
-                InvokeCommand = new TerminalDeviceCommand<SetToIdleCommand, SetToIdleResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod ResetMethod =
+            TerminalDeviceMethod.Register<ResetCommand, ResetResponse>("Reset",
+                typeof(Terminal));
 
-        public class EnableFunctionKeysMethod : TerminalDeviceMethod<EnableFunctionKeysCommand, EnableFunctionKeysResponse>
-        {
-            public EnableFunctionKeysMethod(ITerminalDevice device)
-                : base(device, "EnableFunctionKeys")
-            {
-                InvokeCommand = new TerminalDeviceCommand<EnableFunctionKeysCommand, EnableFunctionKeysResponse>(
-                    this,
-                    Name,
-                    () => new EnableFunctionKeysCommand
+        public static readonly TerminalDeviceMethod SetDateTimeMethod =
+            TerminalDeviceMethod.Register<SetDateTimeCommand, SetDateTimeResponse>("SetDateTime",
+                typeof(Terminal), () => new SetDateTimeCommand
+                {
+                    SystemClock = new SystemClock
+                    {
+                        dateTime = DateTime.Now.ToString("yyyy-MM-dd HH':'mm':'ss"),
+                        TimeZone = new SystemClockTimeZone
                         {
-                            FunctionKey = new []
+                            utcOffsetMinutes = (int)TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).TotalMinutes,
+                            standardName = TimeZone.CurrentTimeZone.StandardName,
+                            daylightName = TimeZone.CurrentTimeZone.DaylightName,
+                        }
+                    },
+                });
+
+        public static readonly TerminalDeviceMethod SetToIdleMethod =
+         TerminalDeviceMethod.Register<SetToIdleCommand, SetToIdleResponse>("SetToIdle",
+             typeof(Terminal));
+
+        public static readonly TerminalDeviceMethod EnableFunctionKeysMethod =
+         TerminalDeviceMethod.Register<EnableFunctionKeysCommand, EnableFunctionKeysResponse>("EnableFunctionKeys",
+             typeof(Terminal), () => new EnableFunctionKeysCommand
+             {
+                 FunctionKey = new[]
                                 {
                                     new FunctionKey {Function = 1, Location = 1, LocationSpecified = true, Text = "Credit"},
                                     new FunctionKey {Function = 2, Location = 5, LocationSpecified = true, Text = "Debit"},
                                     new FunctionKey {Function = 3, Location = 4, LocationSpecified = true, Text = "Cancel"},
                                 }
-                    }
-                    );
-            }
-        }
+             });
 
-        public class DisableFunctionKeysMethod : TerminalDeviceMethod<DisableFunctionKeysCommand, DisableFunctionKeysResponse>
-        {
-            public DisableFunctionKeysMethod(ITerminalDevice device)
-                : base(device, "DisableFunctionKeys")
-            {
-                InvokeCommand = new TerminalDeviceCommand<DisableFunctionKeysCommand, DisableFunctionKeysResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod DisableFunctionKeysMethod =
+            TerminalDeviceMethod.Register<DisableFunctionKeysCommand, DisableFunctionKeysResponse>(
+                "DisableFunctionKeys", typeof(Terminal));
 
-        public class EnableCancelKeyMethod : TerminalDeviceMethod<EnableCancelKeyCommand, EnableCancelKeyResponse>
-        {
-            public EnableCancelKeyMethod(ITerminalDevice device)
-                : base(device, "EnableCancelKey")
-            {
-                InvokeCommand = new TerminalDeviceCommand<EnableCancelKeyCommand, EnableCancelKeyResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod EnableCancelKeyMethod =
+            TerminalDeviceMethod.Register<EnableCancelKeyCommand, EnableCancelKeyResponse>(
+                "EnableCancelKey", typeof(Terminal));
 
-        public class DisableCancelKeyMethod : TerminalDeviceMethod<DisableCancelKeyCommand, DisableCancelKeyResponse>
-        {
-            public DisableCancelKeyMethod(ITerminalDevice device)
-                : base(device, "DisableCancelKey")
-            {
-                InvokeCommand = new TerminalDeviceCommand<DisableCancelKeyCommand, DisableCancelKeyResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod DisableCancelKeyMethod =
+            TerminalDeviceMethod.Register<DisableCancelKeyCommand, DisableCancelKeyResponse>(
+                "DisableCancelKey", typeof(Terminal));
 
-        public class PassThroughMethod : TerminalDeviceMethod<PassThroughCommand, PassThroughResponse>
-        {
-            public PassThroughMethod(ITerminalDevice device)
-                : base(device, "PassThrough")
-            {
-                InvokeCommand = new TerminalDeviceCommand<PassThroughCommand, PassThroughResponse>(
-                    this,
-                    Name,
-                    () => new PassThroughCommand {Value = new byte[] {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0}}
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod PassThroughMethod =
+            TerminalDeviceMethod.Register<PassThroughCommand, PassThroughResponse>(
+                "PassThrough", typeof (Terminal),
+                () => new PassThroughCommand {Value = new byte[] {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0}});
 
         #endregion
 
         #region Device Events
 
-        public class CancelKeyPressedEvent : TerminalDeviceEvent<CancelKeyPressed>
-        {
-            public CancelKeyPressedEvent(ITerminalDevice device)
-                : base(device, "CancelKeyPressed")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent CancelKeyPressedEvent =
+            TerminalDeviceEvent.Register<CancelKeyPressed>("CancelKeyPressed", typeof(Terminal));
 
-        public class FunctionKeyPressedEvent : TerminalDeviceEvent<FunctionKeyPressed>
-        {
-            public FunctionKeyPressedEvent(ITerminalDevice device)
-                : base(device, "FunctionKeyPressed")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent FunctionKeyPressedEvent =
+            TerminalDeviceEvent.Register<FunctionKeyPressed>("FunctionKeyPressed", typeof(Terminal));
 
-        public class OperationalStatusChangedEvent : TerminalDeviceEvent<OperationalStatusChanged>
-        {
-            public OperationalStatusChangedEvent(ITerminalDevice device)
-                : base(device, "OperationalStatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent OperationalStatusChangedEvent =
+            TerminalDeviceEvent.Register<OperationalStatusChanged>("OperationalStatusChanged", typeof(Terminal));
 
-        public class StatusChangedEvent : TerminalDeviceEvent<TerminalStatusChanged>
-        {
-            public StatusChangedEvent(ITerminalDevice device)
-                : base(device, "StatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusChangedEvent =
+            TerminalDeviceEvent.Register<TerminalStatusChanged>("StatusChanged", typeof(Terminal));
 
-        public class BatteryStatusChangedEvent : TerminalDeviceEvent<TerminalStatusChanged>
-        {
-            public BatteryStatusChangedEvent(ITerminalDevice device)
-                : base(device, "BatteryStatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent BatteryStatusChangedEvent =
+            TerminalDeviceEvent.Register<TerminalStatusChanged>("BatteryStatusChanged", typeof(Terminal));
 
-        public class FunctionKeyEntryTimedOutEvent : TerminalDeviceEvent<TerminalStatusChanged>
-        {
-            public FunctionKeyEntryTimedOutEvent(ITerminalDevice device)
-                : base(device, "FunctionKeyEntryTimedOut")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent FunctionKeyEntryTimedOutEvent =
+            TerminalDeviceEvent.Register<TerminalStatusChanged>("FunctionKeyEntryTimedOut", typeof(Terminal));
 
         #endregion
     }

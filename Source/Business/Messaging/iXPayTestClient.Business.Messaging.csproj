@@ -73,7 +73,6 @@
     <Compile Include="CastEventHandlerResolver.cs" />
     <Compile Include="TerminalDeviceMethod.cs" />
     <Compile Include="ProducerConsumerQueue.cs" />
-    <Compile Include="MimicDepProp.cs" />
     <Compile Include="TerminalDeviceProperty.cs" />
     <Compile Include="MessageBrokerTask.cs" />
     <Compile Include="TerminalConnection.cs" />

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Microsoft.Practices.ServiceLocation;
 using Prism.Logging;
 using Prism.Mef.Modularity;
 using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.New;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Constants;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Events;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Interfaces;
 using Wayne.Payment.Tools.iXPayTestClient.Infrastructure.Modules;
+using Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices;
 using Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Views;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform
@@ -27,20 +26,26 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform
         {
             try
             {
+                Terminal.RegisterDeviceProxy();
                 SamReader.RegisterDeviceProxy();
+                BarcodeReader.RegisterDeviceProxy();
+                Beeper.RegisterDeviceProxy();
+                BillAcceptor.RegisterDeviceProxy();
+                ChipCardReader.RegisterDeviceProxy();
+                DallasKey.RegisterDeviceProxy();
+                Keypad.RegisterDeviceProxy();
+                MagStripeReader.RegisterDeviceProxy();
+                NonSecureKeypad.RegisterDeviceProxy();
+                Printer.RegisterDeviceProxy();
+                TamperDetectors.RegisterDeviceProxy();
+                SecurityModule.RegisterDeviceProxy();
+                Display.RegisterDeviceProxy();
+                Softphone.RegisterDeviceProxy();
+                ContactlessReader.RegisterDeviceProxy();
 
                 EventAggregator.GetEvent<DeviceRegisteredEvent>().Subscribe(OnDeviceRegistered);
 
-                var terminalService = Container.GetExportedValue<ITerminalService>();
-
                 RegisterDevicesFromScript();
-
-                var terminal = terminalService.Devices.FirstOrDefault(d => d.Name == "Terminal");
-
-                foreach (var device in terminalService.Devices.Where(d => d.Name != terminal?.Name))
-                {
-                    device.Successor = terminal;
-                }
             }
             catch (Exception ex)
             {
@@ -77,6 +82,10 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform
         private void OnDeviceRegistered(ITerminalDevice device)
         {
             Container.ComposeExportedValue(device);
+
+            var handler = device as ITerminalRequestHandler;
+            if (handler != null)
+                Container.ComposeExportedValue(device);
         }
     }
 }

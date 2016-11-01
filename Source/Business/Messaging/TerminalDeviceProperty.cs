@@ -2,75 +2,106 @@
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public abstract class TerminalDeviceProperty<TValue, TGetCommand, TGetResponse> : TerminalDeviceMember, ITerminalDeviceProperty
-        where TGetCommand : class
-        where TGetResponse : class
+    public sealed class TerminalDeviceProperty : TerminalDeviceMember, ITerminalDeviceProperty
     {
-        protected TerminalDeviceProperty(ITerminalDevice device, string name)
-            : base(device, name)
+        private TerminalDeviceProperty(string name, string valuePropName, Type valueType, Type getCommandType,
+            Type getResponseType, Func<object> prepGetCmdFunc, Type setCommandType, Type setResponseType,
+            Func<object> prepSetCmdFunc)
+            : base(name)
         {
-            ValueType = typeof (TValue);
-            GetCommandType = typeof (TGetCommand);
-            GetResponseType = typeof (TGetResponse);
+            ValuePropertyName = valuePropName;
+            ValueType = valueType;
+            GetCommandType = getCommandType;
+            GetResponseType = getResponseType;
+            GetCommand = new TerminalDeviceCommand(this, $"get_{Name}", GetCommandType, GetResponseType, prepGetCmdFunc);
+            SetCommandType = setCommandType;
+            SetResponseType = setResponseType;
+            SetCommand = new TerminalDeviceCommand(this, $"set_{Name}", SetCommandType, SetResponseType, prepSetCmdFunc);
         }
 
+        private TerminalDeviceProperty(string name, string valuePropName, Type valueType, Type getCommandType,
+            Type getResponseType, Func<object> prepGetCmdFunc)
+            : base(name)
+        {
+            ValuePropertyName = valuePropName;
+            ValueType = valueType;
+            GetCommandType = getCommandType;
+            GetResponseType = getResponseType;
+            GetCommand = new TerminalDeviceCommand(this, $"get_{Name}", GetCommandType, GetResponseType, prepGetCmdFunc);
+        }
+
+        public static TerminalDeviceProperty Register<TValue, TGetCommand, TGetResponse, TSetCommand, TSetResponse>(
+            string name, string valuePropName, Type ownerType, Func<TGetCommand> prepGetCmdFunc = null,
+            Func<TSetCommand> prepSetCmdFunc = null)
+            where TGetCommand : class
+            where TGetResponse : class
+            where TSetCommand : class
+            where TSetResponse : class
+        {
+            var property = new TerminalDeviceProperty(name, valuePropName, typeof (TValue), typeof (TGetCommand),
+                typeof (TGetResponse),
+                prepGetCmdFunc, typeof (TSetCommand), typeof (TSetResponse), prepSetCmdFunc);
+
+            RegisterCommon(ownerType, property);
+
+            return property;
+        }
+
+        public static TerminalDeviceProperty Register<TValue, TGetCommand, TGetResponse>(string name,
+            string valuePropName, Type ownerType, Func<TGetCommand> prepGetCmdFunc = null)
+            where TGetCommand : class
+            where TGetResponse : class
+        {
+            var property = new TerminalDeviceProperty(name, valuePropName, typeof (TValue), typeof (TGetCommand),
+                typeof (TGetResponse),
+                prepGetCmdFunc);
+
+            RegisterCommon(ownerType, property);
+
+            return property;
+        }
+
+        private static void RegisterCommon(Type ownerType, TerminalDeviceProperty property)
+        {
+            TerminalDevice.AddMember(ownerType, property);
+        }
+
+        public string ValuePropertyName { get; }
+
         public Type ValueType { get; }
+
         public Type GetCommandType { get; }
+
         public Type GetResponseType { get; }
 
-        public TValue Value { get; set; }
+        public Type SetCommandType { get; }
 
-        public ITerminalDeviceCommand GetCommand { get; protected set; }
+        public Type SetResponseType { get; }
 
-        public ITerminalDeviceCommand SetCommand { get; protected set; }
+        public ITerminalDeviceCommand GetCommand { get; }
+
+        public ITerminalDeviceCommand SetCommand { get; }
 
         public PropertyInvoke InvokeFlag { get; set; }
 
-        public virtual bool TryGet(CommandParameters parameters, out object result)
+        public bool TryGet(CommandParameters parameters, out object result)
         {
             var response = GetCommand.Execute(parameters);
 
-            Value = GetValue(response);
+            object value = GetValue(response);
 
-            result = InvokeFlag == PropertyInvoke.Get ? response : Value;
+            result = InvokeFlag == PropertyInvoke.Get ? response : value;
 
             return true;
         }
 
-        private TValue GetValue(object response)
+        private object GetValue(object response)
         {
-            PropertyInfo valueProperty = null;
-
-            var attribute = GetType().GetCustomAttributes(typeof (ValuePropertyAttribute), false).FirstOrDefault() as ValuePropertyAttribute;
-
-            if (attribute != null)
-            {
-                valueProperty = response.GetType()
-                        .GetProperties()
-                        .FirstOrDefault(p =>
-                                string.Equals(p.Name, attribute.PropertyName, StringComparison.CurrentCultureIgnoreCase) &&
-                                p.PropertyType == typeof(TValue));
-            }
-
-            if (valueProperty == null)
-            {
-                valueProperty = response.GetType()
-                        .GetProperties()
-                        .FirstOrDefault(p => p.Name.ToLower() == "value" && p.PropertyType == typeof(TValue));
-            }
-
-            if (valueProperty == null)
-            {
-                valueProperty = response.GetType()
-                        .GetProperties()
-                        .FirstOrDefault(p => p.PropertyType == typeof(TValue));
-            }
-
-            return (TValue)valueProperty?.GetValue(response);
+            PropertyInfo valueProperty = response.GetType().GetProperty(ValuePropertyName);
+            return valueProperty?.GetValue(response);
         }
 
         public bool TrySet(CommandParameters parameters)
@@ -80,7 +111,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             return true;
         }
 
-        protected virtual bool TrySet(CommandParameters parameters, out object result)
+        private bool TrySet(CommandParameters parameters, out object result)
         {
             SetValue(parameters);
             result = SetCommand.Execute(parameters);
@@ -89,8 +120,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
         private void SetValue(CommandParameters parameters)
         {
-            PropertyInfo valueProperty = null;
-
             var value = parameters.Where(p => p.Key.ToLower() == "value").Select(p => p.Value).FirstOrDefault();
 
             parameters.Remove("value");
@@ -98,30 +127,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             if (value == null)
                 return;
 
-            var attribute = GetType().GetCustomAttributes(typeof(ValuePropertyAttribute), false).FirstOrDefault() as ValuePropertyAttribute;
-
-            if (attribute != null)
-            {
-                valueProperty = SetCommand.CommandType
-                        .GetProperties()
-                        .FirstOrDefault(p =>
-                                string.Equals(p.Name, attribute.PropertyName, StringComparison.CurrentCultureIgnoreCase) &&
-                                p.PropertyType == typeof(TValue));
-            }
-
-            if (valueProperty == null)
-            {
-                valueProperty = SetCommand.CommandType
-                        .GetProperties()
-                        .FirstOrDefault(p => p.Name.ToLower() == "value" && p.PropertyType == typeof(TValue));
-            }
-
-            if (valueProperty == null)
-            {
-                valueProperty = SetCommand.CommandType
-                        .GetProperties()
-                        .FirstOrDefault(p => p.PropertyType == typeof(TValue));
-            }
+            PropertyInfo valueProperty = SetCommand.GetType().GetProperty(ValuePropertyName);
 
             if (valueProperty == null)
                 return;
@@ -155,24 +161,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
             return success;
         }
-    }
-
-    public abstract class TerminalDeviceProperty<TValue, TGetCommand, TGetResponse, TSetCommand, TSetResponse> :
-        TerminalDeviceProperty<TValue, TGetCommand, TGetResponse>
-        where TGetCommand : class
-        where TGetResponse : class
-        where TSetCommand : class
-        where TSetResponse : class
-    {
-        protected TerminalDeviceProperty(ITerminalDevice device, string name)
-            : base(device, name)
-        {
-            SetCommandType = typeof (TSetCommand);
-            SetResponseType = typeof (TSetResponse);
-        }
-
-        public Type SetCommandType { get; }
-        public Type SetResponseType { get; }
     }
 
     [Flags]

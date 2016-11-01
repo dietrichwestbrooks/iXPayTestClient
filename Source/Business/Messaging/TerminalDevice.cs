@@ -1,71 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Practices.ServiceLocation;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.Extensions;
-using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public abstract class TerminalDevice<TCommand, TResponse> : DynamicObject, ITerminalDevice
+    public sealed class TerminalDevice : DynamicObject, ITerminalDevice
     {
-        protected TerminalDevice(string name)
+        private static Dictionary<Type, List<ITerminalDeviceMember>> RegisteredMembers { get; } =
+          new Dictionary<Type, List<ITerminalDeviceMember>>();
+
+        private Type _ownerType;
+
+        private TerminalDevice(string name, ITerminalRequestHandler successor, Type commandType, Type responseType, Type eventType = null)
         {
             Name = name;
-
-            CommandType = typeof(TCommand);
-            ResponseType = typeof(TResponse);
-
-            var connectionManager = ServiceLocator.Current.GetInstance<ITerminalConnectionManager>();
-
-            connectionManager.ConnectionChanged += (sender, e) =>
-            {
-                if (e.OldConnection != null)
-                    e.OldConnection.EventReceived -= OnEventReceived;
-
-                if (e.NewConnection != null)
-                    e.NewConnection.EventReceived += OnEventReceived;
-            };
+            Successor = successor;
+            CommandType = commandType;
+            ResponseType = responseType;
+            EventType = eventType;
         }
 
-        public string Name { get; protected set; }
-
-        public Type CommandType { get; set; }
-        public Type ResponseType { get; set; }
-        public Type EventType { get; set; }
-
-        IEnumerable<ITerminalDeviceMethod> ITerminalDevice.Methods => Methods;
-
-        IEnumerable<ITerminalDeviceProperty> ITerminalDevice.Properties => Properties;
-
-        IEnumerable<ITerminalDeviceEvent> ITerminalDevice.Events => Events;
-
-        public List<ITerminalDeviceMethod> Methods { get; } = new List<ITerminalDeviceMethod>();
-
-        public List<ITerminalDeviceProperty> Properties { get; } = new List<ITerminalDeviceProperty>();
-
-        public List<ITerminalDeviceEvent> Events { get; } = new List<ITerminalDeviceEvent>();
-
-        public virtual ITerminalRequestHandler Successor { get; set; }
-
-        public virtual object HandleRequest(object command)
+        public static TerminalDevice Register<TCommand, TResponse, TEvent>(string name, ITerminalRequestHandler successor, Type ownerType)
         {
-            var outerCommand = Activator.CreateInstance(CommandType);
+            var device = new TerminalDevice(name, successor, typeof(TCommand), typeof(TResponse), typeof(TEvent));
 
-            outerCommand.GetType().InvokeMember("Item",
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty,
-                Type.DefaultBinder, outerCommand, new[] { command });
+            RegisterCommon(ownerType, device);
 
-            return outerCommand;
+            return device;
         }
+
+        public static TerminalDevice Register<TCommand, TResponse>(string name, ITerminalRequestHandler successor, Type ownerType)
+        {
+            var device = new TerminalDevice(name, successor, typeof(TCommand), typeof(TResponse));
+
+            RegisterCommon(ownerType, device);
+
+            return device;
+        }
+
+        public static TerminalDevice Register<TCommand, TResponse, TEvent>(string name, Type ownerType)
+        {
+            return Register<TCommand, TResponse, TEvent>(name, null, ownerType);
+        }
+
+        public static TerminalDevice Register<TCommand, TResponse>(string name, Type ownerType)
+        {
+            return Register<TCommand, TResponse>(name, null, ownerType);
+        }
+
+        private static void RegisterCommon(Type ownerType, TerminalDevice device)
+        {
+            AddOwnerType(ownerType, device);
+
+            var container = ServiceLocator.Current.GetInstance<CompositionContainer>();
+            container.ComposeExportedValue<ITerminalDevice>(device);
+            container.ComposeExportedValue<ITerminalRequestHandler>(device);
+        }
+
+        public string Name { get; }
+
+        public Type CommandType { get; }
+
+        public Type ResponseType { get; }
+
+        public Type EventType { get; }
+
+        public IEnumerable<ITerminalDeviceMethod> Methods =>
+            RegisteredMembers[_ownerType].OfType<ITerminalDeviceMethod>();
+
+        public IEnumerable<ITerminalDeviceProperty> Properties =>
+            RegisteredMembers[_ownerType].OfType<ITerminalDeviceProperty>();
+
+        public IEnumerable<ITerminalDeviceEvent> Events =>
+            RegisteredMembers[_ownerType].OfType<ITerminalDeviceEvent>();
 
         public void ClearEventHandlers()
         {
-            foreach (var @event in Events)
+            foreach (var e in Events)
             {
-                @event.ClearHandlers();
+                e.ClearHandlers();
             }
         }
 
@@ -122,7 +140,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             if (property != null)
                 return property.TrySet(new CommandParameters(new[] { "value" }, new[] { value }));
 
-            ITerminalDeviceEvent @event = Events.FirstOrDefault(e => e.Name == binder.Name);
+            TerminalDeviceEvent @event = Events.FirstOrDefault(e => e.Name == binder.Name) as TerminalDeviceEvent;
 
             if (@event != null)
                 return @event.TrySet(value);
@@ -136,17 +154,17 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 
             string methodName = binder.Name;
 
-            ITerminalDeviceProperty property = Properties.FirstOrDefault(p => p.GetCommand?.Name == methodName);
+            TerminalDeviceProperty property = Properties.FirstOrDefault(p => p.GetCommand?.Name == methodName) as TerminalDeviceProperty;
 
             if (property != null)
                 return property.TryGet(new CommandParameters(binder.CallInfo.ArgumentNames, args), out result);
-            
-            property = Properties.FirstOrDefault(p => p.SetCommand?.Name == methodName);
+
+            property = Properties.FirstOrDefault(p => p.SetCommand?.Name == methodName) as TerminalDeviceProperty;
 
             if (property != null)
                 return property.TrySet(new CommandParameters(binder.CallInfo.ArgumentNames, args));
 
-            ITerminalDeviceMethod method = Methods.FirstOrDefault(m => m.Name == methodName);
+            TerminalDeviceMethod method = Methods.FirstOrDefault(m => m.Name == methodName) as TerminalDeviceMethod;
 
             if (method != null)
                 return method.TryInvoke(new CommandParameters(binder.CallInfo.ArgumentNames, args), out result);
@@ -154,30 +172,40 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             return false;
         }
 
-        private void OnEventReceived(object sender, TerminalMessage message)
+        public ITerminalRequestHandler Successor { get; set; }
+
+        public object HandleRequest(object command)
         {
-            if (EventType == null)
-                return;
+            var outerCommand = Activator.CreateInstance(CommandType);
 
-            var eventContainerObject = message.GetSecondToLastItem();
+            outerCommand.GetType().InvokeMember("Item",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty,
+                Type.DefaultBinder, outerCommand, new[] { command });
 
-            if (eventContainerObject == null || eventContainerObject.GetType() != EventType)
-                return;
-
-            var eventObject = message.GetLastItem();
-
-            var @event = Events.FirstOrDefault(e => eventObject.GetType() == e.EventType);
-
-            @event?.TryInvoke(eventObject);
+            return outerCommand;
         }
-    }
 
-    public abstract class TerminalDevice<TCommand, TResponse, TEvent> : TerminalDevice<TCommand, TResponse>
-    {
-        protected TerminalDevice(string name)
-            : base(name)
+        private static void AddOwnerType(Type ownerType, TerminalDevice device)
         {
-            EventType = typeof(TEvent);
+            AddOwnerType(ownerType);
+            device._ownerType = ownerType;
+
+            foreach (var member in RegisteredMembers[ownerType].Cast<TerminalDeviceMember>())
+            {
+                member.Attach(device);
+            }
+        }
+
+        private static void AddOwnerType(Type ownerType)
+        {
+            if (!RegisteredMembers.ContainsKey(ownerType))
+                RegisteredMembers.Add(ownerType, new List<ITerminalDeviceMember>());
+        }
+
+        public static void AddMember(Type ownerType, ITerminalDeviceMember member)
+        {
+            AddOwnerType(ownerType);
+            RegisteredMembers[ownerType].Add(member);
         }
     }
 }

@@ -96,7 +96,10 @@
   <ItemGroup>
     <Compile Include="CoreModule.cs" />
     <Compile Include="Devices\FakeDevice.cs" />
-    <Compile Include="Devices\FakeDeviceCommand.cs" />
+    <Compile Include="Devices\FakeDevicePropertyValues.cs" />
+    <Compile Include="Devices\FakeSequenceNumberGenerator.cs" />
+    <Compile Include="Devices\FakeTerminalDeviceMethod.cs" />
+    <Compile Include="Devices\FakeTerminalDeviceProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

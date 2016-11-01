@@ -4,191 +4,101 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    [TerminalRequestHandler]
-    [TerminalDevice]
-    public class NonSecureKeypad : TerminalDevice<NonSecureKeypadCommand, NonSecureKeypadResponse, NonSecureKeypadEvent>
+    public class NonSecureKeypad
     {
-        public NonSecureKeypad() 
-            : base("NonSecureKeypad")
+        public static void RegisterDeviceProxy()
         {
-            Properties.AddRange(new List<ITerminalDeviceProperty>
-                {
-                    new StatusProperty(this),
-                    new OpenedProperty(this),
-                });
-
-            Methods.AddRange(new List<ITerminalDeviceMethod>
-                {
-                    new DisableMethod(this),
-                    new EnableMethod(this),
-                    new EnableForPinMethod(this),
-                });
-
-            Events.AddRange(new List<ITerminalDeviceEvent>
-                {
-                    new OpenChangedEvent(this),
-                    new StatusChangedEvent(this),
-                    new KeyPressedEvent(this),
-                    new EntryCompleteEvent(this),
-                    new PinEntryCompleteEvent(this),
-                });
+            TerminalDevice.Register<NonSecureKeypadCommand, NonSecureKeypadResponse, NonSecureKeypadEvent>(
+                    "NonSecureKeypad", new TerminalRequestHandlerByName("Terminal"), typeof(NonSecureKeypad));
         }
 
         #region Device Properties
 
-        [ValueProperty("State")]
-        public class StatusProperty : TerminalDeviceProperty<Status, GetStatusCommand, GetStatusResponse>
-        {
-            public StatusProperty(ITerminalDevice device)
-                : base(device, "Status")
-            {
-                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty StatusProperty =
+            TerminalDeviceProperty.Register<Status, GetStatusCommand, GetStatusResponse>("Status",
+                "State", typeof(NonSecureKeypad));
 
-        [ValueProperty("Open")]
-        public class OpenedProperty : TerminalDeviceProperty<bool, GetOpenedCommand, GetOpenedResponse>
-        {
-            public OpenedProperty(ITerminalDevice device)
-                : base(device, "Opened")
-            {
-                GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty OpenedProperty =
+            TerminalDeviceProperty.Register<bool, GetOpenedCommand, GetOpenedResponse>("Opened",
+                "Open", typeof(NonSecureKeypad));
 
         #endregion
 
         #region Device Methods
 
-        public class DisableMethod :
-        TerminalDeviceMethod<DisableKeypadCommand, DisableKeypadResponse>
-        {
-            public DisableMethod(ITerminalDevice device)
-                : base(device, "Disable")
-            {
-                InvokeCommand = new TerminalDeviceCommand<DisableKeypadCommand, DisableKeypadResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod DisableMethod =
+         TerminalDeviceMethod.Register<DisableKeypadCommand, DisableKeypadResponse>("Disable",
+             typeof(NonSecureKeypad));
 
-        public class EnableMethod :
-        TerminalDeviceMethod<EnableKeypadCommand, EnableKeypadResponse>
+        public static readonly TerminalDeviceMethod EnableMethod =
+         TerminalDeviceMethod.Register<EnableKeypadCommand, EnableKeypadResponse>("Enable",
+             typeof(NonSecureKeypad), PrepareEnableKeypadCommand);
+
+        private static EnableKeypadCommand PrepareEnableKeypadCommand()
         {
-            public EnableMethod(ITerminalDevice device)
-                : base(device, "Enable")
-            {
-                InvokeCommand = new TerminalDeviceCommand
-                    <EnableKeypadCommand, EnableKeypadResponse>
-                    (
-                    this,
-                    Name,
-                    () => new EnableKeypadCommand
+            return new EnableKeypadCommand
+                {
+                    Location = new Location {Left = 0, Top = 0},
+                    Font = new Font {Name = "Wayne20*24", Size = 0, Style = 0},
+                    NonSecureKeypadKeys = new NonSecureKeypadKeys
                         {
-                            Location = new Location {Left = 0, Top = 0},
-                            Font = new Font {Name = "Wayne20*24", Size = 0, Style = 0},
-                            NonSecureKeypadKeys = new NonSecureKeypadKeys
+                            NonSecureKeypadKey = new[]
                                 {
-                                    NonSecureKeypadKey = new[]
+                                    new NonSecureKeypadKey
                                         {
-                                            new NonSecureKeypadKey
-                                                {
-                                                    Beep = true,
-                                                    EchoCharSpecified = false,
-                                                    Location = 0x20,
-                                                    Lock = true
-                                                },
-                                            new NonSecureKeypadKey
-                                                {
-                                                    Beep = true,
-                                                    EchoCharSpecified = false,
-                                                    Location = 0x13,
-                                                    Lock = true
-                                                },
-                                            new NonSecureKeypadKey
-                                                {
-                                                    Beep = true,
-                                                    EchoCharSpecified = false,
-                                                    Location = 0x23,
-                                                    Lock = true
-                                                },
-                                            new NonSecureKeypadKey
-                                                {
-                                                    Beep = true,
-                                                    EchoCharSpecified = false,
-                                                    Location = 0x33,
-                                                    Lock = true
-                                                },
-                                        }
+                                            Beep = true,
+                                            EchoCharSpecified = false,
+                                            Location = 0x20,
+                                            Lock = true
+                                        },
+                                    new NonSecureKeypadKey
+                                        {
+                                            Beep = true,
+                                            EchoCharSpecified = false,
+                                            Location = 0x13,
+                                            Lock = true
+                                        },
+                                    new NonSecureKeypadKey
+                                        {
+                                            Beep = true,
+                                            EchoCharSpecified = false,
+                                            Location = 0x23,
+                                            Lock = true
+                                        },
+                                    new NonSecureKeypadKey
+                                        {
+                                            Beep = true,
+                                            EchoCharSpecified = false,
+                                            Location = 0x33,
+                                            Lock = true
+                                        },
                                 }
                         }
-                    );
-            }
+                };
         }
 
-        public class EnableForPinMethod :
-        TerminalDeviceMethod<EnableKeypadForPINCommand, EnableKeypadForPINResponse>
-        {
-            public EnableForPinMethod(ITerminalDevice device)
-                : base(device, "EnableForPIN")
-            {
-                InvokeCommand = new TerminalDeviceCommand<EnableKeypadForPINCommand, EnableKeypadForPINResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod EnableForPinMethod =
+         TerminalDeviceMethod.Register<EnableKeypadForPINCommand, EnableKeypadForPINResponse>("EnableForPIN",
+             typeof(NonSecureKeypad));
 
         #endregion
 
         #region Device Events
 
-        public class OpenChangedEvent : TerminalDeviceEvent<OpenChanged>
-        {
-            public OpenChangedEvent(ITerminalDevice device)
-                : base(device, "OpenChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent OpenChangedEvent =
+            TerminalDeviceEvent.Register<OpenChanged>("OpenChanged", typeof(NonSecureKeypad));
 
-        public class StatusChangedEvent : TerminalDeviceEvent<StatusChanged>
-        {
-            public StatusChangedEvent(ITerminalDevice device)
-                : base(device, "StatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusChangedEvent =
+            TerminalDeviceEvent.Register<StatusChanged>("StatusChanged", typeof(NonSecureKeypad));
 
-        public class KeyPressedEvent : TerminalDeviceEvent<KeyPressed>
-        {
-            public KeyPressedEvent(ITerminalDevice device)
-                : base(device, "KeyPressed")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent KeyPressedEvent =
+            TerminalDeviceEvent.Register<KeyPressed>("KeyPressed", typeof(NonSecureKeypad));
 
-        public class EntryCompleteEvent : TerminalDeviceEvent<EntryComplete>
-        {
-            public EntryCompleteEvent(ITerminalDevice device)
-                : base(device, "EntryComplete")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent EntryCompleteEvent =
+            TerminalDeviceEvent.Register<EntryComplete>("EntryComplete", typeof(NonSecureKeypad));
 
-        public class PinEntryCompleteEvent : TerminalDeviceEvent<PINEntryComplete>
-        {
-            public PinEntryCompleteEvent(ITerminalDevice device)
-                : base(device, "PinEntryComplete")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent PinEntryCompleteEvent =
+            TerminalDeviceEvent.Register<PINEntryComplete>("PINEntryComplete", typeof(NonSecureKeypad));
 
         #endregion
     }

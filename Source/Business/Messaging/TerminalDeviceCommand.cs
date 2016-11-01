@@ -7,36 +7,45 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
 {
-    public class TerminalDeviceCommand<TCommand, TResponse> : ITerminalDeviceCommand
-        where TCommand : class, new()
-        where TResponse : class
+    public sealed class TerminalDeviceCommand : ITerminalDeviceCommand
     {
-        private readonly Func<TCommand> _prepareCommand;
+        private readonly Func<object> _prepareCommandFunc;
 
-        public TerminalDeviceCommand(ITerminalDeviceMember member, string name, Func<TCommand> prepareCommand = null)
+        public TerminalDeviceCommand(ITerminalDeviceMember member, string name, Type commandType, Type responseType, Func<object> prepCmdFunc)
         {
             Member = member;
+            //Successor = Successor;
             Name = name;
-            _prepareCommand = prepareCommand ?? (() => new TCommand());
+            CommandType = commandType;
+            ResponseType = responseType;
+            _prepareCommandFunc = prepCmdFunc ?? (() => Activator.CreateInstance(CommandType));
         }
 
-        public ITerminalDeviceMember Member { get; }
+        public string Name { get; set; }
 
-        public string Name { get; }
+        public Type CommandType { get; }
 
-        public Type CommandType => typeof(TCommand);
-
-        public Type ResponseType => typeof(TResponse);
+        public Type ResponseType { get; }
 
         public bool Result { get; private set; }
 
         public string ResultMessage { get; private set; }
 
+        public ITerminalDeviceMember Member { get; }
+
+        public ITerminalRequestHandler Successor { get; set; }
+
+        public object HandleRequest(object command)
+        {
+            return command;
+        }
+
         public TerminalMessage GetMessage(CommandParameters parameters = null)
         {
-            TCommand command = (parameters == null ? _prepareCommand() : CreateCommand(parameters));
+            object command = (parameters == null ? _prepareCommandFunc() : CreateCommand(parameters));
 
             return new TerminalMessage { Item = BuildCommand(command, Member.Device) };
+            //return new TerminalMessage { Item = BuildCommand(command, Successor) };
         }
 
         public object Execute(CommandParameters parameters)
@@ -48,7 +57,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
                 TerminalMessage message = GetMessage(parameters);
 
                 response = SendMessageAsync(message).Result;
-                
+
                 if (!ProcessResponse(response))
                     throw new InvalidOperationException(ResultMessage);
             }
@@ -60,16 +69,16 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
             return response;
         }
 
-        protected virtual Task<object> SendMessageAsync(TerminalMessage message)
+        private Task<object> SendMessageAsync(TerminalMessage message)
         {
             return new MessageBrokerTask(message).Task;
         }
 
-        private TCommand CreateCommand(CommandParameters parameters)
+        private object CreateCommand(CommandParameters parameters)
         {
-            var command = new TCommand();
+            var command = Activator.CreateInstance(CommandType);
 
-            PropertyInfo[] properties = typeof(TCommand).GetProperties();
+            PropertyInfo[] properties = CommandType.GetProperties();
 
             var namedParams = parameters.Where(p => !string.IsNullOrWhiteSpace(p.Key));
 
@@ -132,13 +141,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
         {
             ResultMessage = response.Message;
             return (Result = response.Success);
-        }
-
-        public ITerminalRequestHandler Successor { get; set; }
-
-        public object HandleRequest(object command)
-        {
-            return command;
         }
     }
 }

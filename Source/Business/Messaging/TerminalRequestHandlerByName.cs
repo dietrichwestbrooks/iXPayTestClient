@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Practices.ServiceLocation;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
@@ -22,10 +21,6 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging
                         .FirstOrDefault(h => h.Name == Name) as ITerminalRequestHandler;
 
                 return handler?.Successor;
-            }
-            set
-            {
-                throw new InvalidOperationException("Setting successor is not allowed on this object");
             }
         }
 

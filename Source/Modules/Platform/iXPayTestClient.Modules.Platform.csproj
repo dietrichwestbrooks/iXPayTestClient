@@ -100,7 +100,9 @@
     <Compile Include="Devices\Keypad.cs" />
     <Compile Include="Devices\MagStripeReader.cs" />
     <Compile Include="Devices\Printer.cs" />
+    <Compile Include="Devices\SamReader.cs" />
     <Compile Include="Devices\SecurityModule.cs" />
+    <Compile Include="Devices\Softphone.cs" />
     <Compile Include="Devices\TamperDetectors.cs" />
     <Compile Include="Devices\Terminal.cs" />
     <Compile Include="PlatformModule.cs" />

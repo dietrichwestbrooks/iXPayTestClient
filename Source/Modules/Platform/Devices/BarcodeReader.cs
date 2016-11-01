@@ -1,174 +1,65 @@
-﻿using System.Collections.Generic;
-using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
+﻿using Wayne.Payment.Tools.iXPayTestClient.Business.Messaging;
 using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Modules.Platform.Devices
 {
-    [TerminalRequestHandler]
-    [TerminalDevice]
-    public class BarcodeReader : TerminalDevice<BarcodeReaderCommand, BarcodeReaderResponse, BarcodeReaderEvent>
+    public class BarcodeReader
     {
-        public BarcodeReader()
-            : base("BarcodeReader")
+        public static void RegisterDeviceProxy()
         {
-            Properties.AddRange(new List<ITerminalDeviceProperty>
-                {
-                    new StatusProperty(this),
-                    new OpenedProperty(this),
-                });
-
-            Methods.AddRange(new List<ITerminalDeviceMethod>
-                {
-                    new OpenMethod(this),
-                    new CloseMethod(this),
-                    new FlashLightMethod(this),
-                    new TurnLightOnMethod(this),
-                    new TurnLightOffMethod(this),
-                });
-
-            Events.AddRange(new List<ITerminalDeviceEvent>
-                {
-                    new OpenChangedEvent(this),
-                    new StatusChangedEvent(this),
-                    new DataReadEvent(this),
-                    new InvalidDataReadEvent(this),
-                });
+            TerminalDevice.Register<SAMReaderCommand, SAMReaderResponse, SAMReaderEvent>(
+                    "BarcodeReader", new TerminalRequestHandlerByName("Terminal"), typeof(BarcodeReader));
         }
 
         #region Device Properties
 
-        [ValueProperty("State")]
-        public class StatusProperty : TerminalDeviceProperty<Status,
-            GetStatusCommand, GetStatusResponse>
-        {
-            public StatusProperty(ITerminalDevice device)
-                : base(device, "Status")
-            {
-                GetCommand = new TerminalDeviceCommand<GetStatusCommand, GetStatusResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty StatusProperty =
+            TerminalDeviceProperty.Register<Status, GetStatusCommand, GetStatusResponse>("Status",
+                "State", typeof(BarcodeReader));
 
-        [ValueProperty("Open")]
-        public class OpenedProperty : TerminalDeviceProperty<bool,
-            GetOpenedCommand, GetOpenedResponse>
-        {
-            public OpenedProperty(ITerminalDevice device)
-                : base(device, "Opened")
-            {
-                GetCommand = new TerminalDeviceCommand<GetOpenedCommand, GetOpenedResponse>(
-                    this,
-                    $"get_{Name}"
-                    );
-            }
-        }
+        public static readonly TerminalDeviceProperty OpenedProperty =
+            TerminalDeviceProperty.Register<bool, GetOpenedCommand, GetOpenedResponse>("Opened",
+                "Open", typeof(BarcodeReader));
 
         #endregion
 
         #region Device Methods
 
-        public class OpenMethod :
-        TerminalDeviceMethod<OpenBarcodeReaderCommand, OpenBarcodeReaderResponse>
-        {
-            public OpenMethod(ITerminalDevice device)
-                : base(device, "Open")
-            {
-                InvokeCommand = new TerminalDeviceCommand<OpenBarcodeReaderCommand, OpenBarcodeReaderResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod OpenMethod =
+         TerminalDeviceMethod.Register<OpenBarcodeReaderCommand, OpenBarcodeReaderResponse>("Open",
+             typeof(BarcodeReader));
 
-        public class CloseMethod :
-            TerminalDeviceMethod<CloseBarCodeReaderCommand, CloseBarCodeReaderResponse>
-        {
-            public CloseMethod(ITerminalDevice device)
-                : base(device, "Close")
-            {
-                InvokeCommand = new TerminalDeviceCommand<CloseBarCodeReaderCommand, CloseBarCodeReaderResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod CloseMethod =
+         TerminalDeviceMethod.Register<CloseBarCodeReaderCommand, CloseBarCodeReaderResponse>("Close",
+             typeof(BarcodeReader));
 
-        public class TurnLightOnMethod :
-            TerminalDeviceMethod<TurnLightOnCommand, TurnLightOnResponse>
-        {
-            public TurnLightOnMethod(ITerminalDevice device)
-                : base(device, "TurnLightOn")
-            {
-                InvokeCommand = new TerminalDeviceCommand<TurnLightOnCommand, TurnLightOnResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod TurnLightOnMethod =
+         TerminalDeviceMethod.Register<TurnLightOnCommand, TurnLightOnResponse>("TurnLightOn",
+             typeof(BarcodeReader));
 
-        public class FlashLightMethod :
-            TerminalDeviceMethod<FlashLightCommand, FlashLightResponse>
-        {
-            public FlashLightMethod(ITerminalDevice device)
-                : base(device, "FlashLight")
-            {
-                InvokeCommand = new TerminalDeviceCommand<FlashLightCommand, FlashLightResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod FlashLightMethod =
+         TerminalDeviceMethod.Register<FlashLightCommand, FlashLightResponse>("FlashLight",
+             typeof(BarcodeReader));
 
-        public class TurnLightOffMethod :
-            TerminalDeviceMethod<TurnLightOffCommand, TurnLightOffResponse>
-        {
-            public TurnLightOffMethod(ITerminalDevice device)
-                : base(device, "TurnLightOff")
-            {
-                InvokeCommand = new TerminalDeviceCommand<TurnLightOffCommand, TurnLightOffResponse>(
-                    this,
-                    Name
-                    );
-            }
-        }
+        public static readonly TerminalDeviceMethod TurnLightOffMethod =
+         TerminalDeviceMethod.Register<TurnLightOffCommand, TurnLightOffResponse>("TurnLightOff",
+             typeof(BarcodeReader));
 
         #endregion
 
         #region Device Events
 
-        public class OpenChangedEvent : TerminalDeviceEvent<OpenChanged>
-        {
-            public OpenChangedEvent(ITerminalDevice device)
-                : base(device, "OpenChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent OpenChangedEvent =
+            TerminalDeviceEvent.Register<OpenChanged>("OpenChanged", typeof(BarcodeReader));
 
-        public class StatusChangedEvent : TerminalDeviceEvent<StatusChanged>
-        {
-            public StatusChangedEvent(ITerminalDevice device)
-                : base(device, "StatusChanged")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent StatusChangedEvent =
+            TerminalDeviceEvent.Register<StatusChanged>("StatusChanged", typeof(BarcodeReader));
 
-        public class DataReadEvent : TerminalDeviceEvent<BarcodeData>
-        {
-            public DataReadEvent(ITerminalDevice device)
-                : base(device, "DataRead")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent DataReadEvent =
+            TerminalDeviceEvent.Register<BarcodeData>("DataRead", typeof(BarcodeReader));
 
-        public class InvalidDataReadEvent : TerminalDeviceEvent<BarcodeInvalidData>
-        {
-            public InvalidDataReadEvent(ITerminalDevice device)
-                : base(device, "InvalidDataRead")
-            {
-            }
-        }
+        public static readonly TerminalDeviceEvent InvalidDataReadEvent =
+            TerminalDeviceEvent.Register<BarcodeInvalidData>("InvalidDataRead", typeof(BarcodeReader));
 
         #endregion
     }

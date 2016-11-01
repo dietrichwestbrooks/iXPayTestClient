@@ -12,7 +12,7 @@ using Wayne.Payment.Tools.iXPayTestClient.Business.TerminalCommands;
 
 namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.New
 {
-    public class TerminalDevice : DynamicObject, ITerminalDevice
+    public sealed class TerminalDevice : DynamicObject, ITerminalDevice
     {
         private static Dictionary<Type, List<ITerminalDeviceMember>> RegisteredMembers { get; } =
           new Dictionary<Type, List<ITerminalDeviceMember>>();
@@ -202,7 +202,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.New
         }
     }
 
-    public class TerminalDeviceMember : DynamicObject
+    public abstract class TerminalDeviceMember : DynamicObject
     {
         public ITerminalDevice Device { get; private set; }
 
@@ -330,7 +330,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.New
         }
     }
 
-    public class TerminalDeviceMethod : TerminalDeviceMember, ITerminalDeviceMethod
+    public sealed class TerminalDeviceMethod : TerminalDeviceMember, ITerminalDeviceMethod
     {
         public TerminalDeviceMethod(string name, Type commandType, Type responseType, Func<object> prepareCommandFunc)
         {
@@ -573,7 +573,7 @@ namespace Wayne.Payment.Tools.iXPayTestClient.Business.Messaging.New
         }
     }
 
-    public class TerminalDeviceCommand : ITerminalDeviceCommand
+    public sealed class TerminalDeviceCommand : ITerminalDeviceCommand
     {
         private readonly Func<object> _prepareCommandFunc;
 

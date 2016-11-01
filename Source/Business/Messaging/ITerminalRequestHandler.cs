@@ -2,7 +2,7 @@
 {
     public interface ITerminalRequestHandler
     {
-        ITerminalRequestHandler Successor { get; set; }
+        ITerminalRequestHandler Successor { get; }
         object HandleRequest(object command);
     }
 }
